@@ -40,7 +40,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\..\Source"
+				AdditionalIncludeDirectories="..\..\Source"
 				PreprocessorDefinitions="WIN32;_DEBUG;_LIB"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -103,7 +103,10 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\..\..\..\Source"
+				Optimization="3"
+				FavorSizeOrSpeed="1"
+				OmitFramePointers="true"
+				AdditionalIncludeDirectories="..\..\Source"
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
@@ -149,119 +152,123 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\..\..\..\Source\MloAdtsParser.c"
+				RelativePath="..\..\..\Source\MloAdtsParser.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\Source\MloBitStream.c"
+				RelativePath="..\..\..\Source\MloBitStream.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\Source\MloDecoder.c"
+				RelativePath="..\..\..\Source\MloDecoder.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\Source\MloElementCce.c"
+				RelativePath="..\..\..\Source\MloElementCce.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\Source\MloElementCpe.c"
+				RelativePath="..\..\..\Source\MloElementCpe.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\Source\MloElementDse.c"
+				RelativePath="..\..\..\Source\MloElementDse.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\Source\MloElementFil.c"
+				RelativePath="..\..\..\Source\MloElementFil.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\Source\MloElementPce.c"
+				RelativePath="..\..\..\Source\MloElementPce.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\Source\MloElementSceLfe.c"
+				RelativePath="..\..\..\Source\MloElementSceLfe.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\Source\MloFft.c"
+				RelativePath="..\..\..\Source\MloFft.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\Source\MloFilterBank.c"
+				RelativePath="..\..\..\Source\MloFilterBank.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\Source\MloHcbPair.c"
+				RelativePath="..\..\..\Source\MloHcbPair.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\Source\MloHcbQuad.c"
+				RelativePath="..\..\..\Source\MloHcbQuad.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\Source\MloHcbScaleFactor.c"
+				RelativePath="..\..\..\Source\MloHcbScaleFactor.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\Source\MloHuffman.c"
+				RelativePath="..\..\..\Source\MloHuffman.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\Source\MloIcsInfo.c"
+				RelativePath="..\..\..\Source\MloIcsInfo.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\Source\MloImdct.c"
+				RelativePath="..\..\..\Source\MloImdct.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\Source\MloIndivChnPool.c"
+				RelativePath="..\..\..\Source\MloIndivChnPool.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\Source\MloIndivChnStream.c"
+				RelativePath="..\..\..\Source\MloIndivChnStream.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\Source\MloInvQuant.c"
+				RelativePath="..\..\..\Source\MloInvQuant.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\Source\MloIs.c"
+				RelativePath="..\..\..\Source\MloIs.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\Source\MloMs.c"
+				RelativePath="..\..\..\Source\MloMs.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\Source\MloPns.c"
+				RelativePath="..\..\..\Source\MloPns.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\Source\MloSamplingFreq.c"
+				RelativePath="..\..\..\Source\MloSampleBuffer.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\Source\MloScaleFactor.c"
+				RelativePath="..\..\..\Source\MloSamplingFreq.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\Source\MloSectionData.c"
+				RelativePath="..\..\..\Source\MloScaleFactor.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\Source\MloSyntacticElements.c"
+				RelativePath="..\..\..\Source\MloSectionData.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\Source\MloTns.c"
+				RelativePath="..\..\..\Source\MloSyntacticElements.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\Source\MloUtils.c"
+				RelativePath="..\..\..\Source\MloTns.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\Source\MloUtils.c"
 				>
 			</File>
 		</Filter>
@@ -271,167 +278,167 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\..\..\..\Source\Melo.h"
+				RelativePath="..\..\..\Source\Melo.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\Source\MloAdtsParser.h"
+				RelativePath="..\..\..\Source\MloAdtsParser.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\Source\MloBitStream.h"
+				RelativePath="..\..\..\Source\MloBitStream.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\Source\MloConfig.h"
+				RelativePath="..\..\..\Source\MloConfig.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\Source\MloDebug.h"
+				RelativePath="..\..\..\Source\MloDebug.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\Source\MloDecoder.h"
+				RelativePath="..\..\..\Source\MloDecoder.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\Source\MloDefs.h"
+				RelativePath="..\..\..\Source\MloDefs.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\Source\MloElementCce.h"
+				RelativePath="..\..\..\Source\MloElementCce.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\Source\MloElementCpe.h"
+				RelativePath="..\..\..\Source\MloElementCpe.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\Source\MloElementDse.h"
+				RelativePath="..\..\..\Source\MloElementDse.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\Source\MloElementFil.h"
+				RelativePath="..\..\..\Source\MloElementFil.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\Source\MloElementPce.h"
+				RelativePath="..\..\..\Source\MloElementPce.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\Source\MloElementSceLfe.h"
+				RelativePath="..\..\..\Source\MloElementSceLfe.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\Source\MloFft.h"
+				RelativePath="..\..\..\Source\MloFft.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\Source\MloFilterBank.h"
+				RelativePath="..\..\..\Source\MloFilterBank.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\Source\MloFloat.h"
+				RelativePath="..\..\..\Source\MloFloat.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\Source\MloFloatFix.h"
+				RelativePath="..\..\..\Source\MloFloatFix.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\Source\MloFloatFpu.h"
+				RelativePath="..\..\..\Source\MloFloatFpu.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\Source\MloFrame.h"
+				RelativePath="..\..\..\Source\MloFrame.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\Source\MloHcb.h"
+				RelativePath="..\..\..\Source\MloHcb.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\Source\MloHcbPair.h"
+				RelativePath="..\..\..\Source\MloHcbPair.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\Source\MloHcbQuad.h"
+				RelativePath="..\..\..\Source\MloHcbQuad.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\Source\MloHcbScaleFactor.h"
+				RelativePath="..\..\..\Source\MloHcbScaleFactor.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\Source\MloHuffman.h"
+				RelativePath="..\..\..\Source\MloHuffman.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\Source\MloIcsInfo.h"
+				RelativePath="..\..\..\Source\MloIcsInfo.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\Source\MloImdct.h"
+				RelativePath="..\..\..\Source\MloImdct.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\Source\MloIndivChnPool.h"
+				RelativePath="..\..\..\Source\MloIndivChnPool.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\Source\MloIndivChnStream.h"
+				RelativePath="..\..\..\Source\MloIndivChnStream.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\Source\MloInvQuant.h"
+				RelativePath="..\..\..\Source\MloInvQuant.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\Source\MloIs.h"
+				RelativePath="..\..\..\Source\MloIs.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\Source\MloMs.h"
+				RelativePath="..\..\..\Source\MloMs.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\Source\MloPns.h"
+				RelativePath="..\..\..\Source\MloPns.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\Source\MloResults.h"
+				RelativePath="..\..\..\Source\MloResults.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\Source\MloSampleBuffer.h"
+				RelativePath="..\..\..\Source\MloSampleBuffer.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\Source\MloSamplingFreq.h"
+				RelativePath="..\..\..\Source\MloSamplingFreq.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\Source\MloScaleFactor.h"
+				RelativePath="..\..\..\Source\MloScaleFactor.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\Source\MloSectionData.h"
+				RelativePath="..\..\..\Source\MloSectionData.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\Source\MloSyntacticElements.h"
+				RelativePath="..\..\..\Source\MloSyntacticElements.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\Source\MloTns.h"
+				RelativePath="..\..\..\Source\MloTns.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\Source\MloTypes.h"
+				RelativePath="..\..\..\Source\MloTypes.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\..\Source\MloUtils.h"
+				RelativePath="..\..\..\Source\MloUtils.h"
 				>
 			</File>
 		</Filter>

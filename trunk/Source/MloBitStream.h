@@ -51,7 +51,6 @@ typedef unsigned int MLO_BitsWord;
 typedef struct MLO_BitStream
 {
     unsigned char* buffer;
-    unsigned int   in;
     unsigned int   out;
     MLO_BitsWord   cache;
     unsigned int   bits_cached;
@@ -65,25 +64,13 @@ typedef struct MLO_BitStream
 extern "C" {
 #endif /* __cplusplus */
     
-MLO_Result   MLO_BitStream_AllocateBuffer(MLO_BitStream* bits);
-MLO_Result   MLO_BitStream_FreeBuffer(MLO_BitStream* bits);
-MLO_Result   MLO_BitStream_Reset(MLO_BitStream* bits);
-unsigned int MLO_BitStream_GetContiguousBytesFree(const MLO_BitStream* bits);
-unsigned int MLO_BitStream_GetBytesFree(const MLO_BitStream* bits);
-MLO_Result   MLO_BitStream_WriteBytes(MLO_BitStream*       bits, 
-                                      const unsigned char* bytes, 
-                                      unsigned int         byte_count);
-unsigned int MLO_BitStream_GetContiguousBytesAvailable(const MLO_BitStream* bits);
-unsigned int MLO_BitStream_GetBytesAvailable(const MLO_BitStream* bits);
-MLO_Result   MLO_BitStream_ReadBytes(MLO_BitStream* bits, 
-                                     unsigned char* bytes, 
-                                     unsigned int   byte_count);
-MLO_Result   MLO_BitStream_PeekBytes(const MLO_BitStream* bits, 
-                                     unsigned char* bytes, 
-                                     unsigned int   byte_count);
-MLO_Result   MLO_BitStream_SkipBytes(MLO_BitStream* bits, 
-                                     int            byte_count);
-MLO_Result   MLO_BitStream_ByteAlign(MLO_BitStream* bits);
+MLO_Result MLO_BitStream_Construct(MLO_BitStream* bits);
+MLO_Result MLO_BitStream_Destruct(MLO_BitStream* bits);
+MLO_Result MLO_BitStream_SetData(MLO_BitStream*  bits, 
+                                 const MLO_Byte* data, 
+                                 MLO_Size        data_size);
+MLO_Result MLO_BitStream_ByteAlign(MLO_BitStream* bits);
+MLO_Result MLO_BitStream_Reset(MLO_BitStream* bits);
 
 #ifdef __cplusplus
 }
@@ -213,7 +200,7 @@ MLO_BitStream_PeekBits(const MLO_BitStream* bits, unsigned int n)
    } else {
       /* not enough bits in the cache */
       /* read the next word */
-      MLO_BitsWord   word = MLO_BitStream_ReadCache (bits);
+      MLO_BitsWord word = MLO_BitStream_ReadCache (bits);
 
       /* combine the new word and the cache, and update the state */
       MLO_BitsWord   cache = bits->cache & MLO_BIT_MASK(bits->bits_cached);
@@ -281,27 +268,5 @@ MLO_BitStream_SkipBit(MLO_BitStream* bits)
    }
 }
 
-/*----------------------------------------------------------------------
-|       MLO_BitStream_ReadByte
-+---------------------------------------------------------------------*/
-static inline unsigned char
-MLO_BitStream_ReadByte(MLO_BitStream* bits)
-{
-   MLO_BitStream_SkipBits (bits, bits->bits_cached & 7);
-   return (MLO_BitStream_ReadBits (bits, 8));
-}
-
-/*----------------------------------------------------------------------
-|       MLO_BitStream_PeekByte
-+---------------------------------------------------------------------*/
-static inline unsigned char
-MLO_BitStream_PeekByte(const MLO_BitStream* bits)
-{
-   int            extra_bits = bits->bits_cached & 7;
-   int            data = MLO_BitStream_PeekBits (bits, extra_bits + 8);
-   int            byte = data & 0xFF;
-
-   return (byte);
-}
 
 #endif /* _MLO_BIT_STREAM_H_ */

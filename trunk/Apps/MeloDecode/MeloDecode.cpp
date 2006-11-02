@@ -105,26 +105,27 @@ WriteSamples(AP4_Track* track, AP4_ByteStream* output)
         MLO_SAMPLING_FREQ_44100 // FIXME: this should not be hardcoded
     };
 
-    MLO_Decoder* decoder;
+    MLO_Decoder* decoder = NULL;
     MLO_Result result = MLO_Decoder_Create(&decoder_config, &decoder);
     if (MLO_FAILED(result)) {
         fprintf(stderr, "ERROR: failed to created MLO_Decoder (%d)\n", result);
-        return;
+        goto end;
     }
 
-    MLO_BitStream bitstream;
-    MLO_BitStream_AllocateBuffer(&bitstream);
-    MLO_SampleBuffer pcm_buffer;
-    pcm_buffer.samples = NULL;
+    MLO_SampleBuffer* pcm_buffer = NULL;
+    result = MLO_SampleBuffer_Create(0, &pcm_buffer);
+    if (MLO_FAILED(result)) goto end;
 
     while (AP4_SUCCEEDED(track->ReadSample(index, sample, data))) {
-        MLO_BitStream_Reset(&bitstream);
-        MLO_BitStream_WriteBytes(&bitstream, data.GetData(), data.GetDataSize());
-        result = MLO_Decoder_DecodeFrame(decoder, &bitstream, &pcm_buffer);
+        result = MLO_Decoder_DecodeFrame(decoder, data.GetData(), data.GetDataSize(), pcm_buffer);
         printf("MLO_Decoder_DecodeFrame return %d\n", result);
-        output->Write(pcm_buffer.samples, pcm_buffer.size);
+        output->Write(MLO_SampleBuffer_GetSamples(pcm_buffer), MLO_SampleBuffer_GetSize(pcm_buffer));
 	    index++;
     }
+
+end:
+    if (pcm_buffer) MLO_SampleBuffer_Destroy(pcm_buffer);
+    if (decoder) MLO_Decoder_Destroy(decoder);
 }
 
 /*----------------------------------------------------------------------

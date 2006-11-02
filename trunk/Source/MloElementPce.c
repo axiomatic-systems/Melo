@@ -132,8 +132,8 @@ MLO_Result	MLO_ElementPce_Decode (MLO_ElementPce *pce_ptr, MLO_BitStream *bit_pt
 
    if (MLO_SUCCEEDED (result))
    {
-      int            comment_field_bytes = MLO_BitStream_ReadByte (bit_ptr);
-      result = MLO_BitStream_SkipBytes (bit_ptr, comment_field_bytes);
+      int comment_field_bytes = MLO_BitStream_ReadBits(bit_ptr, 8);
+      MLO_BitStream_SkipBits(bit_ptr, 8*comment_field_bytes);
    }
 
 	return (result);

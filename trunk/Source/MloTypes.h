@@ -97,13 +97,6 @@ typedef const char* MLO_String;
 typedef char*       MLO_StringBuffer;
 
 /**
- * Pointer to void, used to represent pointers to arbitrary untyped data 
- * buffers.
- */
-typedef void*       MLO_Any;
-typedef const void* MLO_AnyConst;
-
-/**
  * 8-bit Byte
  */
 typedef MLO_UInt8 MLO_Byte;

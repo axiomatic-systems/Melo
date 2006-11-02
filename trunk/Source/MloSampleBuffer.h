@@ -5,6 +5,7 @@
 |   includes
 +---------------------------------------------------------------------*/
 #include "MloTypes.h"
+#include "MloUtils.h"
 
 /*----------------------------------------------------------------------
 |    types
@@ -31,13 +32,32 @@ typedef struct
 extern "C" {
 #endif /* __cplusplus */
 
-MLO_Result MLO_SampleBuffer_Create(MLO_Size size, MLO_SampleBuffer** buffer);
-MLO_Result MLO_SampleBuffer_Destroy(MLO_SampleBuffer* self);
-const ATX_Any* MLO_SampleBuffer_GetSamples(const MLO_SampleBuffer* self);
-MLO_Cardinal   MLO_SampleBuffer_GetSampleCount(const MLO_SampleBuffer* self);
-MLO_Size       MLO_SampleBuffer_GetSize(const MLO_SampleBuffer* self);
-const MLO_SampleFormat* MLO_SampleBuffer_GetFormat(const MLO_SampleBuffer* self);
-void MLO_SampleBuffer_SetFormat(MLO_SampleBuffer* self, const MLO_SampleFormat* format);
+MLO_Result 
+MLO_SampleBuffer_Create(MLO_Size size, MLO_SampleBuffer** buffer);
+
+MLO_Result 
+MLO_SampleBuffer_Destroy(MLO_SampleBuffer* self);
+
+const void* 
+MLO_SampleBuffer_GetSamples(const MLO_SampleBuffer* self);
+
+void* 
+MLO_SampleBuffer_UseSamples(MLO_SampleBuffer* self);
+
+MLO_Cardinal   
+MLO_SampleBuffer_GetSampleCount(const MLO_SampleBuffer* self);
+
+MLO_Size       
+MLO_SampleBuffer_GetSize(const MLO_SampleBuffer* self);
+
+const MLO_SampleFormat* 
+MLO_SampleBuffer_GetFormat(const MLO_SampleBuffer* self);
+
+void 
+MLO_SampleBuffer_SetFormat(MLO_SampleBuffer* self, const MLO_SampleFormat* format);
+
+MLO_Result 
+MLO_SampleBuffer_SetSampleCount(MLO_SampleBuffer* self, MLO_Cardinal sample_count);
 
 #ifdef __cplusplus
 }

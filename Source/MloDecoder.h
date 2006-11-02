@@ -48,11 +48,6 @@ typedef struct {
 } MLO_DecoderConfig;
 
 /*----------------------------------------------------------------------
-|       error codes
-+---------------------------------------------------------------------*/
-#define MLO_ERROR_BUFFER_TOO_SMALL (MLO_ERROR_BASE_DECODER - 0)
-
-/*----------------------------------------------------------------------
 |       prototypes
 +---------------------------------------------------------------------*/
 #ifdef __cplusplus
@@ -68,7 +63,8 @@ MLO_Result MLO_Decoder_Create(const MLO_DecoderConfig* config,
 MLO_Result MLO_Decoder_Destroy(MLO_Decoder* decoder);
 MLO_Result MLO_Decoder_Reset(MLO_Decoder* decoder);
 MLO_Result MLO_Decoder_DecodeFrame(MLO_Decoder*       decoder,
-                                   MLO_BitStream*     bitstream,
+                                   const MLO_Byte*    frame,
+                                   MLO_Size           frame_size,
                                    MLO_SampleBuffer*  sample);
 MLO_Result MLO_Decoder_GetStatus(MLO_Decoder*        decoder, 
                                  MLO_DecoderStatus** status);

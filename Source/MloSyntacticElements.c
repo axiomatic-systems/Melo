@@ -529,7 +529,7 @@ void  MLO_SyntacticElements_SendToOutput (const MLO_SyntacticElements *se_ptr, M
       }
    }
 
-   MLO_ASSERT (chn == (int) outbuf_ptr->format.channel_count);
+   MLO_ASSERT (chn == (int) MLO_SampleBuffer_GetFormat(outbuf_ptr)->channel_count);
 }
 
 
@@ -888,20 +888,22 @@ Input/output parameters:
 
 static void MLO_SyntacticElements_InterleaveAndConvertChannel (MLO_SampleBuffer *outbuf_ptr, int chn, const MLO_Float in_ptr [])
 {
-   int            nbr_chn;
+   int                     nbr_chn;
+   const MLO_SampleFormat* format;
 
    MLO_ASSERT (outbuf_ptr != 0);
-   MLO_ASSERT (outbuf_ptr->format.type == MLO_SAMPLE_TYPE_INTERLACED_SIGNED);
    MLO_ASSERT (chn >= 0);
    MLO_ASSERT (in_ptr != 0);
 
-   nbr_chn = outbuf_ptr->format.channel_count;
+   format = MLO_SampleBuffer_GetFormat(outbuf_ptr);
+   MLO_ASSERT (format->type == MLO_SAMPLE_TYPE_INTERLACED_SIGNED_16);
+   nbr_chn = format->channel_count;
    MLO_ASSERT (chn < nbr_chn);
 
-   if (outbuf_ptr->format.bits_per_sample == 16)
+   if (format->bits_per_sample == 16)
    {
       int            pos;
-      MLO_Int16 *    out_ptr = (MLO_Int16 *) outbuf_ptr->samples;
+      MLO_Int16 *    out_ptr = (MLO_Int16 *) MLO_SampleBuffer_UseSamples(outbuf_ptr);
       out_ptr += chn;
       for (pos = 0; pos < MLO_DEFS_FRAME_LEN_LONG; ++pos)
       {

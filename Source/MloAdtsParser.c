@@ -22,6 +22,7 @@
 #include "MloAdtsParser.h"
 #include "MloUtils.h"
 
+#if 0
 /*----------------------------------------------------------------------
 |       types
 +---------------------------------------------------------------------*/
@@ -328,3 +329,4 @@ MLO_AdtsParser_GetBytesAvailable (const MLO_AdtsParser* parser)
 
 
 
+#endif

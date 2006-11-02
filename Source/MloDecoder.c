@@ -39,10 +39,7 @@ struct MLO_Decoder {
     MLO_DecoderStatus      status;
     MLO_SyntacticElements  syntactic_elements;
     MLO_FilterBank         filter_bank;
-    struct {
-        void*    samples;
-        MLO_Size size;
-    } buffer;
+    MLO_BitStream          bitstream;
 };
 
 /*----------------------------------------------------------------------
@@ -60,66 +57,60 @@ MLO_Decoder_DecodeFrameContent (
 +---------------------------------------------------------------------*/
 MLO_Result 
 MLO_Decoder_Create(const MLO_DecoderConfig* config,
-                   MLO_Decoder**            decoder_ptr_ptr)
+                   MLO_Decoder**            decoder)
 {
    MLO_Result     result = MLO_SUCCESS;
    MLO_Boolean    se_flag = MLO_FALSE;
    MLO_Boolean    fb_flag = MLO_FALSE;
 
-   *decoder_ptr_ptr =
-      (MLO_Decoder*) MLO_AllocateZeroMemory (sizeof (MLO_Decoder));
-   if (*decoder_ptr_ptr == NULL)
+   *decoder = (MLO_Decoder*) MLO_AllocateZeroMemory (sizeof (MLO_Decoder));
+   if (*decoder == NULL)
    {
       result = MLO_ERROR_OUT_OF_MEMORY;
    }
 
    if (MLO_SUCCEEDED (result)) {
-      (*decoder_ptr_ptr)->config = *config;
+      (*decoder)->config = *config;
+      result = MLO_BitStream_Construct(&(*decoder)->bitstream);
    }
 
-   if (MLO_SUCCEEDED (result))
-   {
+
+   if (MLO_SUCCEEDED (result)) {
       result = MLO_SyntacticElements_Init (
-         &(*decoder_ptr_ptr)->syntactic_elements
+         &(*decoder)->syntactic_elements
       );
    }
 
-   if (MLO_SUCCEEDED (result))
-   {
+   if (MLO_SUCCEEDED (result)) {
       se_flag = MLO_TRUE;
-      result = MLO_FilterBank_Init (&(*decoder_ptr_ptr)->filter_bank);
+      result = MLO_FilterBank_Init (&(*decoder)->filter_bank);
    }
 
-   if (MLO_SUCCEEDED (result))
-   {
+   if (MLO_SUCCEEDED (result)) {
       fb_flag = MLO_TRUE;
 
       /*** To do ***/
-
    }
 
    /*** To do: initialize status (flags) ***/
 
-   if (MLO_FAILED (result))
-   {
-      if (fb_flag)
-      {
+   if (MLO_FAILED (result)) {
+      if (fb_flag) {
          MLO_FilterBank_Restore (
-            &(*decoder_ptr_ptr)->filter_bank
+            &(*decoder)->filter_bank
          );
       }
 
-      if (se_flag)
-      {
+      if (se_flag) {
          MLO_SyntacticElements_Restore (
-            &(*decoder_ptr_ptr)->syntactic_elements
+            &(*decoder)->syntactic_elements
          );
       }
 
-      if (*decoder_ptr_ptr != NULL)
-      {
-         MLO_FreeMemory (*decoder_ptr_ptr);
-         *decoder_ptr_ptr = NULL;
+      if (*decoder != NULL) {
+          MLO_BitStream_Destruct(&(*decoder)->bitstream);
+          MLO_FreeMemory (*decoder);
+          *decoder = NULL;
       }
    }
 
@@ -132,18 +123,13 @@ MLO_Decoder_Create(const MLO_DecoderConfig* config,
 MLO_Result 
 MLO_Decoder_Destroy(MLO_Decoder* decoder)
 {
-   /* free the internal buffer if we had one */
-   if (decoder->buffer.samples != NULL)
-   {
-      MLO_FreeMemory (decoder->buffer.samples);
-   }
+    MLO_BitStream_Destruct(&decoder->bitstream);
+    MLO_FilterBank_Restore (&decoder->filter_bank);
+    MLO_SyntacticElements_Restore (&decoder->syntactic_elements);
 
-   MLO_FilterBank_Restore (&decoder->filter_bank);
-   MLO_SyntacticElements_Restore (&decoder->syntactic_elements);
+    MLO_FreeMemory (decoder);
 
-   MLO_FreeMemory (decoder);
-
-   return MLO_SUCCESS;
+    return MLO_SUCCESS;
 }
 
 /*----------------------------------------------------------------------
@@ -157,36 +143,12 @@ MLO_Decoder_GetStatus(MLO_Decoder* decoder, MLO_DecoderStatus** status)
 }
 
 /*----------------------------------------------------------------------
-|       MLO_Decoder_AllocateBuffer
-+---------------------------------------------------------------------*/
-static MLO_Result 
-MLO_Decoder_AllocateBuffer(MLO_Decoder* decoder, MLO_Size required)
-{
-    /* return now if we already have enough space */
-    if (decoder->buffer.size >= required) {
-        return MLO_SUCCESS;
-    }
-
-    /* allocate enough space */
-    if (decoder->buffer.samples != NULL) {
-        MLO_FreeMemory(decoder->buffer.samples);
-    }
-    decoder->buffer.samples = MLO_AllocateMemory(required);
-    if (decoder->buffer.samples == NULL) {
-        decoder->buffer.size = 0;
-        return MLO_ERROR_OUT_OF_MEMORY;
-    }
-    decoder->buffer.size = required;
-
-    return MLO_SUCCESS;
-}
-
-/*----------------------------------------------------------------------
 |       MLO_Decoder_DecodeFrame
 +---------------------------------------------------------------------*/
 MLO_Result 
 MLO_Decoder_DecodeFrame(MLO_Decoder*      decoder, 
-                        MLO_BitStream*    bits,
+                        const MLO_Byte*   frame,
+                        MLO_Size          frame_size,
                         MLO_SampleBuffer* buffer)
 {
 
@@ -194,74 +156,54 @@ MLO_Decoder_DecodeFrame(MLO_Decoder*      decoder,
       It allocates memory, so we'd better not to put it in this
       function. ***/
 
-   MLO_Result     result = MLO_SUCCESS;
-   MLO_Size       required;
-   int            bytes_per_samples;
+    MLO_Result result = MLO_SUCCESS;
 
-   MLO_ASSERT (decoder != 0);
-   MLO_ASSERT (buffer != 0);
+    /* check parameters */
+    if (decoder == NULL || frame == NULL || buffer == NULL) {
+        return MLO_ERROR_INVALID_PARAMETERS;
+    }
+    if (frame_size >= MLO_BITSTREAM_BUFFER_SIZE) {
+        return MLO_ERROR_INVALID_PARAMETERS;
+    }
 
-   /* analyze the frame to setup the buffer */
-   /* NOTE: assume 1024 for now */
-   /* NOTE: assume 16 bits/sample for now */
-   /*** To do: change this ***/
-   buffer->format.type = MLO_SAMPLE_TYPE_INTERLACED_SIGNED_16;
-   buffer->format.sample_rate = MLO_SamplingFreq_table[decoder->config.sampling_frequency_index];
-   buffer->format.channel_count = 2; // FIXME: frame->info.channel_configuration;
-   buffer->format.bits_per_sample = 16;
-   buffer->sample_count = MLO_DEFS_FRAME_LEN_LONG;
+    /* setup the bitstream */
+    MLO_BitStream_SetData(&decoder->bitstream, frame, frame_size);
 
-   /* check the buffer */
-   bytes_per_samples =
-      (buffer->format.bits_per_sample + (CHAR_BIT - 1)) / CHAR_BIT;
-   required =   buffer->sample_count
-              * buffer->format.channel_count
-              * bytes_per_samples;
-   if (buffer->samples == NULL)
-   {
-      /* no buffer was supplied, use the internal one */
-      result = MLO_Decoder_AllocateBuffer(decoder, required);
-      if (MLO_SUCCEEDED (result))
-      {
-         buffer->samples = decoder->buffer.samples;
-      }
-   }
-   else
-   {
-      /* a buffer was supplied, check that it is large enough */
-      if (buffer->size < required)
-      {
-         buffer->size = required;
-         result = MLO_ERROR_BUFFER_TOO_SMALL;
-      }
-   }
+    /* analyze the frame to setup the buffer */
+    /* NOTE: assume 1024 for now */
+    /* NOTE: assume 16 bits/sample for now */
+    /*** To do: change this ***/
+    {
+        MLO_SampleFormat format;
+        format.type = MLO_SAMPLE_TYPE_INTERLACED_SIGNED_16;
+        format.sample_rate = MLO_SamplingFreq_table[decoder->config.sampling_frequency_index];
+        format.channel_count = 2; // FIXME: frame->info.channel_configuration;
+        format.bits_per_sample = 16;
+        MLO_SampleBuffer_SetFormat(buffer, &format);
+    }
+    result = MLO_SampleBuffer_SetSampleCount(buffer, MLO_DEFS_FRAME_LEN_LONG);
 
-   if (MLO_SUCCEEDED (result))
-   {
-      MLO_SyntacticElements_StartNewFrame (
+    if (MLO_SUCCEEDED (result)) {
+       MLO_SyntacticElements_StartNewFrame (
          &decoder->syntactic_elements,
          decoder->config.sampling_frequency_index
-      );
+       );
 
-      /* Decode frame content */
-      result = MLO_Decoder_DecodeFrameContent (decoder, bits, buffer);
-   }
+       /* Decode frame content */
+       result = MLO_Decoder_DecodeFrameContent (decoder, &decoder->bitstream, buffer);
+    }
 
-   if (MLO_SUCCEEDED (result))
-   {
-      /* update our status */
-      decoder->status.frame_count++;
-      /*MLO_Int64_Add_Int32(decoder->status.sample_count, 
-      buffer->sample_count);*/
-      /*** To do: update flags ***/
+    if (MLO_SUCCEEDED (result)) {
+       /* update our status */
+       decoder->status.frame_count++;
+       /*MLO_Int64_Add_Int32(decoder->status.sample_count, 
+       buffer->sample_count);*/
+       /*** To do: update flags ***/
+    } else {
+        MLO_SampleBuffer_SetSampleCount(buffer, 0);
+    }
 
-      /* update the buffer info */
-      buffer->size =   buffer->sample_count
-                     * buffer->format.channel_count
-                     * bytes_per_samples;
-   }
-
-   return (result);
+    return (result);
 }
 
 /*----------------------------------------------------------------------

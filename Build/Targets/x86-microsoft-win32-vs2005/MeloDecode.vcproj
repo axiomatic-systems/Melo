@@ -40,7 +40,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\..\Source;..\..\..\..\..\Bento4\Source\C++\Core; ..\..\..\..\..\Bento4\Source\C++\Config; ..\..\..\..\..\Bento4\Source\C++\MetaData"
+				AdditionalIncludeDirectories="..\..\..\Source;..\..\..\..\Bento4\Source\C++\Core; ..\..\..\..\Bento4\Source\C++\Config; ..\..\..\..\Bento4\Source\C++\MetaData"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -116,7 +116,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\..\..\..\Source;..\..\..\..\..\Bento4\Source\C++\Core; ..\..\..\..\..\Bento4\Source\C++\Config; ..\..\..\..\..\Bento4\Source\C++\MetaData"
+				AdditionalIncludeDirectories="..\..\..\Source;..\..\..\..\Bento4\Source\C++\Core; ..\..\..\..\Bento4\Source\C++\Config; ..\..\..\..\Bento4\Source\C++\MetaData"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
@@ -177,7 +177,7 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\..\..\Apps\MeloDecode\MeloDecode.cpp"
+				RelativePath="..\..\..\Apps\MeloDecode\MeloDecode.cpp"
 				>
 			</File>
 		</Filter>

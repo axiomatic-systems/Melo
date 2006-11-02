@@ -32,6 +32,7 @@
 #define MLO_ERROR_BASE_GENERIC            (-20000)
 #define MLO_ERROR_INVALID_PARAMETERS      (MLO_ERROR_BASE_GENERIC-0)
 #define MLO_ERROR_OUT_OF_MEMORY           (MLO_ERROR_BASE_GENERIC-1)
+#define MLO_ERROR_OUT_OF_RANGE            (MLO_ERROR_BASE_GENERIC-2)
 
 /* Decoder errors */
 #define MLO_ERROR_BASE_DECODER            (-20100)

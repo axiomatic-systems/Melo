@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 9.00
 # Visual Studio 2005
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MloDecoder", "MloDecoder.vcproj", "{A5592F6F-C86E-40EB-8791-734C170942EB}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Melo", "Melo.vcproj", "{A5592F6F-C86E-40EB-8791-734C170942EB}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MeloDecode", "MeloDecode.vcproj", "{D51380EA-0195-457C-95BB-4E3C52BF872D}"
 	ProjectSection(ProjectDependencies) = postProject

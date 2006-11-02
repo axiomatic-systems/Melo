@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8.00"
-	Name="MloDecoder"
+	Name="Melo"
 	ProjectGUID="{A5592F6F-C86E-40EB-8791-734C170942EB}"
-	RootNamespace="MloDecoder"
+	RootNamespace="Melo"
 	Keyword="Win32Proj"
 	>
 	<Platforms>

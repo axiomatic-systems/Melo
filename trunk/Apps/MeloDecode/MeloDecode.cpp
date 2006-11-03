@@ -100,13 +100,27 @@ WriteSamples(AP4_Track* track, AP4_ByteStream* output)
     AP4_Sample     sample;
     AP4_DataBuffer data;
     AP4_Ordinal    index = 0;
-    MLO_DecoderConfig decoder_config = {
-        MLO_OBJECT_TYPE_AAC_LC,
-        MLO_SAMPLING_FREQ_44100 // FIXME: this should not be hardcoded
-    };
 
+    // check that we have a decoder config
+    const AP4_DataBuffer* encoded_config = mpeg_desc->GetDecoderInfo();
+    if (encoded_config == NULL) {
+        fprintf(stderr, "ERROR: no decoder config\n");
+        return;
+    }
+
+    // parse the decoder config
+    MLO_DecoderConfig decoder_config;
+    MLO_Result result = MLO_DecoderConfig_Parse(encoded_config->GetData(), 
+                                                encoded_config->GetDataSize(),
+                                                &decoder_config);
+    if (MLO_FAILED(result)) {
+        fprintf(stderr, "ERROR: decoder config is unsupported or unsupported (%d)\n", result);
+        return;
+    }
+
+    // create the decoder
     MLO_Decoder* decoder = NULL;
-    MLO_Result result = MLO_Decoder_Create(&decoder_config, &decoder);
+    result = MLO_Decoder_Create(&decoder_config, &decoder);
     if (MLO_FAILED(result)) {
         fprintf(stderr, "ERROR: failed to created MLO_Decoder (%d)\n", result);
         goto end;

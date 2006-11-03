@@ -4,6 +4,7 @@
 #include "MloBitStream.h"
 #include "MloDebug.h"
 #include "MloElementPce.h"
+#include "MloDecoder.h"
 
 /*----------------------------------------------------------------------
 |       Prototypes
@@ -25,12 +26,13 @@ Input/output parameters:
 	- bits_ptr: Input bitstream to decode
 Returns:
    MLO_SUCCESS if ok
-   MLO_FAILURE for a bitstream error, a non-LC profile or an invalide
+   MLO_FAILURE for a bitstream error, a non-LC profile or an invalid
       sampling rate index.
 ==============================================================================
 */
 
-MLO_Result	MLO_ElementPce_Decode (MLO_ElementPce *pce_ptr, MLO_BitStream *bit_ptr)
+MLO_Result	
+MLO_ElementPce_Decode (MLO_ElementPce *pce_ptr, MLO_BitStream *bit_ptr)
 {
    MLO_Result     result = MLO_SUCCESS;
    int            index;
@@ -42,7 +44,7 @@ MLO_Result	MLO_ElementPce_Decode (MLO_ElementPce *pce_ptr, MLO_BitStream *bit_pt
    pce_ptr->object_type = (MLO_AacProfile) MLO_BitStream_ReadBits (bit_ptr, 2);
    if (pce_ptr->object_type != MLO_AAC_PROFILE_LC)
    {
-      result = MLO_FAILURE;
+      result = MLO_ERROR_DECODER_UNSUPPORTED_CONFIG;
    }
 
    if (MLO_SUCCEEDED (result))
@@ -51,7 +53,7 @@ MLO_Result	MLO_ElementPce_Decode (MLO_ElementPce *pce_ptr, MLO_BitStream *bit_pt
          (MLO_SamplingFreq_Index) MLO_BitStream_ReadBits (bit_ptr, 4);
       if (pce_ptr->sampling_frequency_index >= MLO_SAMPLING_FREQ_INDEX_NBR_VALID)
       {
-         result = MLO_FAILURE;
+         result = MLO_ERROR_DECODER_INVALID_DATA;
       }
    }
 

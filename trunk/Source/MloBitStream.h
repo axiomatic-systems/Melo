@@ -26,12 +26,6 @@
 |       constants
 +---------------------------------------------------------------------*/
 
-/* the max frame size we can handle */
-#define MLO_BITSTREAM_BUFFER_SIZE  8192
-
-/* flags */
-#define MLO_BITSTREAM_FLAG_EOS 0x01
-
 /* error codes */
 #define MLO_ERROR_NOT_ENOUGH_DATA        (MLO_ERROR_BASE_BITSTREAM - 0)
 #define MLO_ERROR_CORRUPTED_BITSTREAM    (MLO_ERROR_BASE_BITSTREAM - 1)
@@ -51,10 +45,11 @@ typedef unsigned int MLO_BitsWord;
 typedef struct MLO_BitStream
 {
     unsigned char* buffer;
-    unsigned int   out;
+    MLO_Size       buffer_size;
+    MLO_Size       data_size;
+    unsigned int   pos;
     MLO_BitsWord   cache;
     unsigned int   bits_cached;
-    unsigned int   flags;
 } MLO_BitStream;
 
 /*----------------------------------------------------------------------
@@ -64,13 +59,14 @@ typedef struct MLO_BitStream
 extern "C" {
 #endif /* __cplusplus */
     
-MLO_Result MLO_BitStream_Construct(MLO_BitStream* bits);
+MLO_Result MLO_BitStream_Construct(MLO_BitStream* bits, MLO_Size size);
 MLO_Result MLO_BitStream_Destruct(MLO_BitStream* bits);
 MLO_Result MLO_BitStream_SetData(MLO_BitStream*  bits, 
                                  const MLO_Byte* data, 
                                  MLO_Size        data_size);
 MLO_Result MLO_BitStream_ByteAlign(MLO_BitStream* bits);
 MLO_Result MLO_BitStream_Reset(MLO_BitStream* bits);
+MLO_Size   MLO_BitStream_GetBitsLeft(MLO_BitStream* bits);
 
 #ifdef __cplusplus
 }
@@ -80,15 +76,6 @@ MLO_Result MLO_BitStream_Reset(MLO_BitStream* bits);
 |       macros
 +---------------------------------------------------------------------*/
 #define MLO_BIT_MASK(_n) ((1<<(_n))-1)
-
-#define MLO_BITSTREAM_POINTER_VAL(offset) \
-    ((offset)&(MLO_BITSTREAM_BUFFER_SIZE-1))
-
-#define MLO_BITSTREAM_POINTER_OFFSET(pointer, offset) \
-    (MLO_BITSTREAM_POINTER_VAL((pointer)+(offset)))
-
-#define MLO_BITSTREAM_POINTER_ADD(pointer, offset) \
-    ((pointer) = MLO_BITSTREAM_POINTER_OFFSET(pointer, offset))
 
 /*
 ==============================================================================
@@ -105,31 +92,21 @@ Returns: The cached bits
 static inline MLO_BitsWord
 MLO_BitStream_ReadCache (const MLO_BitStream* bits_ptr)
 {
-   unsigned int   pos = bits_ptr->out;
-   MLO_BitsWord   cache;
+   unsigned int   pos = bits_ptr->pos;
 
 #if MLO_WORD_BITS != 32
 #error unsupported word size /* 64 and other word size not yet implemented */
 #endif
 
-   if (pos <= MLO_BITSTREAM_BUFFER_SIZE - MLO_WORD_BYTES)
+   if (pos > bits_ptr->buffer_size - MLO_WORD_BYTES) return 0;
+
    {
       unsigned char *   out_ptr = &bits_ptr->buffer [pos];
-      cache =   (((MLO_BitsWord) out_ptr [0]) << 24)
+      return    (((MLO_BitsWord) out_ptr [0]) << 24)
               | (((MLO_BitsWord) out_ptr [1]) << 16)
               | (((MLO_BitsWord) out_ptr [2]) <<  8)
               | (((MLO_BitsWord) out_ptr [3])      );
    }
-   else
-   {
-      unsigned char *   buf_ptr = bits_ptr->buffer;
-      cache =   (((MLO_BitsWord) buf_ptr [                              pos    ]) << 24)
-              | (((MLO_BitsWord) buf_ptr [MLO_BITSTREAM_POINTER_OFFSET (pos, 1)]) << 16)
-              | (((MLO_BitsWord) buf_ptr [MLO_BITSTREAM_POINTER_OFFSET (pos, 2)]) <<  8)
-              | (((MLO_BitsWord) buf_ptr [MLO_BITSTREAM_POINTER_OFFSET (pos, 3)])      );
-   }
-
-   return (cache);
 }
 
 /*----------------------------------------------------------------------
@@ -138,7 +115,7 @@ MLO_BitStream_ReadCache (const MLO_BitStream* bits_ptr)
 static inline unsigned int
 MLO_BitStream_ReadBits(MLO_BitStream* bits, unsigned int n)
 {
-    MLO_BitsWord   result;
+    MLO_BitsWord  result;
     if (bits->bits_cached >= n) {
         /* we have enough bits in the cache to satisfy the request */
         bits->bits_cached -= n;
@@ -149,7 +126,7 @@ MLO_BitStream_ReadBits(MLO_BitStream* bits, unsigned int n)
 
         /* read the next word */
         word = MLO_BitStream_ReadCache (bits);
-        bits->out = MLO_BITSTREAM_POINTER_OFFSET(bits->out, MLO_WORD_BYTES);
+        bits->pos +=  MLO_WORD_BYTES;
 
         /* combine the new word and the cache, and update the state */
         {
@@ -176,7 +153,7 @@ MLO_BitStream_ReadBit(MLO_BitStream* bits)
 
         /* read the next word into the cache */
         bits->cache = MLO_BitStream_ReadCache (bits);
-        bits->out = MLO_BITSTREAM_POINTER_OFFSET(bits->out, MLO_WORD_BYTES);
+        bits->pos +=  MLO_WORD_BYTES;
         bits->bits_cached = MLO_WORD_BITS - 1;
 
         /* return the first bit */
@@ -239,13 +216,13 @@ MLO_BitStream_SkipBits(MLO_BitStream* bits, unsigned int n)
    } else {
       n -= bits->bits_cached;
       while (n >= MLO_WORD_BITS) {
-         bits->out = MLO_BITSTREAM_POINTER_OFFSET(bits->out, MLO_WORD_BYTES);
+         bits->pos +=  MLO_WORD_BYTES;
          n -= MLO_WORD_BITS;
       }
       if (n) {
          bits->cache = MLO_BitStream_ReadCache (bits);
          bits->bits_cached = MLO_WORD_BITS-n;
-         bits->out = MLO_BITSTREAM_POINTER_OFFSET(bits->out, MLO_WORD_BYTES);
+         bits->pos +=  MLO_WORD_BYTES;
       } else {
          bits->bits_cached = 0;
          bits->cache = 0;
@@ -261,7 +238,7 @@ MLO_BitStream_SkipBit(MLO_BitStream* bits)
 {
    if (bits->bits_cached == 0) {
       bits->cache = MLO_BitStream_ReadCache (bits);
-      bits->out = MLO_BITSTREAM_POINTER_OFFSET(bits->out, MLO_WORD_BYTES);
+      bits->pos +=  MLO_WORD_BYTES;
       bits->bits_cached = MLO_WORD_BITS - 1;
    } else {
       --bits->bits_cached;

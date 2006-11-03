@@ -4,7 +4,7 @@
 |
 |      Melo - Bit Streams
 |
-|      (c) 2004 Gilles Boccon-Gibod
+|      (c) 2004-2006 Gilles Boccon-Gibod
 |      Author: Gilles Boccon-Gibod (bok@bok.net)
 |
  ****************************************************************/
@@ -28,10 +28,13 @@
 |       MLO_BitStream_Construct
 +---------------------------------------------------------------------*/
 MLO_Result
-MLO_BitStream_Construct(MLO_BitStream* bits)
+MLO_BitStream_Construct(MLO_BitStream* bits, MLO_Size size)
 {
-    bits->buffer = 
-        (unsigned char*)MLO_AllocateMemory(MLO_BITSTREAM_BUFFER_SIZE);
+    /* make the buffer size an integer number of words */
+    size = MLO_WORD_BYTES*((size+MLO_WORD_BYTES-1)/MLO_WORD_BYTES);
+    bits->buffer = (unsigned char*)MLO_AllocateMemory(size);
+    bits->buffer_size = size;
+    bits->data_size = 0;
     if (bits->buffer == NULL) return MLO_ERROR_OUT_OF_MEMORY;
 
     MLO_BitStream_Reset(bits);
@@ -60,12 +63,20 @@ MLO_BitStream_Destruct(MLO_BitStream* bits)
 MLO_Result
 MLO_BitStream_Reset(MLO_BitStream* bits)
 {
-    bits->out         = 0;
+    bits->pos         = 0;
     bits->bits_cached = 0;
     bits->cache       = 0;
-    bits->flags       = 0;
 
     return MLO_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
+|       MLO_BitStream_GetBitsLeft
++---------------------------------------------------------------------*/
+MLO_Size   
+MLO_BitStream_GetBitsLeft(MLO_BitStream* bits)
+{
+    return 8*(bits->data_size-bits->pos)+bits->bits_cached;
 }
 
 /*----------------------------------------------------------------------
@@ -76,17 +87,18 @@ MLO_BitStream_SetData(MLO_BitStream*  bits,
                       const MLO_Byte* data, 
                       MLO_Size        data_size)
 {
-    if (data_size > MLO_BITSTREAM_BUFFER_SIZE) {
+    if (data_size > bits->buffer_size) {
         return MLO_ERROR_OUT_OF_RANGE;
     }
     if (data == NULL) return MLO_ERROR_INVALID_PARAMETERS;
 
     /* copy the data in the buffer */
+    bits->data_size = data_size;
     MLO_CopyMemory(bits->buffer, data, data_size);
 
     /* fill the rest of the buffer with zeros */
-    if (data_size != MLO_BITSTREAM_BUFFER_SIZE) {
-        MLO_SetMemory(bits->buffer+data_size, 0, MLO_BITSTREAM_BUFFER_SIZE-data_size);
+    if (data_size != bits->buffer_size) {
+        MLO_SetMemory(bits->buffer+data_size, 0, bits->buffer_size-data_size);
     }
 
     /* start from the beginning of the buffer */

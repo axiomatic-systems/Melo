@@ -4,7 +4,7 @@
 |
 |      Melo - Decoder API
 |
-|      (c) 2004 Gilles Boccon-Gibod
+|      (c) 2004-2006 Gilles Boccon-Gibod
 |      Author: Gilles Boccon-Gibod (bok@bok.net)
 |
  ****************************************************************/
@@ -34,21 +34,62 @@ typedef struct {
 } MLO_DecoderStatus;
 
 typedef enum {
-    MLO_OBJECT_TYPE_AAC_MAIN     = 1,
-    MLO_OBJECT_TYPE_AAC_LC       = 2,
-    MLO_OBJECT_TYPE_AAC_SSR      = 3,
-    MLO_OBJECT_TYPE_AAC_LTP      = 4,
-    MLO_OBJECT_TYPE_SBR          = 5,
-    MLO_OBJECT_TYPE_AAC_SCALABLE = 6
+    MLO_OBJECT_TYPE_AAC_MAIN        = 1,
+    MLO_OBJECT_TYPE_AAC_LC          = 2,
+    MLO_OBJECT_TYPE_AAC_SSR         = 3,
+    MLO_OBJECT_TYPE_AAC_LTP         = 4,
+    MLO_OBJECT_TYPE_SBR             = 5,
+    MLO_OBJECT_TYPE_AAC_SCALABLE    = 6,
+    MLO_OBJECT_TYPE_TWINVQ          = 7,
+    MLO_OBJECT_TYPE_ER_AAC_LC       = 17,
+    MLO_OBJECT_TYPE_ER_AAC_LTP      = 19,
+    MLO_OBJECT_TYPE_ER_AAC_SCALABLE = 20,
+    MLO_OBJECT_TYPE_ER_TWINVQ       = 21,
+    MLO_OBJECT_TYPE_ER_BSAC         = 22,
+    MLO_OBJECT_TYPE_ER_AAC_LD       = 23,
+    MLO_OBJECT_TYPE_LAYER_1         = 32,
+    MLO_OBJECT_TYPE_LAYER_2         = 33,
+    MLO_OBJECT_TYPE_LAYER_3         = 34
 } MLO_ObjectTypeIdentifier;
+
+typedef enum {
+    MLO_CHANNEL_CONFIG_NONE   = 0,
+    MLO_CHANNEL_CONFIG_MONO   = 1,
+    MLO_CHANNEL_CONFIG_STEREO = 2,
+    MLO_CHANNEL_CONFIG_STEREO_PLUS_CENTER = 3,
+    MLO_CHANNEL_CONFIG_STEREO_PLUS_CENTER_PLUS_REAR_MONO = 4,
+    MLO_CHANNEL_CONFIG_FIVE = 5,
+    MLO_CHANNEL_CONFIG_FIVE_PLUS_ONE = 6,
+    MLO_CHANNEL_CONFIG_SEVEN_PLUS_ONE = 7,
+    MLO_CHANNEL_CONFIG_UNSUPPORTED
+} MLO_ChannelConfiguration;
 
 typedef struct {
     MLO_ObjectTypeIdentifier object_type;
     MLO_SamplingFreq_Index   sampling_frequency_index;
+    MLO_ChannelConfiguration channel_configuration;
+    MLO_Boolean              frame_length_flag;
+    MLO_Boolean              depends_on_core_coder;
+    MLO_Boolean              core_coder_delay;
+    struct {
+        MLO_Boolean              sbr_present;
+        MLO_ObjectTypeIdentifier object_type;
+        unsigned int             sampling_frequency_index;
+    } extension;
 } MLO_DecoderConfig;
 
 /*----------------------------------------------------------------------
-|       prototypes
+|   constants
++---------------------------------------------------------------------*/
+#define MLO_DECODER_MAX_FRAME_SIZE 8192
+
+#define MLO_ERROR_DECODER_UNSUPPORTED_CONFIG            (MLO_ERROR_BASE_DECODER-0)
+#define MLO_ERROR_DECODER_INVALID_CHANNEL_CONFIGURATION (MLO_ERROR_BASE_DECODER-1)
+#define MLO_ERROR_DECODER_UNSUPPORTED_FORMAT            (MLO_ERROR_BASE_DECODER-2)
+#define MLO_ERROR_DECODER_INVALID_DATA                  (MLO_ERROR_BASE_DECODER-3)
+
+/*----------------------------------------------------------------------
+|   prototypes
 +---------------------------------------------------------------------*/
 #ifdef __cplusplus
 extern "C" {

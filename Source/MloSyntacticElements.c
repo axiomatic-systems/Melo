@@ -10,7 +10,7 @@
 #include "MloSyntacticElements.h"
 #include "MloTns.h"
 #include "MloUtils.h"
-
+#include "MloDecoder.h"
 
 
 /*----------------------------------------------------------------------
@@ -178,7 +178,8 @@ Returns:
 ==============================================================================
 */
 
-MLO_Result	MLO_SyntacticElements_SetNbrChn (MLO_SyntacticElements *se_ptr, int nbr_chn)
+MLO_Result	
+MLO_SyntacticElements_SetNbrChn (MLO_SyntacticElements *se_ptr, int nbr_chn)
 {
    MLO_Result     result = MLO_SUCCESS;
 
@@ -256,7 +257,8 @@ Returns:
 ==============================================================================
 */
 
-MLO_Result	MLO_SyntacticElements_Decode (MLO_SyntacticElements *se_ptr, MLO_BitStream *bit_ptr)
+MLO_Result	
+MLO_SyntacticElements_Decode (MLO_SyntacticElements *se_ptr, MLO_BitStream *bit_ptr)
 {
    MLO_Result     result = MLO_SUCCESS;
    MLO_Boolean    cont_flag = MLO_TRUE;
@@ -344,7 +346,8 @@ Returns:
 ==============================================================================
 */
 
-MLO_Result  MLO_SyntacticElements_FinishSpectralProc (MLO_SyntacticElements *se_ptr)
+MLO_Result  
+MLO_SyntacticElements_FinishSpectralProc (MLO_SyntacticElements *se_ptr)
 {
    MLO_Result     result = MLO_SUCCESS;
    int            cce;
@@ -423,7 +426,8 @@ Returns:
 ==============================================================================
 */
 
-MLO_Result  MLO_SyntacticElements_ConvertSpectralToTime (MLO_SyntacticElements *se_ptr, MLO_FilterBank *fb_ptr)
+MLO_Result  
+MLO_SyntacticElements_ConvertSpectralToTime (MLO_SyntacticElements *se_ptr, MLO_FilterBank *fb_ptr)
 {
    MLO_Result     result = MLO_SUCCESS;
    int            cce;
@@ -472,11 +476,13 @@ Input/output parameters:
 ==============================================================================
 */
 
-void  MLO_SyntacticElements_SendToOutput (const MLO_SyntacticElements *se_ptr, MLO_SampleBuffer *outbuf_ptr)
+MLO_Result
+MLO_SyntacticElements_SendToOutput (const MLO_SyntacticElements *se_ptr, MLO_SampleBuffer *outbuf_ptr)
 {
-   int            chn = 0;
-   int            elt;
-   int            nbr_received_elements;
+   int chn = 0;
+   int elt;
+   int nbr_received_elements;
+   int channel_count = (int) MLO_SampleBuffer_GetFormat(outbuf_ptr)->channel_count;
 
    MLO_ASSERT (se_ptr != 0);
    MLO_ASSERT (outbuf_ptr != 0);
@@ -485,12 +491,13 @@ void  MLO_SyntacticElements_SendToOutput (const MLO_SyntacticElements *se_ptr, M
 
    for (elt = 0; elt < nbr_received_elements; ++elt)
    {
-      const int      index = se_ptr->order_arr [elt].index;
+      const int index = se_ptr->order_arr [elt].index;
 
       switch (se_ptr->order_arr [elt].type)
       {
       /* SCE */
       case  MLO_SYNTACTIC_ELEMENTS_CONTENT_TYPE_SCE:
+         if (chn+1 > channel_count) return MLO_ERROR_DECODER_INVALID_CHANNEL_CONFIGURATION;
          MLO_SyntacticElements_InterleaveAndConvertChannel (
             outbuf_ptr,
             chn,
@@ -501,6 +508,7 @@ void  MLO_SyntacticElements_SendToOutput (const MLO_SyntacticElements *se_ptr, M
 
       /* CPE */
       case  MLO_SYNTACTIC_ELEMENTS_CONTENT_TYPE_CPE:
+         if (chn+2 > channel_count) return MLO_ERROR_DECODER_INVALID_CHANNEL_CONFIGURATION;
          MLO_SyntacticElements_InterleaveAndConvertChannel (
             outbuf_ptr,
             chn + 0,
@@ -516,6 +524,7 @@ void  MLO_SyntacticElements_SendToOutput (const MLO_SyntacticElements *se_ptr, M
 
       /* LFE */
       case  MLO_SYNTACTIC_ELEMENTS_CONTENT_TYPE_LFE:
+         if (chn+1 > channel_count) return MLO_ERROR_DECODER_INVALID_CHANNEL_CONFIGURATION;
          MLO_SyntacticElements_InterleaveAndConvertChannel (
             outbuf_ptr,
             chn,
@@ -529,7 +538,7 @@ void  MLO_SyntacticElements_SendToOutput (const MLO_SyntacticElements *se_ptr, M
       }
    }
 
-   MLO_ASSERT (chn == (int) MLO_SampleBuffer_GetFormat(outbuf_ptr)->channel_count);
+   return MLO_SUCCESS;
 }
 
 

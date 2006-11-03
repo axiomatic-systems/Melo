@@ -121,7 +121,7 @@ void  MLO_SyntacticElements_StartNewFrame (MLO_SyntacticElements *se_ptr, MLO_Sa
 MLO_Result  MLO_SyntacticElements_Decode (MLO_SyntacticElements *se_ptr, MLO_BitStream *bit_ptr);
 MLO_Result  MLO_SyntacticElements_FinishSpectralProc (MLO_SyntacticElements *se_ptr);
 MLO_Result  MLO_SyntacticElements_ConvertSpectralToTime (MLO_SyntacticElements *se_ptr, MLO_FilterBank *fb_ptr);
-void  MLO_SyntacticElements_SendToOutput (const MLO_SyntacticElements *se_ptr, MLO_SampleBuffer *outbuf_ptr);
+MLO_Result  MLO_SyntacticElements_SendToOutput (const MLO_SyntacticElements *se_ptr, MLO_SampleBuffer *outbuf_ptr);
 
 MLO_Result  MLO_SyntacticElements_UseSce (MLO_SyntacticElements *se_ptr, int tag, MLO_ElementSceLfe **sce_ptr_ptr);
 MLO_Result  MLO_SyntacticElements_UseCpe (MLO_SyntacticElements *se_ptr, int tag, MLO_ElementCpe **cpe_ptr_ptr);

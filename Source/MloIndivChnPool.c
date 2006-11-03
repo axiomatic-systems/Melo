@@ -101,7 +101,8 @@ Returns:
 ==============================================================================
 */
 
-MLO_Result  MLO_IndivChnPool_Allocate (MLO_IndivChnPool *pool_ptr, int nbr_chn)
+MLO_Result  
+MLO_IndivChnPool_Allocate (MLO_IndivChnPool *pool_ptr, int nbr_chn)
 {
    MLO_Result     result = MLO_SUCCESS;
    MLO_IndivChnStream * mem_ptr = 0;

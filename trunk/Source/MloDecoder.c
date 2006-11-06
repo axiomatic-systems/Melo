@@ -1,11 +1,27 @@
 /*****************************************************************
 |
-|      File: MloDecoder.c
+|    Melo - Decoder
 |
-|      Melo - Decoder
+|    Copyright 2004-2006 Axiomatic Systems LLC
 |
-|      (c) 2004 Gilles Boccon-Gibod
-|      Author: Gilles Boccon-Gibod (bok@bok.net)
+|    This file is part of Melo (Melo AAC Decoder).
+|
+|    Unless you have obtained Melo under a difference license,
+|    this version of Melo is Melo|GPL.
+|    Melo|GPL is free software; you can redistribute it and/or modify
+|    it under the terms of the GNU General Public License as published by
+|    the Free Software Foundation; either version 2, or (at your option)
+|    any later version.
+|
+|    Melo|GPL is distributed in the hope that it will be useful,
+|    but WITHOUT ANY WARRANTY; without even the implied warranty of
+|    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+|    GNU General Public License for more details.
+|
+|    You should have received a copy of the GNU General Public License
+|    along with Melo|GPL; see the file COPYING.  If not, write to the
+|    Free Software Foundation, 59 Temple Place - Suite 330, Boston, MA
+|    02111-1307, USA.
 |
  ****************************************************************/
 
@@ -103,28 +119,43 @@ MLO_DecoderConfig_Parse(const unsigned char* encoded,
     MLO_SetMemory(config, 0, sizeof(*config));
 
 	result = GetAudioObjectType(&bits, &config->object_type);
-    if (MLO_FAILED(result)) return result;
+    if (MLO_FAILED(result)) goto end;
 
-    if (MLO_BitStream_GetBitsLeft(&bits) < 4) return MLO_ERROR_DECODER_INVALID_DATA;
+    if (MLO_BitStream_GetBitsLeft(&bits) < 4) {
+        result = MLO_ERROR_DECODER_INVALID_DATA;
+        goto end;
+    }
 	config->sampling_frequency_index = MLO_BitStream_ReadBits(&bits, 4);
 	if (config->sampling_frequency_index == 0xF) {
-        if (MLO_BitStream_GetBitsLeft(&bits) < 24) return MLO_ERROR_DECODER_INVALID_DATA;
+        if (MLO_BitStream_GetBitsLeft(&bits) < 24) {
+            result = MLO_ERROR_DECODER_INVALID_DATA;
+            goto end;
+        }
 		MLO_BitStream_ReadBits(&bits, 24);
 	}
-    if (MLO_BitStream_GetBitsLeft(&bits) < 4) return MLO_ERROR_DECODER_INVALID_DATA;
+    if (MLO_BitStream_GetBitsLeft(&bits) < 4) {
+        result = MLO_ERROR_DECODER_INVALID_DATA;
+        goto end;
+    }
 	config->channel_configuration = MLO_BitStream_ReadBits(&bits, 4);
 
 	if (config->object_type == MLO_OBJECT_TYPE_SBR) {
 		config->extension.object_type = config->object_type;
 		config->extension.sbr_present = MLO_TRUE;
-        if (MLO_BitStream_GetBitsLeft(&bits) < 4) return MLO_ERROR_DECODER_INVALID_DATA;
+        if (MLO_BitStream_GetBitsLeft(&bits) < 4) {
+            result = MLO_ERROR_DECODER_INVALID_DATA;
+            goto end;
+        }
 		config->sampling_frequency_index = MLO_BitStream_ReadBits(&bits, 4);;
         if (config->sampling_frequency_index == 0xF) {
-            if (MLO_BitStream_GetBitsLeft(&bits) < 24) return MLO_ERROR_DECODER_INVALID_DATA;
+            if (MLO_BitStream_GetBitsLeft(&bits) < 24) {
+                result = MLO_ERROR_DECODER_INVALID_DATA;
+                goto end;
+            }
 			MLO_BitStream_ReadBits(&bits, 24);
         }
 		result = GetAudioObjectType(&bits, &config->object_type);
-        if (MLO_FAILED(result)) return result;
+        if (MLO_FAILED(result)) goto end;
 	} else {
    	    config->extension.sbr_present = MLO_FALSE;
 		config->extension.object_type = 0;
@@ -144,20 +175,21 @@ MLO_DecoderConfig_Parse(const unsigned char* encoded,
         case MLO_OBJECT_TYPE_ER_BSAC:
         case MLO_OBJECT_TYPE_ER_AAC_LD:
             result = GetGASpecificInfo(&bits, config);
-            if (MLO_FAILED(result)) return result;
             break;
 
         default:
             break;
     }
 
-    return MLO_SUCCESS;
+end:
+    MLO_BitStream_Destruct(&bits);
+    return result;
 }
 
 /*----------------------------------------------------------------------
 |   MLO_DecoderConfig_GetChannelCount
 +---------------------------------------------------------------------*/
-MLO_Cardinal
+static MLO_Cardinal
 MLO_DecoderConfig_GetChannelCount(const MLO_DecoderConfig* config)
 {
     switch (config->channel_configuration) {

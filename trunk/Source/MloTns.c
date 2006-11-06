@@ -1,3 +1,28 @@
+/*****************************************************************
+|
+|    Copyright 2004-2006 Axiomatic Systems LLC
+|
+|    This file is part of Melo (Melo AAC Decoder).
+|
+|    Unless you have obtained Melo under a difference license,
+|    this version of Melo is Melo|GPL.
+|    Melo|GPL is free software; you can redistribute it and/or modify
+|    it under the terms of the GNU General Public License as published by
+|    the Free Software Foundation; either version 2, or (at your option)
+|    any later version.
+|
+|    Melo|GPL is distributed in the hope that it will be useful,
+|    but WITHOUT ANY WARRANTY; without even the implied warranty of
+|    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+|    GNU General Public License for more details.
+|
+|    You should have received a copy of the GNU General Public License
+|    along with Melo|GPL; see the file COPYING.  If not, write to the
+|    Free Software Foundation, 59 Temple Place - Suite 330, Boston, MA
+|    02111-1307, USA.
+|
+ ****************************************************************/
+
 /*----------------------------------------------------------------------
 |       Includes
 +---------------------------------------------------------------------*/
@@ -164,7 +189,7 @@ void  MLO_Tns_Decode (MLO_Tns *tns_ptr, const MLO_IcsInfo *ics_info_ptr, MLO_Bit
       bd_order = 3;
    }
 
-   MLO_ASSERT (ics_info_ptr->num_windows <= MLO_ARRAY_SIZE (tns_ptr->win_arr));
+   MLO_ASSERT (ics_info_ptr->num_windows <= (int)MLO_ARRAY_SIZE (tns_ptr->win_arr));
    for (w = 0; w < ics_info_ptr->num_windows; ++ w)
    {
       MLO_Tns_Window *  win_ptr = &tns_ptr->win_arr [w];
@@ -172,7 +197,7 @@ void  MLO_Tns_Decode (MLO_Tns *tns_ptr, const MLO_IcsInfo *ics_info_ptr, MLO_Bit
       int            f;
 
       win_ptr->n_filt = MLO_BitStream_ReadBits (bit_ptr, bd_n_filt);
-      MLO_ASSERT (win_ptr->n_filt <= MLO_ARRAY_SIZE (win_ptr->filter));
+      MLO_ASSERT (win_ptr->n_filt <= (int)MLO_ARRAY_SIZE (win_ptr->filter));
 
       if (win_ptr->n_filt > 0)
       {

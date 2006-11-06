@@ -1,3 +1,28 @@
+/*****************************************************************
+|
+|    Copyright 2004-2006 Axiomatic Systems LLC
+|
+|    This file is part of Melo (Melo AAC Decoder).
+|
+|    Unless you have obtained Melo under a difference license,
+|    this version of Melo is Melo|GPL.
+|    Melo|GPL is free software; you can redistribute it and/or modify
+|    it under the terms of the GNU General Public License as published by
+|    the Free Software Foundation; either version 2, or (at your option)
+|    any later version.
+|
+|    Melo|GPL is distributed in the hope that it will be useful,
+|    but WITHOUT ANY WARRANTY; without even the implied warranty of
+|    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+|    GNU General Public License for more details.
+|
+|    You should have received a copy of the GNU General Public License
+|    along with Melo|GPL; see the file COPYING.  If not, write to the
+|    Free Software Foundation, 59 Temple Place - Suite 330, Boston, MA
+|    02111-1307, USA.
+|
+ ****************************************************************/
+
 /*
 Section data
 
@@ -73,10 +98,10 @@ void  MLO_SectionData_Decode (MLO_SectionData *sec_ptr, const MLO_IcsInfo *ics_p
          int            sfb;
          int            end;
 
-         MLO_ASSERT (i < MLO_ARRAY_SIZE (sec_ptr->sect_cb [0]));
-         MLO_ASSERT (i < MLO_ARRAY_SIZE (sec_ptr->sect_start [0]));
-         MLO_ASSERT (i < MLO_ARRAY_SIZE (sec_ptr->sect_end [0]));
-         MLO_ASSERT (i < MLO_ARRAY_SIZE (sec_ptr->sect_cb [0]));
+         MLO_ASSERT (i < (int)MLO_ARRAY_SIZE (sec_ptr->sect_cb [0]));
+         MLO_ASSERT (i < (int)MLO_ARRAY_SIZE (sec_ptr->sect_start [0]));
+         MLO_ASSERT (i < (int)MLO_ARRAY_SIZE (sec_ptr->sect_end [0]));
+         MLO_ASSERT (i < (int)MLO_ARRAY_SIZE (sec_ptr->sect_cb [0]));
 
          /* aacSectionDataResilienceFlag not set */
          sec_ptr->sect_cb [g] [i] = MLO_BitStream_ReadBits (bit_ptr, 4);
@@ -89,14 +114,14 @@ void  MLO_SectionData_Decode (MLO_SectionData *sec_ptr, const MLO_IcsInfo *ics_p
          while (sect_len_incr == sect_esc_val);
 
          end = k + sect_len;
-         MLO_ASSERT (k <= MLO_MAX_VAL_U (sec_ptr->sect_start [0] [0]));
-         MLO_ASSERT (end <= MLO_MAX_VAL_U (sec_ptr->sect_end [0] [0]));
+         MLO_ASSERT (k <= (int)MLO_MAX_VAL_U (sec_ptr->sect_start [0] [0]));
+         MLO_ASSERT (end <= (int)MLO_MAX_VAL_U (sec_ptr->sect_end [0] [0]));
          sec_ptr->sect_start [g] [i] = k;
          sec_ptr->sect_end [g] [i] = end;
 
          for (sfb = k; sfb < end; ++sfb)
          {
-            MLO_ASSERT (sfb < MLO_ARRAY_SIZE (sec_ptr->sfb_cb [0]));
+            MLO_ASSERT (sfb < (int)MLO_ARRAY_SIZE (sec_ptr->sfb_cb [0]));
             sec_ptr->sfb_cb [g] [sfb] = sec_ptr->sect_cb [g] [i];
          }
 
@@ -137,9 +162,9 @@ int   MLO_SectionData_IsIntensity (const MLO_SectionData *sec_ptr, int group, in
 
    MLO_ASSERT (sec_ptr != 0);
    MLO_ASSERT (group >= 0);
-   MLO_ASSERT (group < MLO_ARRAY_SIZE (sec_ptr->sect_cb));
+   MLO_ASSERT (group < (int)MLO_ARRAY_SIZE (sec_ptr->sect_cb));
    MLO_ASSERT (sfb >= 0);
-   MLO_ASSERT (sfb < MLO_ARRAY_SIZE (sec_ptr->sect_cb [0]));
+   MLO_ASSERT (sfb < (int)MLO_ARRAY_SIZE (sec_ptr->sect_cb [0]));
 
    c = sec_ptr->sfb_cb [group] [sfb];
    if (c == MLO_HCB_INTENSITY_HCB)
@@ -179,9 +204,9 @@ MLO_Boolean MLO_SectionData_IsNoise (const MLO_SectionData *sec_ptr, int group, 
 
    MLO_ASSERT (sec_ptr != 0);
    MLO_ASSERT (group >= 0);
-   MLO_ASSERT (group < MLO_ARRAY_SIZE (sec_ptr->sect_cb));
+   MLO_ASSERT (group < (int)MLO_ARRAY_SIZE (sec_ptr->sect_cb));
    MLO_ASSERT (sfb >= 0);
-   MLO_ASSERT (sfb < MLO_ARRAY_SIZE (sec_ptr->sect_cb [0]));
+   MLO_ASSERT (sfb < (int)MLO_ARRAY_SIZE (sec_ptr->sect_cb [0]));
 
    c = sec_ptr->sfb_cb [group] [sfb];
    if (c == MLO_HCB_NOISE_HCB)

@@ -1,23 +1,40 @@
+/*****************************************************************
+|
+|    Copyright 2004-2006 Axiomatic Systems LLC
+|
+|    This file is part of Melo (Melo AAC Decoder).
+|
+|    Unless you have obtained Melo under a difference license,
+|    this version of Melo is Melo|GPL.
+|    Melo|GPL is free software; you can redistribute it and/or modify
+|    it under the terms of the GNU General Public License as published by
+|    the Free Software Foundation; either version 2, or (at your option)
+|    any later version.
+|
+|    Melo|GPL is distributed in the hope that it will be useful,
+|    but WITHOUT ANY WARRANTY; without even the implied warranty of
+|    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+|    GNU General Public License for more details.
+|
+|    You should have received a copy of the GNU General Public License
+|    along with Melo|GPL; see the file COPYING.  If not, write to the
+|    Free Software Foundation, 59 Temple Place - Suite 330, Boston, MA
+|    02111-1307, USA.
+|
+ ****************************************************************/
+
 /*----------------------------------------------------------------------
 |       Includes
 +---------------------------------------------------------------------*/
-
-
-
 #include "MloBitStream.h"
 #include "MloDebug.h"
 #include "MloDefs.h"
 #include "MloElementFil.h"
 #include "MloUtils.h"
 
-
-
 /*----------------------------------------------------------------------
 |       Types
 +---------------------------------------------------------------------*/
-
-
-
 /* 4.5.2.9.3, Table 4.105 */
 typedef enum MLO_ElementFil_Ext
 {
@@ -35,14 +52,9 @@ typedef enum MLO_ElementFil_DataElementVersion
    MLO_ELEMENT_FIL_DATA_ELEMENT_VERSION_ANC_DATA = 0
 }  MLO_ElementFil_DataElementVersion;
 
-
-
 /*----------------------------------------------------------------------
 |       Prototypes
 +---------------------------------------------------------------------*/
-
-
-
 static MLO_Result MLO_ElementFil_DecodeExtensionPayload (MLO_ElementFil *fil_ptr, MLO_BitStream *bit_ptr, int *count_ptr);
 static void MLO_ElementFil_DecodeFill (MLO_BitStream *bit_ptr, int count);
 static MLO_Result MLO_ElementFil_DecodeFillData (MLO_BitStream *bit_ptr, int count);
@@ -50,13 +62,9 @@ static void MLO_ElementFil_DecodeDataElement (MLO_BitStream *bit_ptr, int *count
 static int  MLO_ElementFil_DecodeDynamicRangeInfo (MLO_ElementFil_DynamicRangeInfo *drc_ptr, MLO_BitStream *bit_ptr);
 static int  MLO_ElementFil_DecodeExcludedChannels (MLO_ElementFil_DynamicRangeInfo *drc_ptr, MLO_BitStream *bit_ptr);
 
-
-
 /*----------------------------------------------------------------------
 |       Functions
 +---------------------------------------------------------------------*/
-
-
 
 /*
 ==============================================================================
@@ -125,16 +133,16 @@ Returns:
 
 MLO_Result	MLO_ElementFil_DecodeExtensionPayload (MLO_ElementFil *fil_ptr, MLO_BitStream *bit_ptr, int *count_ptr)
 {
-   MLO_Result     result = MLO_SUCCESS;
-   MLO_ElementFil_Ext   extension_type;
+    MLO_Result     result = MLO_SUCCESS;
+    MLO_ElementFil_Ext   extension_type;
 
-   MLO_ASSERT (&fil_ptr != 0);
+    MLO_ASSERT (&fil_ptr != 0);
 	MLO_ASSERT (&bit_ptr != 0);
 	MLO_ASSERT (&count_ptr != 0);
-   MLO_ASSERT (*count_ptr > 0);
+    MLO_ASSERT (*count_ptr > 0);
 
-   extension_type = (MLO_ElementFil_Ext) MLO_BitStream_ReadBits (bit_ptr, 4);
-   switch (extension_type)
+    extension_type = (MLO_ElementFil_Ext) MLO_BitStream_ReadBits (bit_ptr, 4);
+    switch (extension_type)
    {
    case  MLO_ELEMENT_FIL_EXT_FILL:
       MLO_ElementFil_DecodeFill (bit_ptr, *count_ptr);
@@ -393,7 +401,7 @@ int	MLO_ElementFil_DecodeExcludedChannels (MLO_ElementFil_DynamicRangeInfo *drc_
       {
          int            bit = MLO_BitStream_ReadBit (bit_ptr);
          int            channel = offset + index;
-         MLO_ASSERT (channel < MLO_BIT_DEPTH (drc_ptr->excluded_mask));
+         MLO_ASSERT (channel < (int)MLO_BIT_DEPTH (drc_ptr->excluded_mask));
 
          drc_ptr->excluded_mask |= (bit << channel);
       }

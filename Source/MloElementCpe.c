@@ -1,9 +1,31 @@
+/*****************************************************************
+|
+|    Copyright 2004-2006 Axiomatic Systems LLC
+|
+|    This file is part of Melo (Melo AAC Decoder).
+|
+|    Unless you have obtained Melo under a difference license,
+|    this version of Melo is Melo|GPL.
+|    Melo|GPL is free software; you can redistribute it and/or modify
+|    it under the terms of the GNU General Public License as published by
+|    the Free Software Foundation; either version 2, or (at your option)
+|    any later version.
+|
+|    Melo|GPL is distributed in the hope that it will be useful,
+|    but WITHOUT ANY WARRANTY; without even the implied warranty of
+|    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+|    GNU General Public License for more details.
+|
+|    You should have received a copy of the GNU General Public License
+|    along with Melo|GPL; see the file COPYING.  If not, write to the
+|    Free Software Foundation, 59 Temple Place - Suite 330, Boston, MA
+|    02111-1307, USA.
+|
+ ****************************************************************/
+
 /*----------------------------------------------------------------------
 |       Includes
 +---------------------------------------------------------------------*/
-
-
-
 #include "MloBitStream.h"
 #include "MloDebug.h"
 #include "MloElementCpe.h"
@@ -14,14 +36,9 @@
 #include "MloPns.h"
 #include "MloUtils.h"
 
-
-
 /*----------------------------------------------------------------------
 |       Functions
 +---------------------------------------------------------------------*/
-
-
-
 /*
 ==============================================================================
 Name: MLO_ElementCpe_Decode
@@ -117,8 +134,8 @@ MLO_Result  MLO_ElementCpe_Decode (MLO_ElementCpe *cpe_ptr, MLO_BitStream *bit_p
          const int      num_window_groups = ics_info_ptr->num_window_groups;
          int            g;
 
-         MLO_ASSERT (num_window_groups <= MLO_ARRAY_SIZE (cpe_ptr->ms_used));
-         MLO_ASSERT (max_sfb           <= MLO_ARRAY_SIZE (cpe_ptr->ms_used [0]));
+         MLO_ASSERT (num_window_groups <= (int)MLO_ARRAY_SIZE (cpe_ptr->ms_used));
+         MLO_ASSERT (max_sfb           <= (int)MLO_ARRAY_SIZE (cpe_ptr->ms_used [0]));
 
          for (g = 0; g < num_window_groups; ++g)
          {

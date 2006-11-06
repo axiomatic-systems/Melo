@@ -1,3 +1,28 @@
+/*****************************************************************
+|
+|    Copyright 2004-2006 Axiomatic Systems LLC
+|
+|    This file is part of Melo (Melo AAC Decoder).
+|
+|    Unless you have obtained Melo under a difference license,
+|    this version of Melo is Melo|GPL.
+|    Melo|GPL is free software; you can redistribute it and/or modify
+|    it under the terms of the GNU General Public License as published by
+|    the Free Software Foundation; either version 2, or (at your option)
+|    any later version.
+|
+|    Melo|GPL is distributed in the hope that it will be useful,
+|    but WITHOUT ANY WARRANTY; without even the implied warranty of
+|    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+|    GNU General Public License for more details.
+|
+|    You should have received a copy of the GNU General Public License
+|    along with Melo|GPL; see the file COPYING.  If not, write to the
+|    Free Software Foundation, 59 Temple Place - Suite 330, Boston, MA
+|    02111-1307, USA.
+|
+ ****************************************************************/
+
 /*----------------------------------------------------------------------
 |       Includes
 +---------------------------------------------------------------------*/
@@ -230,7 +255,7 @@ void	MLO_SyntacticElements_StartNewFrame (MLO_SyntacticElements *se_ptr, MLO_Sam
    se_ptr->nbr_cce = 0;
    se_ptr->nbr_received_elements = 0;
 
-   for (tag = 0; tag < MLO_ARRAY_SIZE (se_ptr->sce_tag_map); ++tag)
+   for (tag = 0; tag < (int)MLO_ARRAY_SIZE (se_ptr->sce_tag_map); ++tag)
    {
       se_ptr->sce_tag_map [tag] = -1;
       se_ptr->cpe_tag_map [tag] = -1;
@@ -566,8 +591,8 @@ MLO_Result  MLO_SyntacticElements_UseSce (MLO_SyntacticElements *se_ptr, int tag
    int            index;
 
 	MLO_ASSERT (se_ptr != 0);
-   MLO_ASSERT (tag >= 0);
-   MLO_ASSERT (tag < MLO_ARRAY_SIZE (se_ptr->sce_tag_map));
+    MLO_ASSERT (tag >= 0);
+    MLO_ASSERT (tag < (int)MLO_ARRAY_SIZE (se_ptr->sce_tag_map));
 	MLO_ASSERT (sce_ptr_ptr != 0);
 
    index = se_ptr->sce_tag_map [tag];
@@ -608,8 +633,8 @@ MLO_Result  MLO_SyntacticElements_UseCpe (MLO_SyntacticElements *se_ptr, int tag
    int            index;
 
 	MLO_ASSERT (se_ptr != 0);
-   MLO_ASSERT (tag >= 0);
-   MLO_ASSERT (tag < MLO_ARRAY_SIZE (se_ptr->cpe_tag_map));
+    MLO_ASSERT (tag >= 0);
+    MLO_ASSERT (tag < (int)MLO_ARRAY_SIZE (se_ptr->cpe_tag_map));
 	MLO_ASSERT (cpe_ptr_ptr != 0);
 
    index = se_ptr->cpe_tag_map [tag];
@@ -636,7 +661,7 @@ static MLO_Result MLO_SyntacticElements_DecodeSce (MLO_SyntacticElements *se_ptr
 	MLO_ASSERT (bit_ptr != 0);
 
    pos = se_ptr->nbr_sce;
-   if (pos >= MLO_ARRAY_SIZE (se_ptr->sce_arr))
+   if (pos >= (int)MLO_ARRAY_SIZE (se_ptr->sce_arr))
    {
       result = MLO_FAILURE;
    }
@@ -656,7 +681,7 @@ static MLO_Result MLO_SyntacticElements_DecodeSce (MLO_SyntacticElements *se_ptr
       int            tag =
          se_ptr->sce_arr [pos].element_instance_tag;
       MLO_ASSERT (tag >= 0);
-      MLO_ASSERT (tag < MLO_ARRAY_SIZE (se_ptr->sce_tag_map));
+      MLO_ASSERT (tag < (int)MLO_ARRAY_SIZE (se_ptr->sce_tag_map));
       if (se_ptr->sce_tag_map [tag] >= 0)
       {
          result = MLO_ERROR_SCE_TAG_DUPLICATED;
@@ -688,7 +713,7 @@ static MLO_Result MLO_SyntacticElements_DecodeCpe (MLO_SyntacticElements *se_ptr
 	MLO_ASSERT (bit_ptr != 0);
 
    pos = se_ptr->nbr_cpe;
-   if (pos >= MLO_ARRAY_SIZE (se_ptr->cpe_arr))
+   if (pos >= (int)MLO_ARRAY_SIZE (se_ptr->cpe_arr))
    {
       result = MLO_FAILURE;
    }
@@ -708,7 +733,7 @@ static MLO_Result MLO_SyntacticElements_DecodeCpe (MLO_SyntacticElements *se_ptr
       int            tag =
          se_ptr->cpe_arr [pos].element_instance_tag;
       MLO_ASSERT (tag >= 0);
-      MLO_ASSERT (tag < MLO_ARRAY_SIZE (se_ptr->cpe_tag_map));
+      MLO_ASSERT (tag < (int)MLO_ARRAY_SIZE (se_ptr->cpe_tag_map));
       if (se_ptr->cpe_tag_map [tag] >= 0)
       {
          result = MLO_ERROR_CPE_TAG_DUPLICATED;
@@ -738,7 +763,7 @@ static MLO_Result MLO_SyntacticElements_DecodeCce (MLO_SyntacticElements *se_ptr
 	MLO_ASSERT (se_ptr != 0);
 	MLO_ASSERT (bit_ptr != 0);
 
-   if (se_ptr->nbr_cce >= MLO_ARRAY_SIZE (se_ptr->cce_arr))
+   if (se_ptr->nbr_cce >= (int)MLO_ARRAY_SIZE (se_ptr->cce_arr))
    {
       result = MLO_FAILURE;
    }
@@ -772,7 +797,7 @@ static MLO_Result MLO_SyntacticElements_DecodeLfe (MLO_SyntacticElements *se_ptr
 	MLO_ASSERT (bit_ptr != 0);
 
    pos = se_ptr->nbr_lfe;
-   if (pos >= MLO_ARRAY_SIZE (se_ptr->lfe_arr))
+   if (pos >= (int)MLO_ARRAY_SIZE (se_ptr->lfe_arr))
    {
       result = MLO_FAILURE;
    }
@@ -805,12 +830,13 @@ static MLO_Result MLO_SyntacticElements_DecodeLfe (MLO_SyntacticElements *se_ptr
 
 static MLO_Result MLO_SyntacticElements_DecodeDse (MLO_SyntacticElements *se_ptr, MLO_BitStream *bit_ptr)
 {
-   MLO_Result     result = MLO_SUCCESS;
+    MLO_Result     result = MLO_SUCCESS;
 
 	MLO_ASSERT (se_ptr != 0);
 	MLO_ASSERT (bit_ptr != 0);
+    (void)se_ptr; /* unused */
 
-   result = MLO_ElementDse_Decode (bit_ptr);
+    result = MLO_ElementDse_Decode (bit_ptr);
 
 	return (result);
 }
@@ -838,7 +864,7 @@ static MLO_Result MLO_SyntacticElements_DecodeFil (MLO_SyntacticElements *se_ptr
 	MLO_ASSERT (se_ptr != 0);
 	MLO_ASSERT (bit_ptr != 0);
 
-   if (se_ptr->nbr_fil >= MLO_ARRAY_SIZE (se_ptr->fil_arr))
+   if (se_ptr->nbr_fil >= (int)MLO_ARRAY_SIZE (se_ptr->fil_arr))
    {
       result = MLO_FAILURE;
    }
@@ -870,7 +896,7 @@ static void MLO_SyntacticElements_MemorizeElement (MLO_SyntacticElements *se_ptr
    MLO_ASSERT (index >= 0);
 
    pos = se_ptr->nbr_received_elements;
-   MLO_ASSERT (pos < MLO_ARRAY_SIZE (se_ptr->order_arr));
+   MLO_ASSERT (pos < (int)MLO_ARRAY_SIZE (se_ptr->order_arr));
 
    se_ptr->order_arr [pos].type  = type;
    se_ptr->order_arr [pos].index = index;

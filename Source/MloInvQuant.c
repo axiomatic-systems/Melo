@@ -1,3 +1,28 @@
+/*****************************************************************
+|
+|    Copyright 2004-2006 Axiomatic Systems LLC
+|
+|    This file is part of Melo (Melo AAC Decoder).
+|
+|    Unless you have obtained Melo under a difference license,
+|    this version of Melo is Melo|GPL.
+|    Melo|GPL is free software; you can redistribute it and/or modify
+|    it under the terms of the GNU General Public License as published by
+|    the Free Software Foundation; either version 2, or (at your option)
+|    any later version.
+|
+|    Melo|GPL is distributed in the hope that it will be useful,
+|    but WITHOUT ANY WARRANTY; without even the implied warranty of
+|    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+|    GNU General Public License for more details.
+|
+|    You should have received a copy of the GNU General Public License
+|    along with Melo|GPL; see the file COPYING.  If not, write to the
+|    Free Software Foundation, 59 Temple Place - Suite 330, Boston, MA
+|    02111-1307, USA.
+|
+ ****************************************************************/
+
 /*----------------------------------------------------------------------
 |       Includes
 +---------------------------------------------------------------------*/
@@ -1162,7 +1187,7 @@ MLO_Float   MLO_InvQuant_ComputePow43 (int quant)
 
 #else
 
-	if (quant < MLO_ARRAY_SIZE (MLO_InvQuant_table_pow43))
+	if (quant < (int)MLO_ARRAY_SIZE (MLO_InvQuant_table_pow43))
 	{
 		invquant = MLO_Float_Mul (
          MLO_InvQuant_table_pow43 [quant],
@@ -1178,7 +1203,7 @@ MLO_Float   MLO_InvQuant_ComputePow43 (int quant)
       const MLO_Float   diff = MLO_Float_Sub (r1, r0);
 		invquant = MLO_Float_Add (r0, MLO_Float_Mul (diff, t));
 
-      MLO_ASSERT (k + 1 < MLO_ARRAY_SIZE (MLO_InvQuant_table_pow43));
+      MLO_ASSERT (k + 1 < (int)MLO_ARRAY_SIZE (MLO_InvQuant_table_pow43));
    }
 
 #endif

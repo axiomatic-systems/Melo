@@ -189,7 +189,7 @@ end:
 /*----------------------------------------------------------------------
 |   MLO_DecoderConfig_GetChannelCount
 +---------------------------------------------------------------------*/
-static MLO_Cardinal
+MLO_Cardinal
 MLO_DecoderConfig_GetChannelCount(const MLO_DecoderConfig* config)
 {
     switch (config->channel_configuration) {
@@ -202,6 +202,16 @@ MLO_DecoderConfig_GetChannelCount(const MLO_DecoderConfig* config)
         case MLO_CHANNEL_CONFIG_SEVEN_PLUS_ONE: return 8;
         default: return 0;
     }
+}
+
+/*----------------------------------------------------------------------
+|   MLO_DecoderConfig_GetSampleRate
++---------------------------------------------------------------------*/
+unsigned int
+MLO_DecoderConfig_GetSampleRate(const MLO_DecoderConfig* config)
+{
+    return config->sampling_frequency_index < MLO_SAMPLING_FREQ_INDEX_NBR_VALID ?
+        MLO_SamplingFreq_table[config->sampling_frequency_index]:0;
 }
 
 /*----------------------------------------------------------------------
@@ -338,7 +348,7 @@ MLO_Decoder_DecodeFrame(MLO_Decoder*      decoder,
         /* analyze the config to setup the buffer */
         {
             MLO_SampleFormat format;
-            format.type = MLO_SAMPLE_TYPE_INTERLACED_SIGNED_16;
+            format.type = MLO_SAMPLE_TYPE_INTERLACED_SIGNED;
             format.sample_rate = MLO_SamplingFreq_table[decoder->config.sampling_frequency_index];
             format.channel_count = MLO_DecoderConfig_GetChannelCount(&decoder->config);
             format.bits_per_sample = 16;
@@ -398,43 +408,40 @@ MLO_Decoder_DecodeFrameContent (
    MLO_SampleBuffer *   buffer_ptr
 )
 {
-   MLO_Result result = MLO_SUCCESS;
+    MLO_Result result = MLO_SUCCESS;
 
-   MLO_ASSERT (decoder_ptr != 0);
-   MLO_ASSERT (bit_ptr     != 0);
-   MLO_ASSERT (buffer_ptr  != 0);
+    MLO_ASSERT (decoder_ptr != 0);
+    MLO_ASSERT (bit_ptr     != 0);
+    MLO_ASSERT (buffer_ptr  != 0);
 
-   /* Converts compressed bitstream into formated data */
-   result = MLO_SyntacticElements_Decode (
-      &decoder_ptr->syntactic_elements,
-      bit_ptr
-   );
+    /* Convert compressed bitstream into formated data */
+    result = MLO_SyntacticElements_Decode (
+        &decoder_ptr->syntactic_elements,
+        bit_ptr
+    );
 
-   /* Finishes spectral processing */
-   if (MLO_SUCCEEDED (result))
-   {
-      result = MLO_SyntacticElements_FinishSpectralProc (
-         &decoder_ptr->syntactic_elements
-      );
-   }
+    /* Finishe spectral processing */
+    if (MLO_SUCCEEDED (result)) {
+        result = MLO_SyntacticElements_FinishSpectralProc (
+            &decoder_ptr->syntactic_elements
+        );
+    }
 
-   /* Converts signal from frequency to time domain and finishes processing */
-   if (MLO_SUCCEEDED (result))
-   {
-      result = MLO_SyntacticElements_ConvertSpectralToTime (
-         &decoder_ptr->syntactic_elements,
-         &decoder_ptr->filter_bank
-      );
-   }
+    /* Converts signal from frequency to time domain and finishes processing */
+    if (MLO_SUCCEEDED (result)) {
+        result = MLO_SyntacticElements_ConvertSpectralToTime (
+           &decoder_ptr->syntactic_elements,
+           &decoder_ptr->filter_bank
+       );
+    }
 
-   /* To output buffer */
-   if (MLO_SUCCEEDED (result))
-   {
-		MLO_SyntacticElements_SendToOutput (
-         &decoder_ptr->syntactic_elements,
+    /* To output buffer */
+    if (MLO_SUCCEEDED (result)) {
+		result = MLO_SyntacticElements_SendToOutput (
+            &decoder_ptr->syntactic_elements,
 			buffer_ptr
-      );
-   }
+        );
+    }
 
-   return (result);
+    return (result);
 }

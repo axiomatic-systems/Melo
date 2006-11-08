@@ -691,7 +691,7 @@ static MLO_Result MLO_SyntacticElements_DecodeSce (MLO_SyntacticElements *se_ptr
          se_ptr->sce_tag_map [tag] = pos;
          MLO_SyntacticElements_MemorizeElement (
             se_ptr,
-            MLO_SYNTACTIC_ELEMENTS_CONTENT_TYPE_CPE,
+            MLO_SYNTACTIC_ELEMENTS_CONTENT_TYPE_SCE,
             pos
          );
 
@@ -931,7 +931,7 @@ static void MLO_SyntacticElements_InterleaveAndConvertChannel (MLO_SampleBuffer 
    MLO_ASSERT (in_ptr != 0);
 
    format = MLO_SampleBuffer_GetFormat(outbuf_ptr);
-   MLO_ASSERT (format->type == MLO_SAMPLE_TYPE_INTERLACED_SIGNED_16);
+   MLO_ASSERT (format->type == MLO_SAMPLE_TYPE_INTERLACED_SIGNED);
    nbr_chn = format->channel_count;
    MLO_ASSERT (chn < nbr_chn);
 

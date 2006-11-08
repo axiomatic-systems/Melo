@@ -114,6 +114,8 @@ extern "C" {
 MLO_Result MLO_DecoderConfig_Parse(const unsigned char* encoded, 
                                    MLO_Size             encoded_size,
                                    MLO_DecoderConfig*   config);
+unsigned int MLO_DecoderConfig_GetSampleRate(const MLO_DecoderConfig* config);
+MLO_Cardinal MLO_DecoderConfig_GetChannelCount(const MLO_DecoderConfig* config);
 
 MLO_Result MLO_Decoder_Create(const MLO_DecoderConfig* config,
                               MLO_Decoder**            decoder);

@@ -39,7 +39,7 @@ typedef struct MLO_SampleBuffer MLO_SampleBuffer;
 
 typedef enum
 {
-   MLO_SAMPLE_TYPE_INTERLACED_SIGNED_16 = 0
+   MLO_SAMPLE_TYPE_INTERLACED_SIGNED = 0
 } MLO_SampleType;
 
 typedef struct

@@ -31,14 +31,9 @@ Ref:
 4.5.2.3.2
 */
 
-
-
 /*----------------------------------------------------------------------
 |       Includes
 +---------------------------------------------------------------------*/
-
-
-
 #include "MloBitStream.h"
 #include "MloDebug.h"
 #include "MloHcb.h"
@@ -46,14 +41,9 @@ Ref:
 #include "MloSectionData.h"
 #include "MloUtils.h"
 
-
-
 /*----------------------------------------------------------------------
 |       Functions
 +---------------------------------------------------------------------*/
-
-
-
 /*
 ==============================================================================
 Name: MLO_SectionData_Decode
@@ -77,9 +67,9 @@ void  MLO_SectionData_Decode (MLO_SectionData *sec_ptr, const MLO_IcsInfo *ics_p
    int            sect_esc_val;
    int            g;
 
-	MLO_ASSERT (sec_ptr != 0);
-	MLO_ASSERT (ics_ptr != 0);
-	MLO_ASSERT (bit_ptr != 0);
+	MLO_ASSERT (sec_ptr != NULL);
+	MLO_ASSERT (ics_ptr != NULL);
+	MLO_ASSERT (bit_ptr != NULL);
 
    if (ics_ptr->window_sequence == MLO_ICS_INFO_WIN_EIGHT_SHORT_SEQUENCE)
    {
@@ -160,7 +150,7 @@ int   MLO_SectionData_IsIntensity (const MLO_SectionData *sec_ptr, int group, in
    MLO_Hcb        c;
    int            ret_val = 0;
 
-   MLO_ASSERT (sec_ptr != 0);
+   MLO_ASSERT (sec_ptr != NULL);
    MLO_ASSERT (group >= 0);
    MLO_ASSERT (group < (int)MLO_ARRAY_SIZE (sec_ptr->sect_cb));
    MLO_ASSERT (sfb >= 0);
@@ -202,7 +192,7 @@ MLO_Boolean MLO_SectionData_IsNoise (const MLO_SectionData *sec_ptr, int group, 
    MLO_Hcb        c;
    MLO_Boolean    noise_flag = MLO_FALSE;
 
-   MLO_ASSERT (sec_ptr != 0);
+   MLO_ASSERT (sec_ptr != NULL);
    MLO_ASSERT (group >= 0);
    MLO_ASSERT (group < (int)MLO_ARRAY_SIZE (sec_ptr->sect_cb));
    MLO_ASSERT (sfb >= 0);

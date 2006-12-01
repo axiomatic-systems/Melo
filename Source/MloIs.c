@@ -26,9 +26,6 @@
 /*----------------------------------------------------------------------
 |       Includes
 +---------------------------------------------------------------------*/
-
-
-
 #include "MloConfig.h"
 #include "MloDebug.h"
 #include "MloElementCpe.h"
@@ -38,25 +35,15 @@
 #include "MloScaleFactor.h"
 #include "MloUtils.h"
 
-
-
 /*----------------------------------------------------------------------
 |       Prototypes
 +---------------------------------------------------------------------*/
-
-
-
 static void MLO_Is_ProcessSfb (const MLO_IndivChnStream *ics_l_ptr, MLO_IndivChnStream *ics_r_ptr, int g, int sfb, int win_pos, MLO_Float scale);
 static MLO_Float  MLO_Is_ConvIsPositionToGain (int is_position);
-
-
 
 /*----------------------------------------------------------------------
 |       Functions
 +---------------------------------------------------------------------*/
-
-
-
 /*
 ==============================================================================
 Name: MLO_Is_Process
@@ -81,12 +68,12 @@ void  MLO_Is_Process (MLO_ElementCpe *cpe_ptr)
    int            group_pos = 0;
    int            g;
 
-   MLO_ASSERT (cpe_ptr != 0);
+   MLO_ASSERT (cpe_ptr != NULL);
 
    ics_l_ptr = cpe_ptr->ics_ptr_arr [0];
    ics_r_ptr = cpe_ptr->ics_ptr_arr [1];
-   MLO_ASSERT (ics_l_ptr != 0);
-   MLO_ASSERT (ics_r_ptr != 0);
+   MLO_ASSERT (ics_l_ptr != NULL);
+   MLO_ASSERT (ics_r_ptr != NULL);
 
    ms_mask_flag =
       (cpe_ptr->ms_mask_present == MLO_ELEMENT_CPE_MS_MASK_TYPE_USED);
@@ -131,8 +118,8 @@ static void MLO_Is_ProcessSfb (const MLO_IndivChnStream *ics_l_ptr, MLO_IndivChn
    int            sfb_len;
    int            window_group_length;
 
-   MLO_ASSERT (ics_l_ptr != 0);
-   MLO_ASSERT (ics_r_ptr != 0);
+   MLO_ASSERT (ics_l_ptr != NULL);
+   MLO_ASSERT (ics_r_ptr != NULL);
    MLO_ASSERT (g >= 0);
    MLO_ASSERT (g < 8);
    MLO_ASSERT (sfb >= 0);

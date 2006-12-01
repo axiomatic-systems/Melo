@@ -26,9 +26,6 @@
 /*----------------------------------------------------------------------
 |       Includes
 +---------------------------------------------------------------------*/
-
-
-
 #include "MloConfig.h"
 #include "MloDebug.h"
 #include "MloFloat.h"
@@ -37,23 +34,14 @@
 #include "MloMs.h"
 #include "MloUtils.h"
 
-
-
 /*----------------------------------------------------------------------
 |       Prototypes
 +---------------------------------------------------------------------*/
-
-
-
 static void MLO_Ms_ProcessSfb (MLO_IndivChnStream *ics_l_ptr, MLO_IndivChnStream *ics_r_ptr, int g, int sfb, int win_pos);
-
-
 
 /*----------------------------------------------------------------------
 |       Functions
 +---------------------------------------------------------------------*/
-
-
 
 /*
 ==============================================================================
@@ -69,7 +57,7 @@ Input/output parameters:
 void	MLO_Ms_Process (MLO_ElementCpe *cpe_ptr)
 {
    MLO_ElementCpe_MsMaskType  ms_mask_present;
-	MLO_ASSERT (cpe_ptr != 0);
+   MLO_ASSERT (cpe_ptr != NULL);
 
    ms_mask_present = cpe_ptr->ms_mask_present;
    if (ms_mask_present != MLO_ELEMENT_CPE_MS_MASK_TYPE_ALL_0)
@@ -113,8 +101,8 @@ static void MLO_Ms_ProcessSfb (MLO_IndivChnStream *ics_l_ptr, MLO_IndivChnStream
    int            window_group_length;
    int            win;
 
-   MLO_ASSERT (ics_l_ptr != 0);
-   MLO_ASSERT (ics_r_ptr != 0);
+   MLO_ASSERT (ics_l_ptr != NULL);
+   MLO_ASSERT (ics_r_ptr != NULL);
    MLO_ASSERT (g >= 0);
    MLO_ASSERT (g < 8);
    MLO_ASSERT (sfb >= 0);

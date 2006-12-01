@@ -215,11 +215,12 @@ Input/output parameters:
 ==============================================================================
 */
 
-void	MLO_IcsInfo_ClearBuffers (MLO_IcsInfo *ics_ptr)
+void	
+MLO_IcsInfo_ClearBuffers (MLO_IcsInfo *ics_ptr)
 {
    int            pos;
 
-	MLO_ASSERT (ics_ptr != 0);
+	MLO_ASSERT (ics_ptr != NULL);
 
    for (pos = 0; pos <MLO_IcsInfo_WSIndex_NBR_ELT; ++pos)
    {
@@ -249,12 +250,13 @@ Returns:
 ==============================================================================
 */
 
-MLO_Result	MLO_IcsInfo_Decode (MLO_IcsInfo *ics_ptr, MLO_BitStream *bit_ptr, MLO_SamplingFreq_Index fs_index)
+MLO_Result	
+MLO_IcsInfo_Decode (MLO_IcsInfo *ics_ptr, MLO_BitStream *bit_ptr, MLO_SamplingFreq_Index fs_index)
 {
    MLO_Result     result = MLO_SUCCESS;
 
-	MLO_ASSERT (ics_ptr != 0);
-	MLO_ASSERT (bit_ptr != 0);
+   MLO_ASSERT (ics_ptr != NULL);
+   MLO_ASSERT (bit_ptr != NULL);
    MLO_ASSERT (fs_index >= 0);
    MLO_ASSERT (fs_index < MLO_SAMPLING_FREQ_INDEX_NBR_VALID);
 
@@ -323,8 +325,8 @@ void MLO_IcsInfo_DeinterleaveCoefficients (const MLO_IcsInfo *ics_ptr, MLO_Float
    int            num_swb;
    int            g;
 
-   MLO_ASSERT (ics_ptr != 0);
-   MLO_ASSERT (coef_ptr != 0);
+   MLO_ASSERT (ics_ptr != NULL);
+   MLO_ASSERT (coef_ptr != NULL);
 
    num_window_groups = ics_ptr->num_window_groups;
    num_swb = ics_ptr->num_swb;
@@ -390,7 +392,7 @@ MLO_Result  MLO_IcsInfo_ComputeWindowGroupingInfo (MLO_IcsInfo *ics_ptr)
 {
    int            result = MLO_SUCCESS;
 
-   MLO_ASSERT (ics_ptr != 0);
+   MLO_ASSERT (ics_ptr != NULL);
    MLO_ASSERT (ics_ptr->fs_index >= 0);
    MLO_ASSERT (ics_ptr->fs_index < MLO_SAMPLING_FREQ_INDEX_NBR_VALID);
 
@@ -425,13 +427,14 @@ MLO_Result  MLO_IcsInfo_ComputeWindowGroupingInfo (MLO_IcsInfo *ics_ptr)
 
 
 
-void	MLO_IcsInfo_ComputeWindowGroupingInfoLong (MLO_IcsInfo *ics_ptr)
+void	
+MLO_IcsInfo_ComputeWindowGroupingInfoLong (MLO_IcsInfo *ics_ptr)
 {
    MLO_SamplingFreq_Index fs_index;
    int            nbr_swb;
    int            i;
 
-   MLO_ASSERT (ics_ptr != 0);
+   MLO_ASSERT (ics_ptr != NULL);
    MLO_ASSERT (ics_ptr->fs_index >= 0);
    MLO_ASSERT (ics_ptr->fs_index < MLO_SAMPLING_FREQ_INDEX_NBR_SUPPORTED);
 
@@ -464,14 +467,15 @@ void	MLO_IcsInfo_ComputeWindowGroupingInfoLong (MLO_IcsInfo *ics_ptr)
 
 
 
-void	MLO_IcsInfo_ComputeWindowGroupingInfoShort (MLO_IcsInfo *ics_ptr)
+void	
+MLO_IcsInfo_ComputeWindowGroupingInfoShort (MLO_IcsInfo *ics_ptr)
 {
    MLO_SamplingFreq_Index fs_index;
    int            nbr_swb;
    int            i;
    int            g;
 
-   MLO_ASSERT (ics_ptr != 0);
+   MLO_ASSERT (ics_ptr != NULL);
    MLO_ASSERT (ics_ptr->fs_index >= 0);
    MLO_ASSERT (ics_ptr->fs_index < MLO_SAMPLING_FREQ_INDEX_NBR_SUPPORTED);
 

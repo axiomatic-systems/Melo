@@ -26,34 +26,23 @@
 /*----------------------------------------------------------------------
 |       Includes
 +---------------------------------------------------------------------*/
-
-
-
 #include "MloBitStream.h"
 #include "MloConfig.h"
 #include "MloDebug.h"
 #include "MloHcbScaleFactor.h"
-
-
+#include "MloDefs.h"
 
 /*----------------------------------------------------------------------
 |       Types
 +---------------------------------------------------------------------*/
-
-
-
 typedef struct MLO_HcbScaleFactor_Binary
 {
    MLO_Int8       data [2];
 }  MLO_HcbScaleFactor_Binary;
 
-
-
 /*----------------------------------------------------------------------
 |       Constants
 +---------------------------------------------------------------------*/
-
-
 
 /* 4.A, Table 4.A.1 */
 static const MLO_HcbScaleFactor_Binary  MLO_HcbScaleFactor_coodbook [] =
@@ -320,17 +309,17 @@ Returns: The scale factor
 ==============================================================================
 */
 
-int   MLO_HcbScaleFactor_decode (MLO_BitStream *bit_ptr)
+int   
+MLO_HcbScaleFactor_decode (MLO_BitStream *bit_ptr)
 {
-   int            offset = 0;
+   unsigned int offset = 0;
 
-   MLO_ASSERT (bit_ptr != 0);
+   MLO_ASSERT (bit_ptr != NULL);
 
    while (MLO_HcbScaleFactor_coodbook [offset].data [1] != 0)
    {
-      const int      bit = MLO_BitStream_ReadBit (bit_ptr);
+      unsigned int bit = MLO_BitStream_ReadBit (bit_ptr);
       offset += MLO_HcbScaleFactor_coodbook [offset].data [bit];
-      MLO_ASSERT (offset >= 0);
       MLO_ASSERT (offset <= 240);
    }
 

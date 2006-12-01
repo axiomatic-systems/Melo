@@ -66,17 +66,18 @@ Returns:
 ==============================================================================
 */
 
-MLO_Result  MLO_ElementCpe_Decode (MLO_ElementCpe *cpe_ptr, MLO_BitStream *bit_ptr, MLO_IndivChnPool *chn_pool_ptr, MLO_SamplingFreq_Index fs_index)
+MLO_Result  
+MLO_ElementCpe_Decode (MLO_ElementCpe *cpe_ptr, MLO_BitStream *bit_ptr, MLO_IndivChnPool *chn_pool_ptr, MLO_SamplingFreq_Index fs_index)
 {
    MLO_Result     result = MLO_SUCCESS;
    MLO_Boolean    common_window_flag = MLO_FALSE;
    int            ics_index_arr [2] = { -1, -1 };
 
-	MLO_ASSERT (cpe_ptr != 0);
-	MLO_ASSERT (bit_ptr != 0);
-	MLO_ASSERT (chn_pool_ptr != 0);
-   MLO_ASSERT (fs_index >= 0);
-   MLO_ASSERT (fs_index < MLO_SAMPLING_FREQ_INDEX_NBR_VALID);
+	MLO_ASSERT(cpe_ptr != NULL);
+	MLO_ASSERT(bit_ptr != NULL);
+	MLO_ASSERT(chn_pool_ptr != NULL);
+    MLO_ASSERT(fs_index >= 0);
+    MLO_CHECK_ARGS(fs_index < MLO_SAMPLING_FREQ_INDEX_NBR_VALID);
 
    cpe_ptr->element_instance_tag = MLO_BitStream_ReadBits (bit_ptr, 4);
 
@@ -134,8 +135,8 @@ MLO_Result  MLO_ElementCpe_Decode (MLO_ElementCpe *cpe_ptr, MLO_BitStream *bit_p
          const int      num_window_groups = ics_info_ptr->num_window_groups;
          int            g;
 
-         MLO_ASSERT (num_window_groups <= (int)MLO_ARRAY_SIZE (cpe_ptr->ms_used));
-         MLO_ASSERT (max_sfb           <= (int)MLO_ARRAY_SIZE (cpe_ptr->ms_used [0]));
+         MLO_CHECK_DATA(num_window_groups <= (int)MLO_ARRAY_SIZE (cpe_ptr->ms_used));
+         MLO_CHECK_DATA(max_sfb           <= (int)MLO_ARRAY_SIZE (cpe_ptr->ms_used [0]));
 
          for (g = 0; g < num_window_groups; ++g)
          {

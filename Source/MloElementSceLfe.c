@@ -26,9 +26,6 @@
 /*----------------------------------------------------------------------
 |       Includes
 +---------------------------------------------------------------------*/
-
-
-
 #include "MloBitStream.h"
 #include "MloDebug.h"
 #include "MloElementSceLfe.h"
@@ -37,13 +34,9 @@
 #include "MloPns.h"
 #include "MloUtils.h"
 
-
-
 /*----------------------------------------------------------------------
 |       Functions
 +---------------------------------------------------------------------*/
-
-
 
 /*
 ==============================================================================
@@ -72,17 +65,18 @@ Returns:
 ==============================================================================
 */
 
-MLO_Result	MLO_ElementSceLfe_Decode (MLO_ElementSceLfe *sce_ptr, MLO_BitStream *bit_ptr, MLO_IndivChnPool *chn_pool_ptr, MLO_SamplingFreq_Index fs_index)
+MLO_Result	
+MLO_ElementSceLfe_Decode (MLO_ElementSceLfe *sce_ptr, MLO_BitStream *bit_ptr, MLO_IndivChnPool *chn_pool_ptr, MLO_SamplingFreq_Index fs_index)
 {
    MLO_Result     result = MLO_SUCCESS;
    MLO_IndivChnStream * ics_ptr = 0;
    int            ics_index;
 
-	MLO_ASSERT (sce_ptr != 0);
-	MLO_ASSERT (bit_ptr != 0);
-	MLO_ASSERT (chn_pool_ptr != 0);
-    MLO_ASSERT (fs_index >= 0);
-    MLO_ASSERT (fs_index < MLO_SAMPLING_FREQ_INDEX_NBR_VALID);
+	MLO_ASSERT(sce_ptr != NULL);
+	MLO_ASSERT(bit_ptr != NULL);
+	MLO_ASSERT(chn_pool_ptr != NULL);
+    MLO_ASSERT(fs_index >= 0);
+    MLO_CHECK_ARGS(fs_index < MLO_SAMPLING_FREQ_INDEX_NBR_VALID);
 
     sce_ptr->element_instance_tag = MLO_BitStream_ReadBits (bit_ptr, 4);
 

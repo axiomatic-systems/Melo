@@ -26,22 +26,15 @@
 /*----------------------------------------------------------------------
 |       Includes
 +---------------------------------------------------------------------*/
-
-
-
 #include "MloBitStream.h"
 #include "MloConfig.h"
 #include "MloDebug.h"
 #include "MloHcbQuad.h"
-
-
+#include "MloDefs.h"
 
 /*----------------------------------------------------------------------
 |       Types
 +---------------------------------------------------------------------*/
-
-
-
 typedef struct MLO_HcbQuad_Binary
 {
    MLO_Int8       leaf_flag;
@@ -49,13 +42,11 @@ typedef struct MLO_HcbQuad_Binary
 }  MLO_HcbQuad_Binary;
 
 
-
 typedef struct MLO_HcbQuad_Step1
 {
    MLO_Int8       offset;
    MLO_Int8       extra_bits;
 }  MLO_HcbQuad_Step1;
-
 
 
 typedef struct MLO_HcbQuad_Step2
@@ -766,24 +757,24 @@ Input/output parameters:
 ==============================================================================
 */
 
-void  MLO_HcbQuad_decode_binary (MLO_Int16 data_ptr [4], MLO_BitStream *bit_ptr, MLO_Hcb hcb)
+void  
+MLO_HcbQuad_decode_binary (MLO_Int16 data_ptr [4], MLO_BitStream *bit_ptr, MLO_Hcb hcb)
 {
-   int            offset = 0;
+   unsigned int offset = 0;
    const MLO_HcbQuad_Binary * table_ptr;
 
-	MLO_ASSERT (data_ptr != 0);
-	MLO_ASSERT (bit_ptr != 0);
-   MLO_ASSERT (hcb > MLO_HCB_ZERO_HCB);
-   MLO_ASSERT (hcb < MLO_HCB_FIRST_PAIR_HCB);
+   MLO_ASSERT(data_ptr != NULL);
+   MLO_ASSERT(bit_ptr != NULL);
+   MLO_ASSERT(hcb > MLO_HCB_ZERO_HCB);
+   MLO_ASSERT(hcb < MLO_HCB_FIRST_PAIR_HCB);
 
    table_ptr = MLO_HcbQuad_cookbook_index [hcb].bin_ptr;
-   MLO_ASSERT (table_ptr != 0);
+   MLO_ASSERT(table_ptr != NULL);
 
    while (! table_ptr [offset].leaf_flag)
    {
-      const int      bit = MLO_BitStream_ReadBit (bit_ptr);
+      unsigned int bit = MLO_BitStream_ReadBit (bit_ptr);
       offset += table_ptr [offset].data [bit];
-      MLO_ASSERT (offset >= 0);
    }
 
    data_ptr [0] = table_ptr [offset].data [0];
@@ -808,7 +799,8 @@ Input/output parameters:
 ==============================================================================
 */
 
-void  MLO_HcbQuad_decode_2steps (MLO_Int16 data_ptr [4], MLO_BitStream *bit_ptr, MLO_Hcb hcb)
+void  
+MLO_HcbQuad_decode_2steps (MLO_Int16 data_ptr [4], MLO_BitStream *bit_ptr, MLO_Hcb hcb)
 {
    int            offset = 0;
    int            nbr_bits = 5;
@@ -817,15 +809,15 @@ void  MLO_HcbQuad_decode_2steps (MLO_Int16 data_ptr [4], MLO_BitStream *bit_ptr,
    const MLO_HcbQuad_Step1 *  table_1_ptr;
    const MLO_HcbQuad_Step2 *  table_2_ptr;
 
-	MLO_ASSERT (data_ptr != 0);
-	MLO_ASSERT (bit_ptr != 0);
-   MLO_ASSERT (hcb > MLO_HCB_ZERO_HCB);
-   MLO_ASSERT (hcb < MLO_HCB_FIRST_PAIR_HCB);
+   MLO_ASSERT(data_ptr != NULL);
+   MLO_ASSERT(bit_ptr != NULL);
+   MLO_ASSERT(hcb > MLO_HCB_ZERO_HCB);
+   MLO_ASSERT(hcb < MLO_HCB_FIRST_PAIR_HCB);
 
    table_1_ptr = MLO_HcbQuad_cookbook_index [hcb].step_1_ptr;
    table_2_ptr = MLO_HcbQuad_cookbook_index [hcb].step_2_ptr;
-   MLO_ASSERT (table_1_ptr != 0);
-   MLO_ASSERT (table_2_ptr != 0);
+   MLO_ASSERT (table_1_ptr != NULL);
+   MLO_ASSERT (table_2_ptr != NULL);
 
    cw = MLO_BitStream_PeekBits (bit_ptr, nbr_bits);
 

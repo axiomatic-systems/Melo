@@ -26,23 +26,15 @@
 /*----------------------------------------------------------------------
 |       Includes
 +---------------------------------------------------------------------*/
-
-
-
 #include "MloDebug.h"
 #include "MloHcbPair.h"
 #include "MloHcbQuad.h"
 #include "MloHuffman.h"
 #include "MloUtils.h"
 
-
-
 /*----------------------------------------------------------------------
 |       Prototypes
 +---------------------------------------------------------------------*/
-
-
-
 static void MLO_Huffman_decode_spectral_data_pair (MLO_Int16 data_ptr [2], MLO_BitStream *bit_ptr, MLO_Hcb hcb);
 static void MLO_Huffman_decode_spectral_data_quad (MLO_Int16 data_ptr [4], MLO_BitStream *bit_ptr, MLO_Hcb hcb);
 static void MLO_Huffman_decode_spectral_data_esc (MLO_Int16 data_ptr [2], MLO_BitStream *bit_ptr);
@@ -55,13 +47,9 @@ static void MLO_Huffman_decode_2steps_quad_sign (MLO_Int16 data_ptr [4], MLO_Bit
 static MLO_Int16  MLO_Huffman_apply_sign (MLO_Int16 data, MLO_BitStream *bit_ptr);
 static MLO_Int16  MLO_Huffman_decode_escape_code (MLO_Int16 data, MLO_BitStream *bit_ptr);
 
-
-
 /*----------------------------------------------------------------------
 |       Functions
 +---------------------------------------------------------------------*/
-
-
 
 /*
 ==============================================================================
@@ -79,13 +67,14 @@ Returns:
 ==============================================================================
 */
 
-MLO_Result	MLO_Huffman_decode_spectral_data (MLO_Int16 data_ptr [], MLO_BitStream *bit_ptr, MLO_Hcb hcb)
+MLO_Result	
+MLO_Huffman_decode_spectral_data (MLO_Int16 data_ptr [], MLO_BitStream *bit_ptr, MLO_Hcb hcb)
 {
    MLO_Result     result = MLO_SUCCESS;
 
-	MLO_ASSERT (data_ptr != 0);
-	MLO_ASSERT (bit_ptr != 0);
-	MLO_ASSERT (hcb > MLO_HCB_ZERO_HCB);
+   MLO_ASSERT (data_ptr != NULL);
+   MLO_ASSERT (bit_ptr != NULL);
+   MLO_ASSERT (hcb > MLO_HCB_ZERO_HCB);
    MLO_ASSERT (hcb <= MLO_HCB_ESC_HCB);
 
    /* Quad */
@@ -117,12 +106,13 @@ MLO_Result	MLO_Huffman_decode_spectral_data (MLO_Int16 data_ptr [], MLO_BitStrea
 
 
 
-void  MLO_Huffman_decode_spectral_data_pair (MLO_Int16 data_ptr [2], MLO_BitStream *bit_ptr, MLO_Hcb hcb)
+void  
+MLO_Huffman_decode_spectral_data_pair (MLO_Int16 data_ptr [2], MLO_BitStream *bit_ptr, MLO_Hcb hcb)
 {
-	MLO_ASSERT (data_ptr != 0);
-	MLO_ASSERT (bit_ptr != 0);
+	MLO_ASSERT (data_ptr != NULL);
+	MLO_ASSERT (bit_ptr != NULL);
 	MLO_ASSERT (hcb >= MLO_HCB_FIRST_PAIR_HCB);
-   MLO_ASSERT (hcb < MLO_HCB_ESC_HCB);
+    MLO_ASSERT (hcb < MLO_HCB_ESC_HCB);
 
    switch (hcb)
    {
@@ -150,13 +140,12 @@ void  MLO_Huffman_decode_spectral_data_pair (MLO_Int16 data_ptr [2], MLO_BitStre
    }
 }
 
-
-
-void  MLO_Huffman_decode_spectral_data_quad (MLO_Int16 data_ptr [4], MLO_BitStream *bit_ptr, MLO_Hcb hcb)
+void  
+MLO_Huffman_decode_spectral_data_quad (MLO_Int16 data_ptr [4], MLO_BitStream *bit_ptr, MLO_Hcb hcb)
 {
-	MLO_ASSERT (data_ptr != 0);
-	MLO_ASSERT (bit_ptr != 0);
-   MLO_ASSERT (hcb > MLO_HCB_ZERO_HCB);
+	MLO_ASSERT (data_ptr != NULL);
+	MLO_ASSERT (bit_ptr != NULL);
+    MLO_ASSERT (hcb > MLO_HCB_ZERO_HCB);
 	MLO_ASSERT (hcb < MLO_HCB_FIRST_PAIR_HCB);
 
    switch (hcb)
@@ -182,10 +171,11 @@ void  MLO_Huffman_decode_spectral_data_quad (MLO_Int16 data_ptr [4], MLO_BitStre
 
 
 
-void  MLO_Huffman_decode_spectral_data_esc (MLO_Int16 data_ptr [2], MLO_BitStream *bit_ptr)
+void  
+MLO_Huffman_decode_spectral_data_esc (MLO_Int16 data_ptr [2], MLO_BitStream *bit_ptr)
 {
-	MLO_ASSERT (data_ptr != 0);
-	MLO_ASSERT (bit_ptr != 0);
+	MLO_ASSERT (data_ptr != NULL);
+	MLO_ASSERT (bit_ptr != NULL);
 
    MLO_Huffman_decode_2steps_pair_sign (data_ptr, bit_ptr, MLO_HCB_ESC_HCB);
    data_ptr [0] = MLO_Huffman_decode_escape_code (data_ptr [0], bit_ptr);
@@ -251,10 +241,11 @@ Returns: Signed value.
 ==============================================================================
 */
 
-MLO_Int16	MLO_Huffman_apply_sign (MLO_Int16 data, MLO_BitStream *bit_ptr)
+MLO_Int16	
+MLO_Huffman_apply_sign (MLO_Int16 data, MLO_BitStream *bit_ptr)
 {
 	MLO_ASSERT (data >= 0);
-	MLO_ASSERT (bit_ptr != 0);
+	MLO_ASSERT (bit_ptr != NULL);
 
    if (data != 0)
    {
@@ -285,9 +276,10 @@ Returns: The final data.
 ==============================================================================
 */
 
-MLO_Int16	MLO_Huffman_decode_escape_code (MLO_Int16 data, MLO_BitStream *bit_ptr)
+MLO_Int16	
+MLO_Huffman_decode_escape_code (MLO_Int16 data, MLO_BitStream *bit_ptr)
 {
-	MLO_ASSERT (bit_ptr != 0);
+	MLO_ASSERT (bit_ptr != NULL);
 
    /* If escape sequence is present */
    if (MLO_ABS (data) == 16)

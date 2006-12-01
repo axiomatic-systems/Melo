@@ -58,7 +58,7 @@ Input/output parameters:
 
 void  MLO_IndivChnStream_ClearBuffers (MLO_IndivChnStream *ics_ptr)
 {
-   MLO_ASSERT (ics_ptr != 0);
+   MLO_ASSERT (ics_ptr != NULL);
 
    MLO_IcsInfo_ClearBuffers (&ics_ptr->ics_info);
 
@@ -105,8 +105,8 @@ MLO_Result	MLO_IndivChnStream_Decode (MLO_IndivChnStream *ics_ptr, MLO_BitStream
 {
    int            result = MLO_SUCCESS;
 
-	MLO_ASSERT (ics_ptr != 0);
-	MLO_ASSERT (bit_ptr != 0);
+   MLO_ASSERT (ics_ptr != NULL);
+   MLO_ASSERT (bit_ptr != NULL);
    MLO_ASSERT (fs_index >= 0);
    MLO_ASSERT (fs_index < MLO_SAMPLING_FREQ_INDEX_NBR_VALID);
 
@@ -217,8 +217,8 @@ MLO_Result  MLO_IndivChnStream_DecodePulseData (MLO_IndivChnStream *ics_ptr, MLO
    MLO_Result     result = MLO_SUCCESS;
    int            nbr_pulses;
 
-   MLO_ASSERT (ics_ptr != 0);
-	MLO_ASSERT (bit_ptr != 0);
+   MLO_ASSERT (ics_ptr != NULL);
+   MLO_ASSERT (bit_ptr != NULL);
 
    ics_ptr->number_pulse = MLO_BitStream_ReadBits (bit_ptr, 2);
    ics_ptr->pulse_start_sfb = MLO_BitStream_ReadBits (bit_ptr, 6);
@@ -277,8 +277,8 @@ MLO_Result  MLO_IndivChnStream_DecodeSpectralData (MLO_IndivChnStream *ics_ptr, 
    int            group_pos = 0;
    int            num_window_groups;
 
-   MLO_ASSERT (ics_ptr != 0);
-	MLO_ASSERT (bit_ptr != 0);
+   MLO_ASSERT (ics_ptr != NULL);
+   MLO_ASSERT (bit_ptr != NULL);
 
    /* Spectral array should be cleaned before entering the decoding stage
       because non-transmitted info above max_sfb is implicitely 0 (4.6.3.3). */

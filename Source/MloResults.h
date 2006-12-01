@@ -49,6 +49,7 @@
 #define MLO_ERROR_INVALID_PARAMETERS      (MLO_ERROR_BASE_GENERIC-0)
 #define MLO_ERROR_OUT_OF_MEMORY           (MLO_ERROR_BASE_GENERIC-1)
 #define MLO_ERROR_OUT_OF_RANGE            (MLO_ERROR_BASE_GENERIC-2)
+#define MLO_ERROR_INVALID_DATA            (MLO_ERROR_BASE_GENERIC-3)
 
 /* Decoder errors */
 #define MLO_ERROR_BASE_DECODER            (-20100)
@@ -78,7 +79,14 @@
 #define MLO_ERROR_BASE_SYNTACTIC_ELEMENTS (-20900)
 
 /*----------------------------------------------------------------------
-|    import some Atomix error codes
+|    macros
 +---------------------------------------------------------------------*/
+#if defined(MLO_DEBUG)
+#define MLO_CHECK_ARGS(_x) MLO_ASSERT(_x)
+#else
+#define MLO_CHECK_ARGS(_x) if (!(_x)) return MLO_ERROR_INVALID_PARAMETERS
+#endif
+
+#define MLO_CHECK_DATA(_x) if (!(_x)) return MLO_ERROR_INVALID_DATA
 
 #endif /* _MLO_ERRORS_H_ */

@@ -23,18 +23,17 @@
 |
  ****************************************************************/
 
+/*----------------------------------------------------------------------
+|       Includes
++---------------------------------------------------------------------*/
 #include "MloDebug.h"
 #include "MloFft.h"
 #include "MloFloat.h"
 #include "MloUtils.h"
 
-
-
 /*----------------------------------------------------------------------
 |       Data
 +---------------------------------------------------------------------*/
-
-
 
 /* [0 ; Pi/2[ */
 static const MLO_Float MLO_Fft_table_cos [MLO_FFT_TABLE_LEN_COS] =
@@ -332,7 +331,7 @@ Output parameters:
 
 void  MLO_Fft_Init (MLO_Fft *fft_ptr)
 {
-   MLO_ASSERT (fft_ptr != 0);
+   MLO_ASSERT(fft_ptr != NULL);
 
    MLO_Fft_BuildBrTable (&fft_ptr->table_br_l [0], 10);
    MLO_Fft_BuildBrTable (&fft_ptr->table_br_s [0], 7);
@@ -388,10 +387,10 @@ void  MLO_Fft_Process (MLO_Fft *fft_ptr, MLO_Float y_ptr [], const MLO_Float x_p
 {
    MLO_Float *    buf_ptr;
 
-   MLO_ASSERT (fft_ptr != 0);
-   MLO_ASSERT (x_ptr != 0);
-   MLO_ASSERT (y_ptr != 0);
-   MLO_ASSERT (   len == MLO_DEFS_FRAME_LEN_SHORT
+   MLO_ASSERT(fft_ptr != NULL);
+   MLO_ASSERT(x_ptr != NULL);
+   MLO_ASSERT(y_ptr != NULL);
+   MLO_ASSERT(   len == MLO_DEFS_FRAME_LEN_SHORT
 /*************************************************************************************************************/
 /*** Debug ***/
                || len == 8 /*** Debug ***/

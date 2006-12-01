@@ -26,9 +26,6 @@
 /*----------------------------------------------------------------------
 |       Includes
 +---------------------------------------------------------------------*/
-
-
-
 #include "MloConfig.h"
 #include "MloDebug.h"
 #include "MloElementCpe.h"
@@ -37,24 +34,14 @@
 #include "MloScaleFactor.h"
 #include "MloUtils.h"
 
-
-
 /*----------------------------------------------------------------------
 |       Variables
 +---------------------------------------------------------------------*/
-
-
-
 static MLO_UInt32 MLO_Pns_rand_state = 1;
-
-
 
 /*----------------------------------------------------------------------
 |       Prototypes
 +---------------------------------------------------------------------*/
-
-
-
 static void MLO_Pns_ProcessCommon (MLO_IndivChnStream *ics_l_ptr, MLO_IndivChnStream *ics_r_ptr, MLO_ElementCpe *cpe_ptr);
 static void MLO_Pns_ProcessSfbSingle (MLO_IndivChnStream *ics_ptr, int g, int sfb, int win_pos);
 static void MLO_Pns_CopySfbNoise (const MLO_IndivChnStream *ics_l_ptr, MLO_IndivChnStream *ics_r_ptr, int g, int sfb, int win_pos);
@@ -63,14 +50,9 @@ static MLO_Float  MLO_Pns_GenRandVal (void);
 static MLO_Int32  MLO_Pns_GenRandValInt (void);
 static MLO_Float  MLO_Pns_ConvNoiseNrgToGain (int noise_nrg);
 
-
-
 /*----------------------------------------------------------------------
 |       Functions
 +---------------------------------------------------------------------*/
-
-
-
 /*
 ==============================================================================
 Name: MLO_Pns_ProcessSingle
@@ -86,7 +68,7 @@ Input/output parameters:
 
 void  MLO_Pns_ProcessSingle (MLO_IndivChnStream *ics_ptr)
 {
-   MLO_ASSERT (ics_ptr != 0);
+   MLO_ASSERT (ics_ptr != NULL);
 
    MLO_Pns_ProcessCommon (ics_ptr, 0, 0);
 }
@@ -108,7 +90,7 @@ Input/output parameters:
 
 void  MLO_Pns_ProcessPair (MLO_ElementCpe *cpe_ptr)
 {
-   MLO_ASSERT (cpe_ptr != 0);
+   MLO_ASSERT (cpe_ptr != NULL);
    MLO_ASSERT (cpe_ptr->ics_ptr_arr [0] != 0);
    MLO_ASSERT (cpe_ptr->ics_ptr_arr [1] != 0);
 
@@ -143,8 +125,8 @@ static void  MLO_Pns_ProcessCommon (MLO_IndivChnStream *ics_l_ptr, MLO_IndivChnS
    MLO_ElementCpe_MsMaskType
                   ms_mask_present = MLO_ELEMENT_CPE_MS_MASK_TYPE_ALL_0;
 
-   MLO_ASSERT (ics_l_ptr != 0);
-   MLO_ASSERT (ics_r_ptr == 0 || cpe_ptr != 0);
+   MLO_ASSERT (ics_l_ptr != NULL);
+   MLO_ASSERT (ics_r_ptr == NULL || cpe_ptr != NULL);
 
    num_window_groups = ics_l_ptr->ics_info.num_window_groups;
    max_sfb = ics_l_ptr->ics_info.max_sfb;
@@ -215,7 +197,7 @@ static void MLO_Pns_ProcessSfbSingle (MLO_IndivChnStream *ics_ptr, int g, int sf
    MLO_Float      noise_nrg_gain;
    int            window_group_length;
 
-   MLO_ASSERT (ics_ptr != 0);
+   MLO_ASSERT (ics_ptr != NULL);
    MLO_ASSERT (g >= 0);
    MLO_ASSERT (g < 8);
    MLO_ASSERT (sfb >= 0);
@@ -270,8 +252,8 @@ static void MLO_Pns_CopySfbNoise (const MLO_IndivChnStream *ics_l_ptr, MLO_Indiv
    int            sfb_len;
    int            window_group_length;
 
-   MLO_ASSERT (ics_l_ptr != 0);
-   MLO_ASSERT (ics_r_ptr != 0);
+   MLO_ASSERT (ics_l_ptr != NULL);
+   MLO_ASSERT (ics_r_ptr != NULL);
    MLO_ASSERT (g >= 0);
    MLO_ASSERT (g < ics_l_ptr->ics_info.num_window_groups);
    MLO_ASSERT (sfb >= 0);
@@ -320,7 +302,7 @@ static void MLO_Pns_GenRandVect (MLO_Float *coef_ptr, int len, MLO_Float noise_n
    MLO_Float      rms;
    MLO_Float      scale;
 
-   MLO_ASSERT (coef_ptr != 0);
+   MLO_ASSERT (coef_ptr != NULL);
    MLO_ASSERT (len > 0);
    MLO_ASSERT (len <= MLO_DEFS_FRAME_LEN_LONG);
 

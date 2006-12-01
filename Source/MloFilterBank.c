@@ -26,22 +26,14 @@
 /*----------------------------------------------------------------------
 |       Includes
 +---------------------------------------------------------------------*/
-
-
-
 #include "MloDebug.h"
 #include "MloFilterBank.h"
 #include "MloSampleBuffer.h"
 #include "MloUtils.h"
 
-
-
 /*----------------------------------------------------------------------
 |       Function prototypes
 +---------------------------------------------------------------------*/
-
-
-
 static void MLO_FilterBank_ApplyWindow (MLO_FilterBank *fb_ptr, const MLO_IndivChnStream *ics_ptr);
 static void MLO_FilterBank_ApplyWindowLong (MLO_FilterBank *fb_ptr, const MLO_IndivChnStream *ics_ptr, int part);
 static void MLO_FilterBank_ApplyWindowShort (MLO_FilterBank *fb_ptr, const MLO_IndivChnStream *ics_ptr);
@@ -49,21 +41,14 @@ static void MLO_FilterBank_ApplyWindowStart (MLO_FilterBank *fb_ptr, const MLO_I
 static void MLO_FilterBank_ApplyWindowStop (MLO_FilterBank *fb_ptr, const MLO_IndivChnStream *ics_ptr);
 static void MLO_FilterBank_MixFrames (const MLO_FilterBank *fb_ptr, MLO_IndivChnStream *ics_ptr);
 
-
-
 /*----------------------------------------------------------------------
 |       Data
 +---------------------------------------------------------------------*/
-
-
-
 enum
 {
    MLO_FILTER_BANK_BORDER =
       (MLO_DEFS_FRAME_LEN_LONG - MLO_DEFS_FRAME_LEN_SHORT) / 2
 };
-
-
 
 static const MLO_Float MloFilterBank_table_long [MLO_ICS_INFO_WINDOW_SHAPE_NBR_ELT] [MLO_DEFS_FRAME_LEN_LONG * 2] =
 {
@@ -4754,7 +4739,7 @@ MLO_Result	MLO_FilterBank_Init (MLO_FilterBank *fb_ptr)
 {
    MLO_Result  result = MLO_SUCCESS;
 
-   MLO_ASSERT (fb_ptr != 0);
+   MLO_ASSERT(fb_ptr != NULL);
 
    if (MLO_SUCCEEDED (result))
    {
@@ -4778,9 +4763,10 @@ Output parameters:
 ==============================================================================
 */
 
-void	MLO_FilterBank_Restore (MLO_FilterBank *fb_ptr)
+void	
+MLO_FilterBank_Restore (MLO_FilterBank *fb_ptr)
 {
-   MLO_ASSERT (fb_ptr != 0);
+   MLO_ASSERT(fb_ptr != NULL);
 
    MLO_Imdct_Restore (&fb_ptr->imdct);
 }
@@ -4809,8 +4795,8 @@ void	MLO_FilterBank_ConvertSpectralToTime (MLO_FilterBank *fb_ptr, MLO_IndivChnS
    int            win_len = MLO_DEFS_FRAME_LEN_LONG;
    int            num_windows;
 
-   MLO_ASSERT (fb_ptr != 0);
-   MLO_ASSERT (ics_ptr != 0);
+   MLO_ASSERT(fb_ptr != NULL);
+   MLO_ASSERT(ics_ptr != NULL);
 
    if (ics_ptr->ics_info.window_sequence == MLO_ICS_INFO_WIN_EIGHT_SHORT_SEQUENCE)
    {
@@ -4858,10 +4844,11 @@ Input/output parameters:
 ==============================================================================
 */
 
-static void MLO_FilterBank_ApplyWindow (MLO_FilterBank *fb_ptr, const MLO_IndivChnStream *ics_ptr)
+static void 
+MLO_FilterBank_ApplyWindow (MLO_FilterBank *fb_ptr, const MLO_IndivChnStream *ics_ptr)
 {
-   MLO_ASSERT (fb_ptr != 0);
-   MLO_ASSERT (ics_ptr != 0);
+   MLO_ASSERT(fb_ptr != NULL);
+   MLO_ASSERT(ics_ptr != NULL);
 
    switch (ics_ptr->ics_info.window_sequence)
    {
@@ -4904,7 +4891,8 @@ Input/output parameters:
 ==============================================================================
 */
 
-static void MLO_FilterBank_ApplyWindowLong (MLO_FilterBank *fb_ptr, const MLO_IndivChnStream *ics_ptr, int part)
+static void 
+MLO_FilterBank_ApplyWindowLong (MLO_FilterBank *fb_ptr, const MLO_IndivChnStream *ics_ptr, int part)
 {
    const int      part_pos = part * MLO_DEFS_FRAME_LEN_LONG;
    MLO_IcsInfo_WindowShape shape;
@@ -4913,10 +4901,10 @@ static void MLO_FilterBank_ApplyWindowLong (MLO_FilterBank *fb_ptr, const MLO_In
    const MLO_Float * src_ptr;
    int            pos;
 
-   MLO_ASSERT (fb_ptr != 0);
-   MLO_ASSERT (ics_ptr != 0);
-   MLO_ASSERT (part >= 0);
-   MLO_ASSERT (part < 2);
+   MLO_ASSERT(fb_ptr != NULL);
+   MLO_ASSERT(ics_ptr != NULL);
+   MLO_ASSERT(part >= 0);
+   MLO_ASSERT(part < 2);
 
    shape = ics_ptr->ics_info.window_shape [part];
    win_ptr = &MloFilterBank_table_long [shape] [part_pos];
@@ -4942,7 +4930,8 @@ Input/output parameters:
 ==============================================================================
 */
 
-static void MLO_FilterBank_ApplyWindowShort (MLO_FilterBank *fb_ptr, const MLO_IndivChnStream *ics_ptr)
+static void 
+MLO_FilterBank_ApplyWindowShort (MLO_FilterBank *fb_ptr, const MLO_IndivChnStream *ics_ptr)
 {
    MLO_IcsInfo_WindowShape shape;
    const MLO_Float * win_ptr;
@@ -4951,8 +4940,8 @@ static void MLO_FilterBank_ApplyWindowShort (MLO_FilterBank *fb_ptr, const MLO_I
    int            win;
    int            pos;
 
-   MLO_ASSERT (fb_ptr != 0);
-   MLO_ASSERT (ics_ptr != 0);
+   MLO_ASSERT(fb_ptr != NULL);
+   MLO_ASSERT(ics_ptr != NULL);
 
    shape = ics_ptr->ics_info.window_shape [MLO_IcsInfo_WSIndex_PREV];
    win_ptr = &MloFilterBank_table_short [shape] [0];
@@ -5017,7 +5006,8 @@ Input/output parameters:
 ==============================================================================
 */
 
-static void MLO_FilterBank_ApplyWindowStart (MLO_FilterBank *fb_ptr, const MLO_IndivChnStream *ics_ptr)
+static void 
+MLO_FilterBank_ApplyWindowStart (MLO_FilterBank *fb_ptr, const MLO_IndivChnStream *ics_ptr)
 {
    MLO_IcsInfo_WindowShape shape;
    const MLO_Float * win_ptr;
@@ -5025,8 +5015,8 @@ static void MLO_FilterBank_ApplyWindowStart (MLO_FilterBank *fb_ptr, const MLO_I
    MLO_Float *    dest_ptr;
    int            pos;
 
-   MLO_ASSERT (fb_ptr != 0);
-   MLO_ASSERT (ics_ptr != 0);
+   MLO_ASSERT(fb_ptr != NULL);
+   MLO_ASSERT(ics_ptr != NULL);
 
    dest_ptr = &fb_ptr->tmp_win [MLO_DEFS_FRAME_LEN_LONG];
    src_ptr = &fb_ptr->tmp_buf [MLO_DEFS_FRAME_LEN_LONG];
@@ -5070,7 +5060,8 @@ Input/output parameters:
 ==============================================================================
 */
 
-static void MLO_FilterBank_ApplyWindowStop (MLO_FilterBank *fb_ptr, const MLO_IndivChnStream *ics_ptr)
+static void 
+MLO_FilterBank_ApplyWindowStop (MLO_FilterBank *fb_ptr, const MLO_IndivChnStream *ics_ptr)
 {
    MLO_IcsInfo_WindowShape shape;
    const MLO_Float * win_ptr;
@@ -5078,8 +5069,8 @@ static void MLO_FilterBank_ApplyWindowStop (MLO_FilterBank *fb_ptr, const MLO_In
    MLO_Float *    dest_ptr;
    int            pos;
 
-   MLO_ASSERT (fb_ptr != 0);
-   MLO_ASSERT (ics_ptr != 0);
+   MLO_ASSERT(fb_ptr != NULL);
+   MLO_ASSERT(ics_ptr != NULL);
 
    dest_ptr = &fb_ptr->tmp_win [0];
    MLO_SetMemory (
@@ -5123,12 +5114,13 @@ Input/output parameters:
 ==============================================================================
 */
 
-static void MLO_FilterBank_MixFrames (const MLO_FilterBank *fb_ptr, MLO_IndivChnStream *ics_ptr)
+static void 
+MLO_FilterBank_MixFrames (const MLO_FilterBank *fb_ptr, MLO_IndivChnStream *ics_ptr)
 {
    int            pos;
 
-   MLO_ASSERT (fb_ptr != 0);
-   MLO_ASSERT (ics_ptr != 0);
+   MLO_ASSERT(fb_ptr != NULL);
+   MLO_ASSERT(ics_ptr != NULL);
 
    /* Overlaps current and previous frame */
    for (pos = 0; pos < MLO_DEFS_FRAME_LEN_LONG; ++pos)

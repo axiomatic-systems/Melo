@@ -26,20 +26,14 @@
 /*----------------------------------------------------------------------
 |       Includes
 +---------------------------------------------------------------------*/
-
-
-
 #include "MloBitStream.h"
 #include "MloDebug.h"
 #include "MloElementDse.h"
-
-
+#include "MloDefs.h"
 
 /*----------------------------------------------------------------------
 |       Functions
 +---------------------------------------------------------------------*/
-
-
 
 /*
 ==============================================================================
@@ -54,13 +48,14 @@ Returns:
 ==============================================================================
 */
 
-MLO_Result	MLO_ElementDse_Decode (MLO_BitStream *bit_ptr)
+MLO_Result	
+MLO_ElementDse_Decode (MLO_BitStream *bit_ptr)
 {
    MLO_Result     result = MLO_SUCCESS;
    MLO_Boolean    byte_align_flag;
    int            count;
 
-	MLO_ASSERT (bit_ptr != 0);
+	MLO_ASSERT (bit_ptr != NULL);
 
    MLO_BitStream_ReadBits (bit_ptr, 4);   /* Ignores element_instance_tag */
    byte_align_flag = (MLO_Boolean) MLO_BitStream_ReadBit (bit_ptr);

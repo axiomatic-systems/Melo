@@ -26,7 +26,6 @@
 /*----------------------------------------------------------------------
 |       Includes
 +---------------------------------------------------------------------*/
-
 #include "MloConfig.h"
 #include "MloDebug.h"
 #include "MloFloat.h"
@@ -35,25 +34,15 @@
 #include "MloTypes.h"
 #include "MloUtils.h"
 
-
-
 /*----------------------------------------------------------------------
 |       Function prototypes
 +---------------------------------------------------------------------*/
-
-
-
 static void MLO_InvQuant_DoInverseQuantisation (MLO_Float coef_arr [], const MLO_Int16 data_arr [], long len);
 static inline MLO_Float MLO_InvQuant_ComputePow43 (int quant);
-
-
 
 /*----------------------------------------------------------------------
 |       Data
 +---------------------------------------------------------------------*/
-
-
-
 static const MLO_Float MLO_InvQuant_table_pow43 [8192 / 8] =
 {
    MLO_FLOAT_C (0),
@@ -1105,7 +1094,7 @@ Input/output parameters:
 
 void  MLO_InvQuant_ProcessChannel (MLO_IndivChnStream *ics_ptr)
 {
-   MLO_ASSERT (ics_ptr != 0);
+   MLO_ASSERT (ics_ptr != NULL);
 
    MLO_InvQuant_DoInverseQuantisation (
       &ics_ptr->coef_arr [0],
@@ -1120,8 +1109,8 @@ void  MLO_InvQuant_DoInverseQuantisation (MLO_Float coef_arr [], const MLO_Int16
 {
    int            pos;
 
-   MLO_ASSERT (coef_arr != 0);
-   MLO_ASSERT (data_arr != 0);
+   MLO_ASSERT (coef_arr != NULL);
+   MLO_ASSERT (data_arr != NULL);
    MLO_ASSERT (len > 0);
    MLO_ASSERT (len <= MLO_DEFS_FRAME_LEN_LONG);
 

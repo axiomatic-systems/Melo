@@ -55,12 +55,12 @@ typedef enum MLO_ElementFil_DataElementVersion
 /*----------------------------------------------------------------------
 |       Prototypes
 +---------------------------------------------------------------------*/
-static MLO_Result MLO_ElementFil_DecodeExtensionPayload (MLO_ElementFil *fil_ptr, MLO_BitStream *bit_ptr, int *count_ptr);
-static void MLO_ElementFil_DecodeFill (MLO_BitStream *bit_ptr, int count);
-static MLO_Result MLO_ElementFil_DecodeFillData (MLO_BitStream *bit_ptr, int count);
-static void MLO_ElementFil_DecodeDataElement (MLO_BitStream *bit_ptr, int *count_ptr);
-static int  MLO_ElementFil_DecodeDynamicRangeInfo (MLO_ElementFil_DynamicRangeInfo *drc_ptr, MLO_BitStream *bit_ptr);
-static int  MLO_ElementFil_DecodeExcludedChannels (MLO_ElementFil_DynamicRangeInfo *drc_ptr, MLO_BitStream *bit_ptr);
+static MLO_Result MLO_ElementFil_DecodeExtensionPayload (MLO_ElementFil *fil_ptr, MLO_BitStream *bit_ptr, unsigned int *count_ptr);
+static void MLO_ElementFil_DecodeFill (MLO_BitStream *bit_ptr, unsigned int count);
+static MLO_Result MLO_ElementFil_DecodeFillData (MLO_BitStream *bit_ptr, unsigned int count);
+static void MLO_ElementFil_DecodeDataElement (MLO_BitStream *bit_ptr, unsigned int *count_ptr);
+static MLO_Result MLO_ElementFil_DecodeDynamicRangeInfo(MLO_ElementFil_DynamicRangeInfo *drc_ptr, MLO_BitStream *bit_ptr, unsigned int* bytes_used);
+static MLO_Result MLO_ElementFil_DecodeExcludedChannels(MLO_ElementFil_DynamicRangeInfo *drc_ptr, MLO_BitStream *bit_ptr, unsigned int* bytes_used);
 
 /*----------------------------------------------------------------------
 |       Functions
@@ -82,24 +82,25 @@ Returns:
 ==============================================================================
 */
 
-MLO_Result	MLO_ElementFil_Decode (MLO_ElementFil *fil_ptr, MLO_BitStream *bit_ptr)
+MLO_Result	
+MLO_ElementFil_Decode (MLO_ElementFil *fil_ptr, MLO_BitStream *bit_ptr)
 {
-   MLO_Result     result = MLO_SUCCESS;
-   int            count;
+   MLO_Result   result = MLO_SUCCESS;
+   unsigned int count;
 
-	MLO_ASSERT (fil_ptr != 0);
-	MLO_ASSERT (bit_ptr != 0);
+	MLO_ASSERT(fil_ptr != NULL);
+	MLO_ASSERT(bit_ptr != NULL);
 
    count = MLO_BitStream_ReadBits (bit_ptr, 4);
    if (count == 15)
    {
-      int            esc_count = MLO_BitStream_ReadBits (bit_ptr, 8);
+      unsigned int esc_count = MLO_BitStream_ReadBits (bit_ptr, 8);
       count += esc_count - 1;
    }
 
    while (count > 0 && MLO_SUCCEEDED (result))
    {
-      int         cnt = count;
+      unsigned int cnt = count;
       result = MLO_ElementFil_DecodeExtensionPayload (fil_ptr, bit_ptr, &cnt);
       count -= cnt;
    }
@@ -131,15 +132,16 @@ Returns:
 ==============================================================================
 */
 
-MLO_Result	MLO_ElementFil_DecodeExtensionPayload (MLO_ElementFil *fil_ptr, MLO_BitStream *bit_ptr, int *count_ptr)
+MLO_Result	
+MLO_ElementFil_DecodeExtensionPayload (MLO_ElementFil *fil_ptr, MLO_BitStream *bit_ptr, unsigned int* count_ptr)
 {
     MLO_Result     result = MLO_SUCCESS;
     MLO_ElementFil_Ext   extension_type;
 
-    MLO_ASSERT (&fil_ptr != 0);
-	MLO_ASSERT (&bit_ptr != 0);
-	MLO_ASSERT (&count_ptr != 0);
-    MLO_ASSERT (*count_ptr > 0);
+    MLO_ASSERT(fil_ptr != NULL);
+	MLO_ASSERT(bit_ptr != NULL);
+	MLO_ASSERT(count_ptr != NULL);
+    MLO_CHECK_ARGS(*count_ptr > 0);
 
     extension_type = (MLO_ElementFil_Ext) MLO_BitStream_ReadBits (bit_ptr, 4);
     switch (extension_type)
@@ -157,9 +159,10 @@ MLO_Result	MLO_ElementFil_DecodeExtensionPayload (MLO_ElementFil *fil_ptr, MLO_B
       break;
 
    case  MLO_ELEMENT_FIL_EXT_DYNAMIC_RANGE:
-      *count_ptr = MLO_ElementFil_DecodeDynamicRangeInfo (
+      result = MLO_ElementFil_DecodeDynamicRangeInfo (
          &fil_ptr->dynamic_range_info,
-         bit_ptr
+         bit_ptr,
+         count_ptr
       );
       break;
 
@@ -193,15 +196,15 @@ Input/output parameters:
 ==============================================================================
 */
 
-void	MLO_ElementFil_DecodeFill (MLO_BitStream *bit_ptr, int count)
+void	
+MLO_ElementFil_DecodeFill (MLO_BitStream *bit_ptr, unsigned int count)
 {
-   int            align = 4;
-   int            bits_to_skip = (count - 1) * 8 + align;
+    int            align = 4;
+    int            bits_to_skip = (count - 1) * 8 + align;
 
-	MLO_ASSERT (&bit_ptr != 0);
-   MLO_ASSERT (count > 0);
+	MLO_ASSERT(bit_ptr != NULL);
 
-   MLO_BitStream_SkipBits (bit_ptr, bits_to_skip);
+    MLO_BitStream_SkipBits (bit_ptr, bits_to_skip);
 }
 
 
@@ -222,32 +225,32 @@ Returns:
 ==============================================================================
 */
 
-MLO_Result	MLO_ElementFil_DecodeFillData (MLO_BitStream *bit_ptr, int count)
+MLO_Result	
+MLO_ElementFil_DecodeFillData (MLO_BitStream *bit_ptr, unsigned int count)
 {
-   MLO_Result     result = MLO_SUCCESS;
-   int            data;
-   int            index;
+    MLO_Result     result = MLO_SUCCESS;
+    int            data;
+    unsigned int   index;
 
-	MLO_ASSERT (&bit_ptr != 0);
-   MLO_ASSERT (count > 0);
+	MLO_ASSERT(bit_ptr != NULL);
 
-   data = MLO_BitStream_ReadBits (bit_ptr, 4);
-   if (data != 0)
-   {
-      result = MLO_ERROR_WRONG_FILL_NIBBLE;
-   }
+    data = MLO_BitStream_ReadBits (bit_ptr, 4);
+    if (data != 0)
+    {
+       result = MLO_ERROR_WRONG_FILL_NIBBLE;
+    }
 
-   -- count;
-   for (index = 0; index < count && MLO_SUCCEEDED (result); ++index)
-   {
-      data = MLO_BitStream_ReadBits (bit_ptr, 8);
-      if (data != 0xA5)
-      {
-         result = MLO_ERROR_WRONG_FILL_BYTE;
-      }
-   }
+    -- count;
+    for (index = 0; index < count && MLO_SUCCEEDED (result); ++index)
+    {
+        data = MLO_BitStream_ReadBits (bit_ptr, 8);
+        if (data != 0xA5)
+        {
+            result = MLO_ERROR_WRONG_FILL_BYTE;
+        }
+    }
 
-	return (result);
+ 	return (result);
 }
 
 
@@ -264,11 +267,12 @@ Output parameters:
 ==============================================================================
 */
 
-void	MLO_ElementFil_DecodeDataElement (MLO_BitStream *bit_ptr, int *count_ptr)
+void	
+MLO_ElementFil_DecodeDataElement (MLO_BitStream *bit_ptr, unsigned int *count_ptr)
 {
-   MLO_ElementFil_DataElementVersion   data_element_version;
+    MLO_ElementFil_DataElementVersion   data_element_version;
 
-	MLO_ASSERT (&bit_ptr != 0);
+    MLO_ASSERT(bit_ptr != NULL);
 
    data_element_version =
       (MLO_ElementFil_DataElementVersion) MLO_BitStream_ReadBits (bit_ptr, 4);
@@ -308,28 +312,34 @@ Returns: Number of bytes read from the stream, > 0
 ==============================================================================
 */
 
-int	MLO_ElementFil_DecodeDynamicRangeInfo (MLO_ElementFil_DynamicRangeInfo *drc_ptr, MLO_BitStream *bit_ptr)
+MLO_Result
+MLO_ElementFil_DecodeDynamicRangeInfo (MLO_ElementFil_DynamicRangeInfo *drc_ptr, 
+                                       MLO_BitStream                   *bit_ptr, 
+                                       unsigned int                    *bytes_used)
 {
-   int            n = 1;
-   int            index;
+    int index;
 
-   MLO_ASSERT (&drc_ptr != 0);
-	MLO_ASSERT (&bit_ptr != 0);
+    MLO_ASSERT(drc_ptr != NULL);
+	MLO_ASSERT(bit_ptr != NULL);
 
-   drc_ptr->num_bands = 1;
+    *bytes_used = 1;
+    drc_ptr->num_bands = 1;
 
    if (MLO_BitStream_ReadBit (bit_ptr) != 0)
    {
       drc_ptr->pce_instance_tag = MLO_BitStream_ReadBits (bit_ptr, 4);
       drc_ptr->tag_reserved_bits = MLO_BitStream_ReadBits (bit_ptr, 4);
-      ++ n;
+      ++*bytes_used;
    }
 
    drc_ptr->excluded_chns_present_flag =
       (MLO_Boolean) MLO_BitStream_ReadBit (bit_ptr);
    if (drc_ptr->excluded_chns_present_flag)
    {
-      n += MLO_ElementFil_DecodeExcludedChannels (drc_ptr, bit_ptr);
+       unsigned int used = 0;
+       MLO_Result result = MLO_ElementFil_DecodeExcludedChannels (drc_ptr, bit_ptr, &used);
+       if (MLO_FAILED(result)) return result;
+       *bytes_used += used;
    }
 
    if (MLO_BitStream_ReadBit (bit_ptr) != 0)
@@ -343,14 +353,14 @@ int	MLO_ElementFil_DecodeDynamicRangeInfo (MLO_ElementFil_DynamicRangeInfo *drc_
          drc_ptr->band_top_arr [index] = MLO_BitStream_ReadBits (bit_ptr, 8);
       }
 
-      n += drc_ptr->num_bands + 1;
+      *bytes_used += drc_ptr->num_bands + 1;
    }
 
    if (MLO_BitStream_ReadBit (bit_ptr) != 0)
    {
       drc_ptr->prog_ref_level = MLO_BitStream_ReadBits (bit_ptr, 7);
       MLO_BitStream_SkipBit (bit_ptr);
-      ++ n;
+      ++*bytes_used;
    }
 
    for (index = 0; index < drc_ptr->num_bands; ++index)
@@ -359,9 +369,9 @@ int	MLO_ElementFil_DecodeDynamicRangeInfo (MLO_ElementFil_DynamicRangeInfo *drc_
          1 - (MLO_BitStream_ReadBit (bit_ptr) << 1);
       drc_ptr->dyn_rng_ctl [index] = MLO_BitStream_ReadBits (bit_ptr, 7);
    }
-   n += drc_ptr->num_bands;
+   *bytes_used += drc_ptr->num_bands;
 
-	return (n);
+   return MLO_SUCCESS;
 }
 
 
@@ -379,38 +389,39 @@ Returns: Number of bytes read from the stream, > 0
 ==============================================================================
 */
 
-int	MLO_ElementFil_DecodeExcludedChannels (MLO_ElementFil_DynamicRangeInfo *drc_ptr, MLO_BitStream *bit_ptr)
+MLO_Result
+MLO_ElementFil_DecodeExcludedChannels (MLO_ElementFil_DynamicRangeInfo *drc_ptr, MLO_BitStream *bit_ptr, unsigned int* bytes_read)
 {
    MLO_CHECK_CST (
       ExcludedMaskBitDepth,
       MLO_BIT_DEPTH (drc_ptr->excluded_mask) >= MLO_DEFS_MAX_CHN
    );
 
-   int            n = 0;
-   int            continue_flag = 1;
-   int            offset = 0;
+   int continue_flag = 1;
+   int offset = 0;
 
-   MLO_ASSERT (&drc_ptr != 0);
-	MLO_ASSERT (&bit_ptr != 0);
+   MLO_ASSERT(drc_ptr != NULL);
+   MLO_ASSERT(bit_ptr != NULL);
+   *bytes_read = 0;
    drc_ptr->excluded_mask = 0;
 
    do
    {
-      int            index;
+      int index;
       for (index = 0; index < 7; ++index)
       {
          int            bit = MLO_BitStream_ReadBit (bit_ptr);
          int            channel = offset + index;
-         MLO_ASSERT (channel < (int)MLO_BIT_DEPTH (drc_ptr->excluded_mask));
+         MLO_CHECK_DATA(channel < (int)MLO_BIT_DEPTH (drc_ptr->excluded_mask));
 
          drc_ptr->excluded_mask |= (bit << channel);
       }
       continue_flag = MLO_BitStream_ReadBit (bit_ptr);
 
-      ++ n;
+      ++*bytes_read;
       offset += 7;
    }
    while (continue_flag != 0);
 
-	return (n);
+    return MLO_SUCCESS;
 }

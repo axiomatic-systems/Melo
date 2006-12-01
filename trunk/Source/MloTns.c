@@ -26,9 +26,6 @@
 /*----------------------------------------------------------------------
 |       Includes
 +---------------------------------------------------------------------*/
-
-
-
 #include "MloBitStream.h"
 #include "MloDebug.h"
 #include "MloDefs.h"
@@ -38,14 +35,9 @@
 #include "MloTns.h"
 #include "MloUtils.h"
 
-
-
 /*----------------------------------------------------------------------
 |       Constants
 +---------------------------------------------------------------------*/
-
-
-
 typedef enum MLO_Tns_WinSize
 {
    MLO_TNS_WIN_SIZE_SHORT = 0,
@@ -178,9 +170,9 @@ void  MLO_Tns_Decode (MLO_Tns *tns_ptr, const MLO_IcsInfo *ics_info_ptr, MLO_Bit
    int            bd_order = 5;
    int            w;
 
-   MLO_ASSERT (tns_ptr != 0);
-   MLO_ASSERT (ics_info_ptr != 0);
-	MLO_ASSERT (bit_ptr != 0);
+   MLO_ASSERT (tns_ptr != NULL);
+   MLO_ASSERT (ics_info_ptr != NULL);
+   MLO_ASSERT (bit_ptr != NULL);
 
    if (ics_info_ptr->window_sequence == MLO_ICS_INFO_WIN_EIGHT_SHORT_SEQUENCE)
    {
@@ -251,7 +243,7 @@ Input/output parameters:
 
 void  MLO_Tns_Process (struct MLO_IndivChnStream *ics_ptr)
 {
-   MLO_ASSERT (ics_ptr != 0);
+   MLO_ASSERT (ics_ptr != NULL);
 
    if (ics_ptr->tns_data_present_flag)
    {
@@ -299,12 +291,12 @@ static void MLO_Tns_ProcessFilter (MLO_IndivChnStream *ics_ptr, int win, int fil
    int            tns_max_order;
    MLO_Tns_WinSize   win_size = MLO_TNS_WIN_SIZE_LONG;
 
-   MLO_ASSERT (ics_ptr != 0);
+   MLO_ASSERT (ics_ptr != NULL);
    MLO_ASSERT (win >= 0);
    MLO_ASSERT (win < ics_ptr->ics_info.num_windows);
    MLO_ASSERT (filter >= 0);
    MLO_ASSERT (filter < ics_ptr->tns.win_arr [win].n_filt);
-   MLO_ASSERT (bottom_ptr != 0);
+   MLO_ASSERT (bottom_ptr != NULL);
    MLO_ASSERT (*bottom_ptr > 0);
    MLO_ASSERT (*bottom_ptr <= ics_ptr->ics_info.num_swb);
 
@@ -487,7 +479,7 @@ static void MLO_Tns_RunFilter (MLO_Float *coef_ptr, int length, int inc, const M
 {
    int            pos = 1;
 
-   MLO_ASSERT (coef_ptr != 0);
+   MLO_ASSERT (coef_ptr != NULL);
    MLO_ASSERT (length > 0);
    MLO_ASSERT (inc == 1 || inc == -1);
    MLO_ASSERT (lpc_coef_arr != 0);

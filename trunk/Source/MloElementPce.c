@@ -62,8 +62,8 @@ MLO_ElementPce_Decode (MLO_ElementPce *pce_ptr, MLO_BitStream *bit_ptr)
    MLO_Result     result = MLO_SUCCESS;
    int            index;
 
-	MLO_ASSERT (pce_ptr != 0);
-	MLO_ASSERT (bit_ptr != 0);
+	MLO_ASSERT(pce_ptr != NULL);
+	MLO_ASSERT(bit_ptr != NULL);
 
    pce_ptr->element_instance_tag = MLO_BitStream_ReadBits (bit_ptr, 4);
    pce_ptr->object_type = (MLO_AacProfile) MLO_BitStream_ReadBits (bit_ptr, 2);
@@ -182,20 +182,21 @@ Input/output parameters:
 ==============================================================================
 */
 
-void	MLO_ElementPce_ReadTaggedElementArray (MLO_ElementPce_TaggedElt tag_elt_ptr [], MLO_BitStream *bit_ptr, int nbr_elt)
+void
+MLO_ElementPce_ReadTaggedElementArray (MLO_ElementPce_TaggedElt tag_elt_ptr [], MLO_BitStream *bit_ptr, int nbr_elt)
 {
-   int            index;
+    int index;
 
-	MLO_ASSERT (tag_elt_ptr != 0);
-	MLO_ASSERT (bit_ptr != 0);
-	MLO_ASSERT (nbr_elt >= 0);
+	MLO_ASSERT(tag_elt_ptr != NULL);
+	MLO_ASSERT(bit_ptr != NULL);
+	MLO_ASSERT(nbr_elt >= 0);
 
-   for (index = 0; index < nbr_elt; ++index)
-   {
-      tag_elt_ptr [index].is_cpe_flag =
-         (MLO_Boolean) MLO_BitStream_ReadBit (bit_ptr);
-      tag_elt_ptr [index].tag = MLO_BitStream_ReadBits (bit_ptr, 4);
-   }
+    for (index = 0; index < nbr_elt; ++index)
+    {
+        tag_elt_ptr [index].is_cpe_flag =
+            (MLO_Boolean) MLO_BitStream_ReadBit (bit_ptr);
+        tag_elt_ptr [index].tag = MLO_BitStream_ReadBits (bit_ptr, 4);
+    }
 }
 
 

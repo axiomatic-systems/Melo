@@ -26,9 +26,6 @@
 /*----------------------------------------------------------------------
 |       Includes
 +---------------------------------------------------------------------*/
-
-
-
 #include "MloBitStream.h"
 #include "MloConfig.h"
 #include "MloDebug.h"
@@ -45,14 +42,9 @@
 #include <math.h>
 #endif
 
-
-
 /*----------------------------------------------------------------------
 |       Data
 +---------------------------------------------------------------------*/
-
-
-
 static const MLO_Float MLO_ScaleFactor_table_pow2  [1 << 2] =
 {
    MLO_FLOAT_C (1),
@@ -61,13 +53,9 @@ static const MLO_Float MLO_ScaleFactor_table_pow2  [1 << 2] =
    MLO_FLOAT_C (1.68179283)
 };
 
-
-
 /*----------------------------------------------------------------------
 |       Functions
 +---------------------------------------------------------------------*/
-
-
 
 /*
 ==============================================================================
@@ -104,10 +92,10 @@ MLO_Result  MLO_ScaleFactor_Decode (MLO_ScaleFactor *sf_ptr, const MLO_IcsInfo *
    int            g;
    int            num_windows_groups;
 
-   MLO_ASSERT (sf_ptr != 0);
-   MLO_ASSERT (ics_ptr != 0);
-   MLO_ASSERT (sec_ptr != 0);
-	MLO_ASSERT (bit_ptr != 0);
+   MLO_ASSERT (sf_ptr != NULL);
+   MLO_ASSERT (ics_ptr != NULL);
+   MLO_ASSERT (sec_ptr != NULL);
+   MLO_ASSERT (bit_ptr != NULL);
    MLO_ASSERT (global_gain >= 0);
    MLO_ASSERT (global_gain <= 255);
 
@@ -193,9 +181,9 @@ void  MLO_ScaleFactor_ScaleCoefficients (const MLO_ScaleFactor *sf_ptr, const ML
    int            num_window_groups;
    int            max_sfb;
 
-   MLO_ASSERT (sf_ptr != 0);
-   MLO_ASSERT (ics_ptr != 0);
-   MLO_ASSERT (coef_ptr != 0);
+   MLO_ASSERT (sf_ptr != NULL);
+   MLO_ASSERT (ics_ptr != NULL);
+   MLO_ASSERT (coef_ptr != NULL);
 
    num_window_groups = ics_ptr->num_window_groups;
    max_sfb = ics_ptr->max_sfb;

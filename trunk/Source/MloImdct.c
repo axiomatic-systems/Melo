@@ -26,9 +26,6 @@
 /*----------------------------------------------------------------------
 |       Includes
 +---------------------------------------------------------------------*/
-
-
-
 #include "MloDebug.h"
 #include "MloDefs.h"
 #include "MloFloat.h"
@@ -36,13 +33,9 @@
 #include "MloResults.h"
 #include "MloUtils.h"
 
-
-
 /*----------------------------------------------------------------------
 |       Data
 +---------------------------------------------------------------------*/
-
-
 
 /*
 f (k) = cos (PI * (k*2+1) / (len*4))
@@ -2134,7 +2127,7 @@ MLO_Result  MLO_Imdct_Init (MLO_Imdct *imdct_ptr)
 {
    MLO_Result     result = MLO_SUCCESS;
 
-   MLO_ASSERT (imdct_ptr != 0);
+   MLO_ASSERT (imdct_ptr != NULL);
 
    MLO_Fft_Init (&imdct_ptr->fft);
 
@@ -2204,9 +2197,9 @@ void  MLO_Imdct_Process (MLO_Imdct *imdct_ptr, MLO_Float x_ptr [], const MLO_Flo
    int            k;
    MLO_Float *    tmp_ptr;
 
-   MLO_ASSERT (imdct_ptr != 0);
-   MLO_ASSERT (x_ptr != 0);
-   MLO_ASSERT (f_ptr != 0);
+   MLO_ASSERT (imdct_ptr != NULL);
+   MLO_ASSERT (x_ptr != NULL);
+   MLO_ASSERT (f_ptr != NULL);
    MLO_ASSERT (   len == MLO_DEFS_FRAME_LEN_LONG  * 2
 /*************************************************************************************************************/
 /*** Debug ***/
@@ -2276,9 +2269,9 @@ void  MLO_Imdct_ComputeDct4 (MLO_Imdct *imdct_ptr, MLO_Float dest_ptr [], const 
    const MLO_Float * table_ptr = &MLO_Imdct_cos_table_1 [0];
    int            step = 1;
 
-   MLO_ASSERT (imdct_ptr != 0);
-   MLO_ASSERT (dest_ptr != 0);
-   MLO_ASSERT (src_ptr != 0);
+   MLO_ASSERT (imdct_ptr != NULL);
+   MLO_ASSERT (dest_ptr != NULL);
+   MLO_ASSERT (src_ptr != NULL);
    MLO_ASSERT (len > 0);
 
    /* Uses the FFT buffer as temporary buffer for input of the DCT-II */
@@ -2355,9 +2348,9 @@ void  MLO_Imdct_ComputeDct2 (MLO_Imdct *imdct_ptr, MLO_Float dest_ptr [], const 
    int            step = 1;
    int            qpi_offset = len_h;
 
-   MLO_ASSERT (imdct_ptr != 0);
-   MLO_ASSERT (dest_ptr != 0);
-   MLO_ASSERT (src_ptr != 0);
+   MLO_ASSERT (imdct_ptr != NULL);
+   MLO_ASSERT (dest_ptr != NULL);
+   MLO_ASSERT (src_ptr != NULL);
    MLO_ASSERT (len > 0);
 
    /* Reorders data */

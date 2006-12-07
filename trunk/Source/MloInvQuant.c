@@ -1159,7 +1159,7 @@ MLO_Float   MLO_InvQuant_ComputePow43 (int quant)
 
 #if defined (MLO_CONFIG_FIXED)
 
-	if (quant < MLO_ARRAY_SIZE (MLO_InvQuant_table_pow43))
+	if (quant < (int)MLO_ARRAY_SIZE (MLO_InvQuant_table_pow43))
 	{
       invquant = MLO_InvQuant_table_pow43 [quant] >> 4;
 	}
@@ -1171,7 +1171,7 @@ MLO_Float   MLO_InvQuant_ComputePow43 (int quant)
 		const MLO_Float   r1 = MLO_InvQuant_table_pow43 [k + 1];
 		invquant = MLO_Float_Lerp (r0, r1, t, 3);
 
-      MLO_ASSERT (k + 1 < MLO_ARRAY_SIZE (MLO_InvQuant_table_pow43));
+      MLO_ASSERT (k + 1 < (int)MLO_ARRAY_SIZE (MLO_InvQuant_table_pow43));
    }
 
 #else

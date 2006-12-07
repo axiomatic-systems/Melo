@@ -77,9 +77,6 @@ typedef int              MLO_Int;
 #if defined(__QNX__)
 #endif
 
-/* define/undef for fixed/floating point arithmetic */
-#undef   MLO_CONFIG_FIXED
-
 /*----------------------------------------------------------------------
 |    compiler specifics
 +---------------------------------------------------------------------*/

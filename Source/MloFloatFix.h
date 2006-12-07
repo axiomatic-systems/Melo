@@ -82,9 +82,6 @@ static const MLO_Float  MLO_Float_max = ~((MLO_Float) 1) ^ (((MLO_Float)1) << (M
 /*----------------------------------------------------------------------
 |       Private functions
 +---------------------------------------------------------------------*/
-
-
-
 static inline MLO_CONFIG_INT64_TYPE MLO_Float_Mul3232To64 (MLO_Int32 a, MLO_Int32 b)
 {
 #if defined (_MSC_VER)
@@ -114,14 +111,9 @@ static inline MLO_CONFIG_INT64_TYPE MLO_Float_Mul3232To64 (MLO_Int32 a, MLO_Int3
 #endif
 }
 
-
-
 /*----------------------------------------------------------------------
 |       Public functions
 +---------------------------------------------------------------------*/
-
-
-
 static inline MLO_Float MLO_Float_ConvIntToFloat (int a)
 {
    return (((MLO_Float) a) << MLO_FLOAT_FRAC);

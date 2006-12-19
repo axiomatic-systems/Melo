@@ -84,7 +84,7 @@ static const MLO_Float  MLO_Float_max = ~((MLO_Float) 1) ^ (((MLO_Float)1) << (M
 +---------------------------------------------------------------------*/
 static inline MLO_CONFIG_INT64_TYPE MLO_Float_Mul3232To64 (MLO_Int32 a, MLO_Int32 b)
 {
-#if defined (_MSC_VER)
+#if defined (_MSC_VER) && defined(_X86_)
 
    __asm
    {

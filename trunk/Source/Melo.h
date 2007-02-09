@@ -28,6 +28,30 @@
  * Master Header file included by Melo clients
  */
 
+/** 
+@mainpage Melo AAC Decoder SDK
+
+@section intro Introduction
+ 
+The Melo AAC Decoder is a portable runtime library, written in ANSI C
+that decodes AAC Low Complexity audio frames and produces PCM audio
+samples.
+
+@section header_files Header Files
+Client applications that use the functions and data structures of the SDK
+should only include the file Melo.h. This is the master include file that
+includes a number of more specific include files containing the prototypes
+and type definitions for all the client API functions and data structures
+of the SDK.
+
+@section decoder_api Decoder API
+Client applications should use the Decoder API to create an @ref MLO_Decoder
+object, use it to decode AAC audio frames into PCM audio samples, and 
+destroy that decoder object when no longer needed. See the @ref MLO_Decoder
+documentation for API details.
+
+*/
+
 #ifndef _MELO_H_
 #define _MELO_H_
 

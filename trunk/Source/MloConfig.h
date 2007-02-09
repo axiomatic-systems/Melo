@@ -51,7 +51,6 @@ typedef short            MLO_Int16;
 typedef unsigned short   MLO_UInt16;
 typedef signed char      MLO_Int8;
 typedef unsigned char    MLO_UInt8;
-typedef int              MLO_Int;
 
 /*----------------------------------------------------------------------
 |    platform specifics

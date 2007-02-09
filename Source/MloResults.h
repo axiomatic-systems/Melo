@@ -25,7 +25,7 @@
 |
  ****************************************************************/
 /** @file
- * MLO Result and Error codes
+ * Results and Error codes
  */
 
 #ifndef _MLO_ERRORS_H_
@@ -38,7 +38,10 @@
 /*----------------------------------------------------------------------
 |    error codes
 +---------------------------------------------------------------------*/
+/** Result code indicating that a call was successful */
 #define MLO_SUCCESS      0
+
+/** Error: an unspecififed error has occurred. */
 #define MLO_FAILURE      (-1)
 
 #define MLO_FAILED(result)       ((result) != MLO_SUCCESS)

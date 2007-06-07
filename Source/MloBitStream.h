@@ -117,11 +117,11 @@ MLO_BitStream_ReadCache (const MLO_BitStream* bits_ptr)
    if (pos > bits_ptr->buffer_size - MLO_WORD_BYTES) return 0;
 
    {
-      unsigned char *   out_ptr = &bits_ptr->buffer [pos];
-      return    (((MLO_BitsWord) out_ptr [0]) << 24)
-              | (((MLO_BitsWord) out_ptr [1]) << 16)
-              | (((MLO_BitsWord) out_ptr [2]) <<  8)
-              | (((MLO_BitsWord) out_ptr [3])      );
+      unsigned char *in = &bits_ptr->buffer[pos];
+      return    (((MLO_BitsWord) in[0]) << 24)
+              | (((MLO_BitsWord) in[1]) << 16)
+              | (((MLO_BitsWord) in[2]) <<  8)
+              | (((MLO_BitsWord) in[3])      );
    }
 }
 

@@ -118,18 +118,18 @@ WriteSamples(AP4_Track* track, AP4_ByteStream* output)
         return;
     }
 
-    // create the decoder
+    // create the decoder and sample buffer
     MLO_Decoder* decoder = NULL;
+    MLO_SampleBuffer* pcm_buffer = NULL;
     result = MLO_Decoder_Create(&decoder_config, &decoder);
     if (MLO_FAILED(result)) {
         fprintf(stderr, "ERROR: failed to created MLO_Decoder (%d)\n", result);
         goto end;
     }
-
-    MLO_SampleBuffer* pcm_buffer = NULL;
     result = MLO_SampleBuffer_Create(0, &pcm_buffer);
     if (MLO_FAILED(result)) goto end;
 
+    // decode and write all samples
     while (AP4_SUCCEEDED(track->ReadSample(index, sample, data))) {
         result = MLO_Decoder_DecodeFrame(decoder, data.GetData(), data.GetDataSize(), pcm_buffer);
         printf("MLO_Decoder_DecodeFrame return %d\n", result);

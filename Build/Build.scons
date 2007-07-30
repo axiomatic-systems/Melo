@@ -197,23 +197,32 @@ if os.path.exists(target_config_file):
 # module's implementation only.
 #######################################################
 
+OptionalModules = []
+
 ############################ Bento4
-AP4_SOURCE_ROOT = 'Bento4/Source/C++'
-SourceDirLookup[AP4_SOURCE_ROOT] = '#/../Bento4/Source/C++'  
-if env.has_key('AP4_CPP_DEFINES'):
-    AP4_EXTRA_CPP_DEFINES = env['AP4_CPP_DEFINES']
+AP4_HOME= os.environ.has_key('BENTO4_HOME') and os.environ['BENTO4_HOME'] or '#/../Bento4'
+
+# check if Bento4 is available
+if os.path.exists(AP4_HOME):
+    OptionalModules.append('MeloDecode')
+    AP4_SOURCE_ROOT = 'Bento4/Source/C++'
+    SourceDirLookup[AP4_SOURCE_ROOT] = AP4_HOME+'/Source/C++'  
+    if env.has_key('AP4_CPP_DEFINES'):
+        AP4_EXTRA_CPP_DEFINES = env['AP4_CPP_DEFINES']
+    else:
+        AP4_EXTRA_CPP_DEFINES = {}
+    if env['build_config'] == 'Debug':
+        AP4_EXTRA_CPP_DEFINES['AP4_DEBUG'] = None
+    
+    BuildModule(name                  = 'Bento4',
+                build_source_dirs     = ['Core', 'MetaData', 'Crypto'],
+                build_source_files    = env['AP4_SYSTEM_SOURCES'],
+                included_only_modules = [AP4_SOURCE_ROOT+'/'+dir for dir in ['Config', 'Core', 'MetaData', 'Crypto']],
+                source_root           = AP4_SOURCE_ROOT,
+                extra_cpp_defines     = AP4_EXTRA_CPP_DEFINES)
 else:
-    AP4_EXTRA_CPP_DEFINES = {}
-if env['build_config'] == 'Debug':
-    AP4_EXTRA_CPP_DEFINES['AP4_DEBUG'] = None
-
-BuildModule(name                  = 'Bento4',
-            build_source_dirs     = ['Core', 'MetaData', 'Crypto'],
-            build_source_files    = env['AP4_SYSTEM_SOURCES'],
-            included_only_modules = [AP4_SOURCE_ROOT+'/'+dir for dir in ['Config', 'Core', 'MetaData', 'Crypto']],
-            source_root           = AP4_SOURCE_ROOT,
-            extra_cpp_defines     = AP4_EXTRA_CPP_DEFINES)
-
+    print "*** Bento4 external package not available, the MeloDecode test program will not be compiled"
+    
 ############################ Melo
 if env.has_key('MLO_CPP_DEFINES'):
     MLO_EXTRA_CPP_DEFINES = env['MLO_CPP_DEFINES'] 
@@ -228,12 +237,13 @@ BuildModule(name              = 'Melo',
             extra_cpp_defines = MLO_EXTRA_CPP_DEFINES)
 
 ############################# MeloDecode
-BuildModule(name               = 'MeloDecode',
-            type               = 'Executable',
-            source_root        = 'Apps',
-            build_source_dirs  = ['MeloDecode'],
-            build_include_dirs = ['Source'],
-            linked_modules     = ['Melo', 'Bento4'])
+if 'MeloDecode' in OptionalModules:
+    BuildModule(name               = 'MeloDecode',
+                type               = 'Executable',
+                source_root        = 'Apps',
+                build_source_dirs  = ['MeloDecode'],
+                build_include_dirs = ['Source'],
+                linked_modules     = ['Melo', 'Bento4'])
 
 ############################# SDK
 
@@ -241,4 +251,4 @@ BuildModule(name               = 'MeloDecode',
 ################################################
 # Default Build Modues
 ################################################
-env.Default(['Melo', 'MeloDecode'])
+env.Default(['Melo'] + OptionalModules)

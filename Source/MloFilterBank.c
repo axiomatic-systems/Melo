@@ -4682,46 +4682,6 @@ static const MLO_Float MloFilterBank_table_short [MLO_ICS_INFO_WINDOW_SHAPE_NBR_
 |       Functions
 +---------------------------------------------------------------------*/
 
-
-
-/**********************************************************************************************************/
-/*** Debug ***/
-#if 0
-#include <stdio.h>
-
-static int  MLO_FilterBank_frame_t_index = 0;
-
-void  MLO_FilterBank_dump_frame_t (int sub_nbr, const MLO_Float *data_ptr, long len)
-{
-   if (MLO_FilterBank_frame_t_index < 500)
-   {
-      long           pos;
-      FILE *         f_ptr;
-      const char *   fname_0 = "D:\\Ohm Force\\dev\\test\\frames_t_test.txt";
-
-      if (MLO_FilterBank_frame_t_index == 0)
-      {
-         remove (fname_0);
-      }
-      f_ptr = fopen (fname_0, "a");
-
-      fprintf (f_ptr, "Frame # %06d, sub # %02d\n", MLO_FilterBank_frame_t_index, sub_nbr);
-      for (pos = 0; pos < len; ++pos)
-      {
-         fprintf (f_ptr, "%6d\n", (int) (floor (data_ptr [pos] + 0.5)));
-      }
-      fprintf (f_ptr, "\n");
-
-      fclose (f_ptr);
-
-      ++ MLO_FilterBank_frame_t_index;
-   }
-}
-#endif
-/**********************************************************************************************************/
-
-
-
 /*
 ==============================================================================
 Name: MLO_FilterBank_Init
@@ -4812,12 +4772,6 @@ void	MLO_FilterBank_ConvertSpectralToTime (MLO_FilterBank *fb_ptr, MLO_IndivChnS
          &ics_ptr->coef_arr [win_pos],
          win_len * 2
       );
-/**********************************************************************************************************/
-/*** Debug ***/
-#if 0
-      MLO_FilterBank_dump_frame_t (win, &fb_ptr->tmp_buf [win_pos * 2], win_len * 2);
-#endif
-/**********************************************************************************************************/
       win_pos += win_len;
    }
 

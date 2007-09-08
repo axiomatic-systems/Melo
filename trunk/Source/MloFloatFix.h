@@ -62,10 +62,10 @@ typedef  MLO_CONFIG_INT64_TYPE   MLO_Float;
 
 
 /* Resolution in bits */
-enum {   MLO_FLOAT_BD   = 64  };
+#define MLO_FLOAT_BD 64
 
 /* Number of bits of the fractional part. Must be even */
-enum {   MLO_FLOAT_FRAC = 30  };
+#define MLO_FLOAT_FRAC 32
 
 #define  MLO_FLOAT_C(x) ((MLO_Float) ((x) * (65536.0 * (double) (1L << (MLO_FLOAT_FRAC - 16)))))
 
@@ -121,8 +121,7 @@ static inline MLO_Float MLO_Float_ConvIntToFloat (int a)
 
 static inline int MLO_Float_RoundInt (MLO_Float a)
 {
-   const MLO_Float   half = ((MLO_Float) 1) << (MLO_FLOAT_FRAC - 1);
-   return ((int) ((a + half) >> MLO_FLOAT_FRAC));
+   return ((int) ((a + (((MLO_Float) 1) << (MLO_FLOAT_FRAC - 1))) >> MLO_FLOAT_FRAC));
 }
 
 static inline MLO_Float MLO_Float_Add (MLO_Float a, MLO_Float b)
@@ -140,33 +139,52 @@ static inline MLO_Float MLO_Float_Neg (MLO_Float a)
    return (-a);
 }
 
+static inline unsigned long long
+MLO_Float_Mul3232To64U(unsigned long a, unsigned long b)
+{
+    return ((unsigned long long)a)*((unsigned long long)b);
+}
+
 static inline MLO_Float MLO_Float_Mul (MLO_Float a, MLO_Float b)
 {
-   const MLO_Int32   a_f = ((MLO_Int32) a) & ((MLO_Int32) MLO_Float_frac_mask);
-   const MLO_Int32   a_i = (MLO_Int32) (a >> MLO_FLOAT_FRAC);
-   const MLO_Int32   b_f = ((MLO_Int32) b) & ((MLO_Int32) MLO_Float_frac_mask);
-   const MLO_Int32   b_i = (MLO_Int32) (b >> MLO_FLOAT_FRAC);
+   int change_sign = 0;
+   if (a < 0) {
+        a = -a;
+        change_sign = 1;
+   } 
+   if (b < 0) {
+        b = -b;
+        change_sign = 1-change_sign;
+   }
+
+   {
+       const MLO_UInt32   a_f = ((MLO_UInt32) a) & ((MLO_UInt32) MLO_Float_frac_mask);
+       const MLO_UInt32   a_i = (MLO_UInt32) (a >> MLO_FLOAT_FRAC);
+       const MLO_UInt32   b_f = ((MLO_UInt32) b) & ((MLO_UInt32) MLO_Float_frac_mask);
+       const MLO_UInt32   b_i = (MLO_UInt32) (b >> MLO_FLOAT_FRAC);
 
 #if 1
+   const MLO_Float   ab_ff = (MLO_Float_Mul3232To64U(a_f, b_f)) >> MLO_FLOAT_FRAC;
+   const MLO_Float   ab_if = MLO_Float_Mul3232To64U (a_i, b_f) + MLO_Float_Mul3232To64U (a_f, b_i);
+   const MLO_Float   ab_ii = MLO_Float_Mul3232To64U (a_i, b_i) << MLO_FLOAT_FRAC;
 
-   const MLO_Float   ab_ff = MLO_Float_Mul3232To64 (a_f, b_f) >> MLO_FLOAT_FRAC;
+   MLO_Float result = (ab_ii + ab_if + ab_ff);
+   if (change_sign) {
+      return -result;
+   } else {
+      return result;
+   }
+
+#else
+
+   const MLO_Float   ab_ff = ((unsigned long long)MLO_Float_Mul3232To64 (a_f, b_f)) >> MLO_FLOAT_FRAC;
    const MLO_Float   ab_if = MLO_Float_Mul3232To64 (a_i, b_f) + MLO_Float_Mul3232To64 (a_f, b_i);
    const MLO_Float   ab_ii = MLO_Float_Mul3232To64 (a_i, b_i) << MLO_FLOAT_FRAC;
 
    return (ab_ii + ab_if + ab_ff);
 
-#else
-
-   const MLO_Float   a_bi = a * b_i;
-   const MLO_Float   af_bf = MLO_Float_Mul3232To64 (a_f, b_f) >> MLO_FLOAT_FRAC;
-   const MLO_Float   ai_bf = MLO_Float_Mul3232To64 (a_i, b_f);
-
-   MLO_ASSERT (MLO_FLOAT_IS_SAME_SIGN (a, a_i));
-   MLO_ASSERT (MLO_FLOAT_IS_SAME_SIGN (b, b_i));
-
-   return (a_bi + af_bf + ai_bf);
-
 #endif
+    }
 }
 
 static inline MLO_Float MLO_Float_MulInt (MLO_Float a, int b)

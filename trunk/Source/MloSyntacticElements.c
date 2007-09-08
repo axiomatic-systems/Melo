@@ -893,8 +893,6 @@ static void MLO_SyntacticElements_MemorizeElement (MLO_SyntacticElements *se_ptr
    ++ se_ptr->nbr_received_elements;
 }
 
-
-
 /*
 ==============================================================================
 Name: MLO_SyntacticElements_InterleaveAndConvertChannel
@@ -929,11 +927,10 @@ static void MLO_SyntacticElements_InterleaveAndConvertChannel (MLO_SampleBuffer 
       int            pos;
       MLO_Int16 *    out_ptr = (MLO_Int16 *) MLO_SampleBuffer_UseSamples(outbuf_ptr);
       out_ptr += chn;
-      for (pos = 0; pos < MLO_DEFS_FRAME_LEN_LONG; ++pos)
+      for (pos = 0; pos < MLO_DEFS_FRAME_LEN_LONG; ++pos, out_ptr += nbr_chn)
       {
-         MLO_Float      val = in_ptr [pos];
-         val = MLO_BOUND (val, MLO_FLOAT_C (-32768), MLO_FLOAT_C (+32767));
-         out_ptr [pos * nbr_chn] = MLO_Float_RoundInt (val);
+         int sample = MLO_Float_RoundInt(in_ptr[pos]);
+         *out_ptr = MLO_BOUND(sample, -32768, 32767);
       }
    }
 

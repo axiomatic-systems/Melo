@@ -166,14 +166,6 @@ MLO_ElementFil_DecodeExtensionPayload (MLO_ElementFil *fil_ptr, MLO_BitStream *b
       );
       break;
 
-   case  MLO_ELEMENT_FIL_EXT_SBR_DATA:
-      result = MLO_ERROR_SBR_IN_LC;   /* No SBR in LC profile */
-      break;
-
-   case  MLO_ELEMENT_FIL_EXT_SBR_DATA_CRC:
-      result = MLO_ERROR_SBR_IN_LC;   /* No SBR in LC profile */
-      break;
-
    default:
       MLO_ElementFil_DecodeFill (bit_ptr, *count_ptr);
       break;

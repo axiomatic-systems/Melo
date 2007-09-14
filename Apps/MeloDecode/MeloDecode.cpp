@@ -48,6 +48,102 @@ PrintUsageAndExit()
 }
 
 /*----------------------------------------------------------------------
+|   BytesFromUInt32LE
++---------------------------------------------------------------------*/
+static void
+BytesFromUInt32LE(unsigned char* bytes, AP4_UI32 value)
+{
+    bytes[3] = (unsigned char)(value >> 24);
+    bytes[2] = (unsigned char)(value >> 16);
+    bytes[1] = (unsigned char)(value >>  8);
+    bytes[0] = (unsigned char)(value      );
+}
+
+/*----------------------------------------------------------------------
+|   AP4_BytesFromUInt16LE
++---------------------------------------------------------------------*/
+static void
+BytesFromUInt16LE(unsigned char* bytes, AP4_UI16 value)
+{
+    bytes[1] = (unsigned char)(value >> 8);
+    bytes[0] = (unsigned char)(value     );
+}
+
+/*----------------------------------------------------------------------
+|   WriteWaveHeader
++---------------------------------------------------------------------*/
+static void
+WriteWaveHeader(AP4_ByteStream* out, 
+                unsigned int    stream_size,
+                unsigned int    channel_count,
+                unsigned int    sample_rate)
+{
+    unsigned char buffer[4];
+
+    /* rewind */
+    out->Seek(0);
+    
+    /* RIFF tag */
+    out->Write("RIFF", 4);
+
+    /* RIFF chunk size */
+    BytesFromUInt32LE(buffer, stream_size + 8+16+12);
+    out->Write(buffer, 4);
+
+    /* WAVE format */
+    out->Write("WAVE", 4);
+    out->Write("fmt ", 4);
+    BytesFromUInt32LE(buffer, 16L);
+    out->Write(buffer, 4);
+    BytesFromUInt16LE(buffer, 1);
+    out->Write(buffer, 2);
+
+    /* number of channels */
+    BytesFromUInt16LE(buffer, channel_count);        
+    out->Write(buffer, 2);
+
+    /* sample rate */
+    BytesFromUInt32LE(buffer, sample_rate);       
+    out->Write(buffer, 4);
+
+    /* bytes per second */
+    BytesFromUInt32LE(buffer, sample_rate * channel_count * 2);
+    out->Write(buffer, 4);
+
+    /* alignment   */
+    BytesFromUInt16LE(buffer, channel_count*2);     
+    out->Write(buffer, 2);
+
+    /* bits per sample */
+    BytesFromUInt16LE(buffer, 16);               
+    out->Write(buffer, 2);
+
+    out->Write("data", 4);
+
+    /* data size */
+    BytesFromUInt32LE(buffer, stream_size);        
+    out->Write(buffer, 4);
+}
+
+/*----------------------------------------------------------------------
+|   WriteWaveSamples
++---------------------------------------------------------------------*/
+static void
+WriteWaveSamples(AP4_ByteStream* out, MLO_SampleBuffer* sample_buffer)
+{
+    unsigned int sample_count = MLO_SampleBuffer_GetSampleCount(sample_buffer);
+    unsigned int channel_count = MLO_SampleBuffer_GetFormat(sample_buffer)->channel_count;
+    const short* samples = (const short*)MLO_SampleBuffer_GetSamples(sample_buffer);
+    
+    for (unsigned int i=0; i<sample_count*channel_count; i++) {
+        /* write the samples as 16-bit little endian (WAVE format) */
+        unsigned char s[2];
+        BytesFromUInt16LE(s, samples[i]);
+        out->Write(s, 2);
+    }
+}
+
+/*----------------------------------------------------------------------
 |   WriteSamples
 +---------------------------------------------------------------------*/
 static void
@@ -93,6 +189,8 @@ WriteSamples(AP4_Track* track, AP4_ByteStream* output)
         fprintf(stderr, "ERROR: sample description is not of the right type\n");
         return;
     }
+    unsigned int channel_count = audio_desc->GetChannelCount();
+    unsigned int sample_rate   = audio_desc->GetSampleRate();
     printf("    Sample Rate: %d\n", audio_desc->GetSampleRate());
     printf("    Sample Size: %d\n", audio_desc->GetSampleSize());
     printf("    Channels:    %d\n", audio_desc->GetChannelCount());
@@ -100,6 +198,7 @@ WriteSamples(AP4_Track* track, AP4_ByteStream* output)
     AP4_Sample     sample;
     AP4_DataBuffer data;
     AP4_Ordinal    index = 0;
+    unsigned long  total_size = 0;
 
     // check that we have a decoder config
     const AP4_DataBuffer* encoded_config = mpeg_desc->GetDecoderInfo();
@@ -118,6 +217,22 @@ WriteSamples(AP4_Track* track, AP4_ByteStream* output)
         return;
     }
 
+    // print the object type (AAC stream type)
+    const char* ots = "Unknown";
+    switch (decoder_config.object_type) {
+        case MLO_OBJECT_TYPE_AAC_MAIN:        ots = "AAC Main Profile"; break;
+        case MLO_OBJECT_TYPE_AAC_LC:          ots = "AAC Low Complexity"; break;
+        case MLO_OBJECT_TYPE_AAC_SSR:         ots = "AAC Scalable Sample Rate"; break;
+        case MLO_OBJECT_TYPE_AAC_LTP:         ots = "AAC Long Term Prediction"; break;
+        case MLO_OBJECT_TYPE_SBR:             ots = "Spectral Band Replication"; break;
+        case MLO_OBJECT_TYPE_AAC_SCALABLE:    ots = "AAC Scalable"; break;
+        case MLO_OBJECT_TYPE_ER_AAC_LC:       ots = "Error Resilient AAC Low Complexity"; break;
+        case MLO_OBJECT_TYPE_ER_AAC_LTP:      ots = "Error Resilient AAC Long Term Prediction"; break;
+        case MLO_OBJECT_TYPE_ER_AAC_SCALABLE: ots = "Error Resilient AAC Scalable"; break;
+        case MLO_OBJECT_TYPE_ER_AAC_LD:       ots = "Error Resilient AAC Low Delay"; break;
+    }
+    printf("    Sub Type: [%d] %s\n", decoder_config.object_type, ots);
+    
     // create the decoder and sample buffer
     MLO_Decoder* decoder = NULL;
     MLO_SampleBuffer* pcm_buffer = NULL;
@@ -129,14 +244,42 @@ WriteSamples(AP4_Track* track, AP4_ByteStream* output)
     result = MLO_SampleBuffer_Create(0, &pcm_buffer);
     if (MLO_FAILED(result)) goto end;
 
+    // write a WAVE header
+    WriteWaveHeader(output, total_size, channel_count, sample_rate);
+    
     // decode and write all samples
     while (AP4_SUCCEEDED(track->ReadSample(index, sample, data))) {
+        // decode one frame
         result = MLO_Decoder_DecodeFrame(decoder, data.GetData(), data.GetDataSize(), pcm_buffer);
-        printf("MLO_Decoder_DecodeFrame return %d\n", result);
-        output->Write(MLO_SampleBuffer_GetSamples(pcm_buffer), MLO_SampleBuffer_GetSize(pcm_buffer));
+        if (result != MLO_SUCCESS) {
+            printf("MLO_Decoder_DecodeFrame return %d\n", result);
+            break;
+        }
+        
+        // check that the sample rate and channel count matches what was in the header
+        // (sometimes it does not...)
+        const MLO_SampleFormat* format = MLO_SampleBuffer_GetFormat(pcm_buffer);
+        if (format->sample_rate != sample_rate) {
+            fprintf(stderr, "WARNING: sample rate different from header (%d vs %d)\n",
+                    format->sample_rate, sample_rate);
+            sample_rate = format->sample_rate;
+        }
+        if (format->channel_count != channel_count) {
+            fprintf(stderr, "WARNING: channel count different from header (%d vs %d)\n",
+                    format->channel_count, channel_count);
+            channel_count = format->channel_count;
+        }
+        
+        // write the samples in WAVE format
+        WriteWaveSamples(output, pcm_buffer);
+        
+        total_size += MLO_SampleBuffer_GetSize(pcm_buffer);
 	    index++;
     }
 
+    // update the WAVE header
+    WriteWaveHeader(output, total_size, channel_count, sample_rate);
+    
 end:
     if (pcm_buffer) MLO_SampleBuffer_Destroy(pcm_buffer);
     if (decoder) MLO_Decoder_Destroy(decoder);

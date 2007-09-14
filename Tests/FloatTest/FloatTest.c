@@ -88,7 +88,58 @@ static MLO_Result MLO_FloatTest_TestAndPrintAccuracy (const char *name_0, double
    return (result);
 }
 
+static unsigned long long
+MLO_Float_Mul3232To64U(unsigned long a, unsigned long b)
+{
+    return ((unsigned long long)a)*((unsigned long long)b);
+}
 
+typedef unsigned long long MLO_FloatU;
+static MLO_Float MLO_Float_Mul2 (MLO_Float a, MLO_Float b)
+{
+   int change_sign = 0;
+//   if (a < 0) {
+//        a = -a;
+//        change_sign = 1;
+//   } 
+//   if (b < 0) {
+//        b = -b;
+//        change_sign = 1-change_sign;
+//   }
+
+   {
+   const MLO_UInt32   a_f = ((MLO_UInt32) a) & ((MLO_UInt32) MLO_Float_frac_mask);
+   const MLO_UInt32   a_i = (MLO_UInt32) (a >> MLO_FLOAT_FRAC);
+   const MLO_UInt32   b_f = ((MLO_UInt32) b) & ((MLO_UInt32) MLO_Float_frac_mask);
+   const MLO_UInt32   b_i = (MLO_UInt32) (b >> MLO_FLOAT_FRAC);
+
+   MLO_FloatU   ab_ff   = MLO_Float_Mul3232To64U (a_f, b_f);
+   MLO_FloatU   ab_if_1 = MLO_Float_Mul3232To64U (a_i, b_f);
+   MLO_FloatU   ab_if_2 = MLO_Float_Mul3232To64U (a_f, b_i);
+   MLO_FloatU   ab_if   = ab_if_1+ab_if_2;
+   MLO_FloatU   ab_ii   = (a_i*b_i)&0xFFFFFFFF;
+   MLO_FloatU   result;
+   
+   ab_ff >>= MLO_FLOAT_FRAC;
+   ab_ii <<= MLO_FLOAT_FRAC;
+   
+   result = (ab_ii + ab_if + ab_ff);
+   return change_sign?-result:result;
+   }
+}
+
+static MLO_Result MLO_FloatTest_TestMul2 (MLO_Float a, MLO_Float b, MLO_Boolean print_flag)
+{
+   const double a_f = MLO_FloatTest_ToDouble (a);
+   const double b_f = MLO_FloatTest_ToDouble (b);
+
+   const MLO_Float   ab = MLO_Float_Mul2 (a, b);
+   const double ab_fr = a_f * b_f;
+
+   const double ab_ft = MLO_FloatTest_ToDouble (ab);
+
+   return (MLO_FloatTest_TestAndPrintAccuracy ("Mul ", ab_ft, ab_fr, a_f, b_f, print_flag, 0));
+}
 
 static MLO_Result MLO_FloatTest_TestMul (MLO_Float a, MLO_Float b, MLO_Boolean print_flag)
 {
@@ -233,19 +284,35 @@ static MLO_Result MLO_FloatTest_TestScaleP2All ()
    return (result);
 }
 
-
+static void MLO_Print_Fix(MLO_Float f) {
+#if defined(MLO_CONFIG_FIXED)
+    unsigned int hi = (f>>32)&0xFFFFFFFF;
+    unsigned int lo = (f    )&0xFFFFFFFF;
+    printf("%08x%08x\n", hi, lo);
+#endif
+}
 
 int main (int argc, char *argv [])
 {
    MLO_Result     result = MLO_SUCCESS;
 
+    MLO_Print_Fix(MLO_Float_one);
+    MLO_Print_Fix(MLO_Float_frac_mask);
+    MLO_Print_Fix(MLO_Float_max);
+
+    MLO_FloatTest_TestMul2 (MLO_FLOAT_C (1.00001), MLO_FLOAT_C (0.99999), MLO_TRUE);
+    MLO_FloatTest_TestMul2 (MLO_FLOAT_C (-2147483647.0), MLO_FLOAT_C (-0.000001), MLO_TRUE);
+    MLO_FloatTest_TestMul2 (MLO_FLOAT_C (-0.000000005821), MLO_FLOAT_C(-0.562021692283), MLO_TRUE);
+    
    if (MLO_SUCCEEDED (result))
    {
       MLO_FloatTest_TestMul (MLO_FLOAT_C (16001.2395), MLO_FLOAT_C (694.65), MLO_TRUE);
       MLO_FloatTest_TestMul (MLO_FLOAT_C (1), MLO_FLOAT_C (1.0 / 65536.0 / 256.0), MLO_TRUE);
       MLO_FloatTest_TestMul (MLO_FLOAT_C (1), MLO_FLOAT_C (65536.0 * 256.0), MLO_TRUE);
       MLO_FloatTest_TestMul (MLO_FLOAT_C (1.00001), MLO_FLOAT_C (1.00001), MLO_TRUE);
-      MLO_FloatTest_TestMul (MLO_FLOAT_C (1.00001), MLO_FLOAT_C (0.99999), MLO_TRUE);
+      MLO_FloatTest_TestMul2 (MLO_FLOAT_C (1.00001), MLO_FLOAT_C (0.99999), MLO_TRUE);
+      MLO_FloatTest_TestMul (MLO_FLOAT_C (-30.0), MLO_FLOAT_C (30.0), MLO_TRUE);
+      MLO_FloatTest_TestMul (MLO_FLOAT_C (-2147483647.0), MLO_FLOAT_C (-0.000001), MLO_TRUE);
       printf ("\n");
 
       result = MLO_FloatTest_TestMulAll ();

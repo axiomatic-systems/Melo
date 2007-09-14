@@ -153,6 +153,10 @@ MLO_SampleBuffer_UseSamples(MLO_SampleBuffer* self);
  * should be retuned.
  *
  * @return The number of audio samples encapsulated by the MLO_SampleBuffer object.
+ * Each 'sample' contains the data for all the channels at any given sampling point.
+ * Thus, each sample is <channel_count>*<bits_per_sample> bits. For example, a
+ * buffer containing 1 second of audio at 44.1kHz contains 44100 samples, regardless
+ * of the numbe of channels.
  */
 MLO_Cardinal   
 MLO_SampleBuffer_GetSampleCount(const MLO_SampleBuffer* self);

@@ -103,6 +103,34 @@ GetGASpecificInfo(MLO_BitStream* bits, MLO_DecoderConfig* config)
 }
 
 /*----------------------------------------------------------------------
+|   GetSamplingFrequency
++---------------------------------------------------------------------*/
+static MLO_Result
+GetSamplingFrequency(MLO_BitStream*          bits, 
+                     MLO_SamplingFreq_Index* sampling_frequency_index,
+                     unsigned int*           sampling_frequency)
+{
+    if (MLO_BitStream_GetBitsLeft(bits) < 4) {
+        return MLO_ERROR_DECODER_INVALID_DATA;
+    }
+
+    *sampling_frequency_index = MLO_BitStream_ReadBits(bits, 4);;
+    if (*sampling_frequency_index == 0xF) {
+        if (MLO_BitStream_GetBitsLeft(bits) < 24) {
+            return MLO_ERROR_DECODER_INVALID_DATA;
+        }
+        *sampling_frequency = MLO_BitStream_ReadBits(bits, 24);
+    } else if (*sampling_frequency_index < MLO_SAMPLING_FREQ_INDEX_NBR_VALID) {
+        *sampling_frequency = MLO_SamplingFreq_table[*sampling_frequency_index];
+    } else {
+        *sampling_frequency = 0;
+        return MLO_ERROR_DECODER_INVALID_DATA;
+    }
+
+    return MLO_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
 |   MLO_DecoderConfig_Parse
 +---------------------------------------------------------------------*/
 MLO_Result
@@ -121,18 +149,11 @@ MLO_DecoderConfig_Parse(const unsigned char* encoded,
 	result = GetAudioObjectType(&bits, &config->object_type);
     if (MLO_FAILED(result)) goto end;
 
-    if (MLO_BitStream_GetBitsLeft(&bits) < 4) {
-        result = MLO_ERROR_DECODER_INVALID_DATA;
-        goto end;
-    }
-	config->sampling_frequency_index = MLO_BitStream_ReadBits(&bits, 4);
-	if (config->sampling_frequency_index == 0xF) {
-        if (MLO_BitStream_GetBitsLeft(&bits) < 24) {
-            result = MLO_ERROR_DECODER_INVALID_DATA;
-            goto end;
-        }
-		MLO_BitStream_ReadBits(&bits, 24);
-	}
+    result = GetSamplingFrequency(&bits, 
+                                  &config->sampling_frequency_index, 
+                                  &config->sampling_frequency);
+    if (MLO_FAILED(result)) goto end;
+    
     if (MLO_BitStream_GetBitsLeft(&bits) < 4) {
         result = MLO_ERROR_DECODER_INVALID_DATA;
         goto end;
@@ -142,25 +163,14 @@ MLO_DecoderConfig_Parse(const unsigned char* encoded,
 	if (config->object_type == MLO_OBJECT_TYPE_SBR) {
 		config->extension.object_type = config->object_type;
 		config->extension.sbr_present = MLO_TRUE;
-        if (MLO_BitStream_GetBitsLeft(&bits) < 4) {
-            result = MLO_ERROR_DECODER_INVALID_DATA;
-            goto end;
-        }
-		config->sampling_frequency_index = MLO_BitStream_ReadBits(&bits, 4);;
-        if (config->sampling_frequency_index == 0xF) {
-            if (MLO_BitStream_GetBitsLeft(&bits) < 24) {
-                result = MLO_ERROR_DECODER_INVALID_DATA;
-                goto end;
-            }
-			MLO_BitStream_ReadBits(&bits, 24);
-        }
+        result = GetSamplingFrequency(&bits, 
+                                      &config->extension.sampling_frequency_index, 
+                                      &config->extension.sampling_frequency);
+        if (MLO_FAILED(result)) goto end;
 		result = GetAudioObjectType(&bits, &config->object_type);
         if (MLO_FAILED(result)) goto end;
-	} else {
-   	    config->extension.sbr_present = MLO_FALSE;
-		config->extension.object_type = 0;
-        config->extension.sampling_frequency_index = 0;
 	}
+    
 	switch (config->object_type) {
         case MLO_OBJECT_TYPE_AAC_MAIN:
         case MLO_OBJECT_TYPE_AAC_LC:
@@ -175,12 +185,36 @@ MLO_DecoderConfig_Parse(const unsigned char* encoded,
         case MLO_OBJECT_TYPE_ER_BSAC:
         case MLO_OBJECT_TYPE_ER_AAC_LD:
             result = GetGASpecificInfo(&bits, config);
+            if (MLO_FAILED(result)) goto end;
             break;
 
         default:
             break;
     }
 
+    /* extension (only supported for non-ER AAC types here) */
+	if ((config->object_type == MLO_OBJECT_TYPE_AAC_MAIN ||
+         config->object_type == MLO_OBJECT_TYPE_AAC_LC   ||
+         config->object_type == MLO_OBJECT_TYPE_AAC_SSR  ||
+         config->object_type == MLO_OBJECT_TYPE_AAC_LTP  ||
+         config->object_type == MLO_OBJECT_TYPE_AAC_SCALABLE) &&
+         MLO_BitStream_GetBitsLeft(&bits) >= 16) {
+        unsigned int sync_extension_type = MLO_BitStream_ReadBits(&bits, 11);
+        if (sync_extension_type == 0x2b7) {
+            result = GetAudioObjectType(&bits, &config->extension.object_type);
+            if (MLO_FAILED(result)) goto end;
+            if (config->extension.object_type == MLO_OBJECT_TYPE_SBR) {
+                config->extension.sbr_present = MLO_BitStream_ReadBit(&bits);
+                if (config->extension.sbr_present) {
+                    result = GetSamplingFrequency(&bits, 
+                                      &config->extension.sampling_frequency_index, 
+                                      &config->extension.sampling_frequency);
+                    if (MLO_FAILED(result)) goto end;
+                }
+            }
+        }
+    }
+    
 end:
     MLO_BitStream_Destruct(&bits);
     return result;
@@ -211,7 +245,7 @@ unsigned int
 MLO_DecoderConfig_GetSampleRate(const MLO_DecoderConfig* config)
 {
     return config->sampling_frequency_index < MLO_SAMPLING_FREQ_INDEX_NBR_VALID ?
-        MLO_SamplingFreq_table[config->sampling_frequency_index]:0;
+        MLO_SamplingFreq_table[config->sampling_frequency_index]:config->sampling_frequency;
 }
 
 /*----------------------------------------------------------------------

@@ -116,6 +116,7 @@ typedef enum {
 typedef struct {
     MLO_ObjectTypeIdentifier object_type;              /**< Type identifier for the audio data */
     MLO_SamplingFreq_Index   sampling_frequency_index; /**< Index of the sampling frequency in the sampling frequency table */
+    MLO_UInt32               sampling_frequency;       /**< Sampling frequency in Hz */
     MLO_ChannelConfiguration channel_configuration;    /**< Channel configuration */
     MLO_Boolean              frame_length_flag;        /**< Frame Length Flag     */
     MLO_Boolean              depends_on_core_coder;    /**< Depends on Core Coder */
@@ -124,7 +125,8 @@ typedef struct {
     struct {
         MLO_Boolean              sbr_present;              /**< SBR is present        */
         MLO_ObjectTypeIdentifier object_type;              /**< Extension object type */
-        unsigned int             sampling_frequency_index; /**< Sampling frequency index of the extension */
+        MLO_SamplingFreq_Index   sampling_frequency_index; /**< Sampling frequency index of the extension */
+        MLO_UInt32               sampling_frequency;       /**< Sampling frequency of the extension, in Hz */
     } extension;
 } MLO_DecoderConfig;
 

@@ -163,7 +163,7 @@ MLO_BitStream_ReadBits(MLO_BitStream* bits, unsigned int n)
 static inline unsigned int
 MLO_BitStream_ReadBit(MLO_BitStream* bits)
 {
-    MLO_BitsWord   result;
+    MLO_BitsWord result;
     if (bits->bits_cached == 0) {
         /* the cache is empty */
 

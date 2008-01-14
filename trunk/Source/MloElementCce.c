@@ -143,7 +143,7 @@ MLO_ElementCce_Decode (MLO_ElementCce *cce_ptr, MLO_BitStream *bit_ptr, MLO_Indi
    if (MLO_SUCCEEDED (result))
    {
       int            c;
-      for (c = 1; c < num_gain_element_lists; ++ num_gain_element_lists)
+      for (c = 1; c < num_gain_element_lists; ++c)
       {
          MLO_ElementCce_DecodeGainElementList (
             &cce_ptr->gel_arr [c],

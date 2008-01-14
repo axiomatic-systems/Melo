@@ -163,7 +163,8 @@ Input/output parameters:
 ==============================================================================
 */
 
-void  MLO_Tns_Decode (MLO_Tns *tns_ptr, const MLO_IcsInfo *ics_info_ptr, MLO_BitStream *bit_ptr)
+MLO_Result
+MLO_Tns_Decode (MLO_Tns *tns_ptr, const MLO_IcsInfo *ics_info_ptr, MLO_BitStream *bit_ptr)
 {
    int            bd_n_filt = 2;
    int            bd_length = 6;
@@ -189,7 +190,7 @@ void  MLO_Tns_Decode (MLO_Tns *tns_ptr, const MLO_IcsInfo *ics_info_ptr, MLO_Bit
       int            f;
 
       win_ptr->n_filt = MLO_BitStream_ReadBits (bit_ptr, bd_n_filt);
-      MLO_ASSERT (win_ptr->n_filt <= (int)MLO_ARRAY_SIZE (win_ptr->filter));
+      MLO_CHECK_DATA (win_ptr->n_filt <= (int)MLO_ARRAY_SIZE (win_ptr->filter));
 
       if (win_ptr->n_filt > 0)
       {
@@ -206,7 +207,7 @@ void  MLO_Tns_Decode (MLO_Tns *tns_ptr, const MLO_IcsInfo *ics_info_ptr, MLO_Bit
 
          filter_ptr->length = MLO_BitStream_ReadBits (bit_ptr, bd_length);
          filter_ptr->order  = MLO_BitStream_ReadBits (bit_ptr, bd_order);
-         MLO_ASSERT (filter_ptr->order <= MLO_ARRAY_SIZE (filter_ptr->coef));
+         MLO_CHECK_DATA (filter_ptr->order <= MLO_ARRAY_SIZE (filter_ptr->coef));
 
          if (filter_ptr->order > 0)
          {
@@ -216,8 +217,8 @@ void  MLO_Tns_Decode (MLO_Tns *tns_ptr, const MLO_IcsInfo *ics_info_ptr, MLO_Bit
             filter_ptr->direction = MLO_BitStream_ReadBit (bit_ptr);
             filter_ptr->compress = MLO_BitStream_ReadBit (bit_ptr);
             bd_coef -= filter_ptr->compress;
-            MLO_ASSERT (bd_coef > 0);
-            MLO_ASSERT (bd_coef <= MLO_TNS_MAX_COEF_RES);
+            MLO_CHECK_DATA (bd_coef > 0);
+            MLO_CHECK_DATA (bd_coef <= MLO_TNS_MAX_COEF_RES);
 
             for (c = 0; c < filter_ptr->order; ++c)
             {
@@ -227,6 +228,8 @@ void  MLO_Tns_Decode (MLO_Tns *tns_ptr, const MLO_IcsInfo *ics_info_ptr, MLO_Bit
          }
       }
    }
+   
+   return MLO_SUCCESS;
 }
 
 
@@ -241,7 +244,8 @@ Input/output parameters:
 ==============================================================================
 */
 
-void  MLO_Tns_Process (struct MLO_IndivChnStream *ics_ptr)
+MLO_Result
+MLO_Tns_Process (struct MLO_IndivChnStream *ics_ptr)
 {
    MLO_ASSERT (ics_ptr != NULL);
 
@@ -264,6 +268,8 @@ void  MLO_Tns_Process (struct MLO_IndivChnStream *ics_ptr)
          }
       }
    }
+   
+   return MLO_SUCCESS;
 }
 
 

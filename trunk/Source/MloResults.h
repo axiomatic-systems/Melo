@@ -38,6 +38,10 @@
 /*----------------------------------------------------------------------
 |    error codes
 +---------------------------------------------------------------------*/
+#if !defined(MLO_ERROR_BASE)
+#define MLO_ERROR_BASE (-22000)
+#endif
+
 /** Result code indicating that a call was successful */
 #define MLO_SUCCESS      0
 
@@ -48,38 +52,38 @@
 #define MLO_SUCCEEDED(result)    ((result) == MLO_SUCCESS)
 
 /* Generic Errors */
-#define MLO_ERROR_BASE_GENERIC            (-20000)
+#define MLO_ERROR_BASE_GENERIC            (MLO_ERROR_BASE-0)
 #define MLO_ERROR_INVALID_PARAMETERS      (MLO_ERROR_BASE_GENERIC-0)
 #define MLO_ERROR_OUT_OF_MEMORY           (MLO_ERROR_BASE_GENERIC-1)
 #define MLO_ERROR_OUT_OF_RANGE            (MLO_ERROR_BASE_GENERIC-2)
 #define MLO_ERROR_INVALID_DATA            (MLO_ERROR_BASE_GENERIC-3)
 
 /* Decoder errors */
-#define MLO_ERROR_BASE_DECODER            (-20100)
+#define MLO_ERROR_BASE_DECODER            (MLO_ERROR_BASE - 100)
 
 /* BitStream errors */
-#define MLO_ERROR_BASE_BITSTREAM          (-20200)
+#define MLO_ERROR_BASE_BITSTREAM          (MLO_ERROR_BASE - 200)
 
 /* IcsInfo errors */
-#define MLO_ERROR_BASE_ICS_INFO           (-20300)
+#define MLO_ERROR_BASE_ICS_INFO           (MLO_ERROR_BASE - 300)
 
 /* IndivChnPool errors */
-#define MLO_ERROR_BASE_INDIV_CHN_POOL     (-20400)
+#define MLO_ERROR_BASE_INDIV_CHN_POOL     (MLO_ERROR_BASE - 400)
 
 /* IndivChnStream errors */
-#define MLO_ERROR_BASE_INDIV_CHN_STREAM   (-20500)
+#define MLO_ERROR_BASE_INDIV_CHN_STREAM   (MLO_ERROR_BASE - 500)
 
 /* Huffman errors */
-#define MLO_ERROR_BASE_HUFFMAN            (-20600)
+#define MLO_ERROR_BASE_HUFFMAN            (MLO_ERROR_BASE - 600)
 
 /* ElementFil errors */
-#define MLO_ERROR_BASE_ELEMENT_FIL        (-20700)
+#define MLO_ERROR_BASE_ELEMENT_FIL        (MLO_ERROR_BASE - 700)
 
 /* ElementFil errors */
-#define MLO_ERROR_BASE_SCALE_FACTOR       (-20800)
+#define MLO_ERROR_BASE_SCALE_FACTOR       (MLO_ERROR_BASE - 800)
 
 /* SyntacticElements errors */
-#define MLO_ERROR_BASE_SYNTACTIC_ELEMENTS (-20900)
+#define MLO_ERROR_BASE_SYNTACTIC_ELEMENTS (MLO_ERROR_BASE - 900)
 
 /*----------------------------------------------------------------------
 |    macros

@@ -114,8 +114,8 @@ extern "C" {
 
 
 
-void  MLO_Tns_Decode (MLO_Tns *tns_ptr, const MLO_IcsInfo *ics_info_ptr, MLO_BitStream *bit_ptr);
-void  MLO_Tns_Process (struct MLO_IndivChnStream *ics_ptr);
+MLO_Result MLO_Tns_Decode (MLO_Tns *tns_ptr, const MLO_IcsInfo *ics_info_ptr, MLO_BitStream *bit_ptr);
+MLO_Result MLO_Tns_Process (struct MLO_IndivChnStream *ics_ptr);
 
 
 

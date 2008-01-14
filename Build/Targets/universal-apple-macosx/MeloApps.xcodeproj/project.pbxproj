@@ -18,21 +18,21 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = CA18AD3B0C9327F000A5FE6D /* Melo.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = D2AAC046055464E500DB518D /* libMelo.a */;
+			remoteGlobalIDString = D2AAC046055464E500DB518D;
 			remoteInfo = Melo;
 		};
 		CA18AD530C93288100A5FE6D /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = CA18AD3B0C9327F000A5FE6D /* Melo.xcodeproj */;
 			proxyType = 1;
-			remoteGlobalIDString = D2AAC045055464E500DB518D /* Melo */;
+			remoteGlobalIDString = D2AAC045055464E500DB518D;
 			remoteInfo = Melo;
 		};
 		CA18ADAB0C9331A900A5FE6D /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = CA18AD3B0C9327F000A5FE6D /* Melo.xcodeproj */;
 			proxyType = 1;
-			remoteGlobalIDString = D2AAC045055464E500DB518D /* Melo */;
+			remoteGlobalIDString = D2AAC045055464E500DB518D;
 			remoteInfo = Melo;
 		};
 /* End PBXContainerItemProxy section */
@@ -43,8 +43,8 @@
 		CA18AD460C93282800A5FE6D /* DecoderTest.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = DecoderTest.c; sourceTree = "<group>"; };
 		CA18AD480C93282800A5FE6D /* FloatTest.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = FloatTest.c; sourceTree = "<group>"; };
 		CA18AD4A0C93282800A5FE6D /* ImdctTest.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = ImdctTest.c; sourceTree = "<group>"; };
-		CA18AD4E0C93286A00A5FE6D /* FloatTest */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = FloatTest; path = build/Debug/FloatTest; sourceTree = "<group>"; };
-		CA18ADA60C93318600A5FE6D /* ImdctTest */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = ImdctTest; path = build/Debug/ImdctTest; sourceTree = "<group>"; };
+		CA18AD4E0C93286A00A5FE6D /* FloatTest */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = FloatTest; sourceTree = BUILT_PRODUCTS_DIR; };
+		CA18ADA60C93318600A5FE6D /* ImdctTest */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = ImdctTest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -181,6 +181,7 @@
 		08FB7793FE84155DC02AAC07 /* Project object */ = {
 			isa = PBXProject;
 			buildConfigurationList = 1DEB928908733DD80010E9CD /* Build configuration list for PBXProject "MeloApps" */;
+			compatibilityVersion = "Xcode 2.4";
 			hasScannedForEncodings = 1;
 			mainGroup = 08FB7794FE84155DC02AAC07 /* MeloApps */;
 			projectDirPath = "";
@@ -190,6 +191,7 @@
 					ProjectRef = CA18AD3B0C9327F000A5FE6D /* Melo.xcodeproj */;
 				},
 			);
+			projectRoot = ../../..;
 			targets = (
 				CA18AD4D0C93286A00A5FE6D /* FloatTest */,
 				CA18ADA50C93318600A5FE6D /* ImdctTest */,

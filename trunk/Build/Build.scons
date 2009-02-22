@@ -112,7 +112,7 @@ class BuildModule(Module):
         self.type               = type
 
         # setup the environment        
-        self.env = environment and environment.Copy() or env.Copy()
+        self.env = environment and environment.Clone() or env.Clone()
         if extra_cpp_defines: self.env.Append(CPPDEFINES = extra_cpp_defines.items())
         
         # for each source drct to build, create a BuildDir

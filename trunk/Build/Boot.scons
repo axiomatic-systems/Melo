@@ -1,4 +1,3 @@
-<<<<<<< .mine
 import sys
 
 #######################################################
@@ -88,4 +87,3 @@ for build_config in env['build_config']:
     env['build_config'] = build_config
     print '********** Configuring Build Target =', env['target'], '/', build_config, '********'  
     SConscript('Build.scons', build_dir='Targets/'+env['target']+'/'+build_config, exports='env', duplicate=0)
->>>>>>> .r28

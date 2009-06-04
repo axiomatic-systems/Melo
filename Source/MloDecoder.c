@@ -391,6 +391,7 @@ MLO_Decoder_DecodeFrame(MLO_Decoder*      decoder,
         result = MLO_SampleBuffer_SetSampleCount(buffer, MLO_DEFS_FRAME_LEN_LONG);
 
         /* Decode frame content */
+
         result = MLO_Decoder_DecodeFrameContent (decoder, &decoder->bitstream, buffer);
      }
 

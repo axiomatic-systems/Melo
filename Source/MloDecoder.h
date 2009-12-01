@@ -108,7 +108,7 @@ typedef enum {
  * This information is necessary in order to create a decoder object.
  * It is normally obtained from the DecoderSpecificInfo field of the
  * DecoderConfigDescriptor descriptor carried in the sample description
- * for the audio samples. See 14496-1, subpart 2, p 2.6.6 for details.
+ * for the audio samples. See 14496-3, subpart 1, p 1.6.2.1 for details.
  * To populate the fields of this data structure from an encoded 
  * DecoderSpecificInfo byte array, use the @ref MLO_DecoderConfig_Parse
  * function.

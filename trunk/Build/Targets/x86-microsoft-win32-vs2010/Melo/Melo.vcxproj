@@ -1,0 +1,151 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{A5592F6F-C86E-40EB-8791-734C170942EB}</ProjectGuid>
+    <RootNamespace>Melo</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>..\..\Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <Optimization>Full</Optimization>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>true</OmitFramePointers>
+      <AdditionalIncludeDirectories>..\..\Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\..\Source\MloAdtsParser.c" />
+    <ClCompile Include="..\..\..\..\Source\MloBitStream.c" />
+    <ClCompile Include="..\..\..\..\Source\MloDecoder.c" />
+    <ClCompile Include="..\..\..\..\Source\MloElementCce.c" />
+    <ClCompile Include="..\..\..\..\Source\MloElementCpe.c" />
+    <ClCompile Include="..\..\..\..\Source\MloElementDse.c" />
+    <ClCompile Include="..\..\..\..\Source\MloElementFil.c" />
+    <ClCompile Include="..\..\..\..\Source\MloElementPce.c" />
+    <ClCompile Include="..\..\..\..\Source\MloElementSceLfe.c" />
+    <ClCompile Include="..\..\..\..\Source\MloFft.c" />
+    <ClCompile Include="..\..\..\..\Source\MloFilterBank.c" />
+    <ClCompile Include="..\..\..\..\Source\MloHcbPair.c" />
+    <ClCompile Include="..\..\..\..\Source\MloHcbQuad.c" />
+    <ClCompile Include="..\..\..\..\Source\MloHcbScaleFactor.c" />
+    <ClCompile Include="..\..\..\..\Source\MloHuffman.c" />
+    <ClCompile Include="..\..\..\..\Source\MloIcsInfo.c" />
+    <ClCompile Include="..\..\..\..\Source\MloImdct.c" />
+    <ClCompile Include="..\..\..\..\Source\MloIndivChnPool.c" />
+    <ClCompile Include="..\..\..\..\Source\MloIndivChnStream.c" />
+    <ClCompile Include="..\..\..\..\Source\MloInvQuant.c" />
+    <ClCompile Include="..\..\..\..\Source\MloIs.c" />
+    <ClCompile Include="..\..\..\..\Source\MloMs.c" />
+    <ClCompile Include="..\..\..\..\Source\MloPns.c" />
+    <ClCompile Include="..\..\..\..\Source\MloSampleBuffer.c" />
+    <ClCompile Include="..\..\..\..\Source\MloSamplingFreq.c" />
+    <ClCompile Include="..\..\..\..\Source\MloScaleFactor.c" />
+    <ClCompile Include="..\..\..\..\Source\MloSectionData.c" />
+    <ClCompile Include="..\..\..\..\Source\MloSyntacticElements.c" />
+    <ClCompile Include="..\..\..\..\Source\MloTns.c" />
+    <ClCompile Include="..\..\..\..\Source\MloUtils.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\Source\Melo.h" />
+    <ClInclude Include="..\..\..\..\Source\MloAdtsParser.h" />
+    <ClInclude Include="..\..\..\..\Source\MloBitStream.h" />
+    <ClInclude Include="..\..\..\..\Source\MloConfig.h" />
+    <ClInclude Include="..\..\..\..\Source\MloDebug.h" />
+    <ClInclude Include="..\..\..\..\Source\MloDecoder.h" />
+    <ClInclude Include="..\..\..\..\Source\MloDefs.h" />
+    <ClInclude Include="..\..\..\..\Source\MloElementCce.h" />
+    <ClInclude Include="..\..\..\..\Source\MloElementCpe.h" />
+    <ClInclude Include="..\..\..\..\Source\MloElementDse.h" />
+    <ClInclude Include="..\..\..\..\Source\MloElementFil.h" />
+    <ClInclude Include="..\..\..\..\Source\MloElementPce.h" />
+    <ClInclude Include="..\..\..\..\Source\MloElementSceLfe.h" />
+    <ClInclude Include="..\..\..\..\Source\MloFft.h" />
+    <ClInclude Include="..\..\..\..\Source\MloFilterBank.h" />
+    <ClInclude Include="..\..\..\..\Source\MloFloat.h" />
+    <ClInclude Include="..\..\..\..\Source\MloFloatFix.h" />
+    <ClInclude Include="..\..\..\..\Source\MloFloatFpu.h" />
+    <ClInclude Include="..\..\..\..\Source\MloFrame.h" />
+    <ClInclude Include="..\..\..\..\Source\MloHcb.h" />
+    <ClInclude Include="..\..\..\..\Source\MloHcbPair.h" />
+    <ClInclude Include="..\..\..\..\Source\MloHcbQuad.h" />
+    <ClInclude Include="..\..\..\..\Source\MloHcbScaleFactor.h" />
+    <ClInclude Include="..\..\..\..\Source\MloHuffman.h" />
+    <ClInclude Include="..\..\..\..\Source\MloIcsInfo.h" />
+    <ClInclude Include="..\..\..\..\Source\MloImdct.h" />
+    <ClInclude Include="..\..\..\..\Source\MloIndivChnPool.h" />
+    <ClInclude Include="..\..\..\..\Source\MloIndivChnStream.h" />
+    <ClInclude Include="..\..\..\..\Source\MloInvQuant.h" />
+    <ClInclude Include="..\..\..\..\Source\MloIs.h" />
+    <ClInclude Include="..\..\..\..\Source\MloMs.h" />
+    <ClInclude Include="..\..\..\..\Source\MloPns.h" />
+    <ClInclude Include="..\..\..\..\Source\MloResults.h" />
+    <ClInclude Include="..\..\..\..\Source\MloSampleBuffer.h" />
+    <ClInclude Include="..\..\..\..\Source\MloSamplingFreq.h" />
+    <ClInclude Include="..\..\..\..\Source\MloScaleFactor.h" />
+    <ClInclude Include="..\..\..\..\Source\MloSectionData.h" />
+    <ClInclude Include="..\..\..\..\Source\MloSyntacticElements.h" />
+    <ClInclude Include="..\..\..\..\Source\MloTns.h" />
+    <ClInclude Include="..\..\..\..\Source\MloTypes.h" />
+    <ClInclude Include="..\..\..\..\Source\MloUtils.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

@@ -314,13 +314,13 @@ MLO_HcbScaleFactor_decode (MLO_BitStream *bit_ptr)
 {
    unsigned int offset = 0;
 
-   MLO_ASSERT (bit_ptr != NULL);
-
    while (MLO_HcbScaleFactor_coodbook [offset].data [1] != 0)
    {
       unsigned int bit = MLO_BitStream_ReadBit (bit_ptr);
       offset += MLO_HcbScaleFactor_coodbook [offset].data [bit];
-      MLO_ASSERT (offset <= 240);
+      if (offset > 240) {
+          return 0;
+      }
    }
 
    return (MLO_HcbScaleFactor_coodbook [offset].data [0]);

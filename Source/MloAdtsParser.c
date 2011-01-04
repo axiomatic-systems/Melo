@@ -327,8 +327,6 @@ fail:
 unsigned int	
 MLO_AdtsParser_GetBytesFree (const MLO_AdtsParser* parser)
 {
-	MLO_ASSERT (parser != 0);
-
 	return (MLO_BitStream_GetBytesFree (&parser->bits));
 }
 
@@ -337,8 +335,6 @@ MLO_AdtsParser_GetBytesFree (const MLO_AdtsParser* parser)
 unsigned int	
 MLO_AdtsParser_GetBytesAvailable (const MLO_AdtsParser* parser)
 {
-	MLO_ASSERT (parser != 0);
-
 	return (MLO_BitStream_GetBytesAvailable(&parser->bits));
 }
 

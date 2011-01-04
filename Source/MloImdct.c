@@ -2127,7 +2127,7 @@ MLO_Result  MLO_Imdct_Init (MLO_Imdct *imdct_ptr)
 {
    MLO_Result     result = MLO_SUCCESS;
 
-   MLO_ASSERT (imdct_ptr != NULL);
+   MLO_ASSERT(imdct_ptr != NULL);
 
    MLO_Fft_Init (&imdct_ptr->fft);
 
@@ -2188,7 +2188,8 @@ Input/output parameters:
 ==============================================================================
 */
 
-void  MLO_Imdct_Process (MLO_Imdct *imdct_ptr, MLO_Float x_ptr [], const MLO_Float f_ptr [], int len)
+MLO_Result
+MLO_Imdct_Process (MLO_Imdct *imdct_ptr, MLO_Float x_ptr [], const MLO_Float f_ptr [], int len)
 {
    const int      len_h  = len >> 1;
    const int      len_q  = len >> 2;
@@ -2197,10 +2198,10 @@ void  MLO_Imdct_Process (MLO_Imdct *imdct_ptr, MLO_Float x_ptr [], const MLO_Flo
    int            k;
    MLO_Float *    tmp_ptr;
 
-   MLO_ASSERT (imdct_ptr != NULL);
-   MLO_ASSERT (x_ptr != NULL);
-   MLO_ASSERT (f_ptr != NULL);
-   MLO_ASSERT (   len == MLO_DEFS_FRAME_LEN_LONG  * 2
+   MLO_ASSERT(imdct_ptr != NULL);
+   MLO_ASSERT(x_ptr != NULL);
+   MLO_ASSERT(f_ptr != NULL);
+   MLO_CHECK(   len == MLO_DEFS_FRAME_LEN_LONG  * 2
 /*************************************************************************************************************/
 /*** Debug ***/
                || len == 8 * 2
@@ -2222,6 +2223,8 @@ void  MLO_Imdct_Process (MLO_Imdct *imdct_ptr, MLO_Float x_ptr [], const MLO_Flo
       x_ptr [len_q3 - 1 - k] = ma;
       x_ptr [len_q3     + k] = ma;
    }
+   
+   return MLO_SUCCESS;
 }
 
 
@@ -2262,17 +2265,18 @@ Input/output parameters:
 ==============================================================================
 */
 
-void  MLO_Imdct_ComputeDct4 (MLO_Imdct *imdct_ptr, MLO_Float dest_ptr [], const MLO_Float src_ptr [], int len)
+MLO_Result
+MLO_Imdct_ComputeDct4 (MLO_Imdct *imdct_ptr, MLO_Float dest_ptr [], const MLO_Float src_ptr [], int len)
 {
    int            k;
    MLO_Float *    buf_ptr;
    const MLO_Float * table_ptr = &MLO_Imdct_cos_table_1 [0];
    int            step = 1;
 
-   MLO_ASSERT (imdct_ptr != NULL);
-   MLO_ASSERT (dest_ptr != NULL);
-   MLO_ASSERT (src_ptr != NULL);
-   MLO_ASSERT (len > 0);
+   MLO_ASSERT(imdct_ptr != NULL);
+   MLO_ASSERT(dest_ptr != NULL);
+   MLO_ASSERT(src_ptr != NULL);
+   MLO_CHECK(len > 0);
 
    /* Uses the FFT buffer as temporary buffer for input of the DCT-II */
    buf_ptr = &imdct_ptr->fft.buffer [0];
@@ -2281,7 +2285,7 @@ void  MLO_Imdct_ComputeDct4 (MLO_Imdct *imdct_ptr, MLO_Float dest_ptr [], const 
    if (len == MLO_DEFS_FRAME_LEN_SHORT)
    {
       step = MLO_DEFS_FRAME_LEN_LONG / MLO_DEFS_FRAME_LEN_SHORT;
-      MLO_ASSERT ((step & 3) == 0);
+      MLO_CHECK((step & 3) == 0);
       table_ptr = &MLO_Imdct_cos_table_2 [step >> 1];
    }
 
@@ -2299,6 +2303,8 @@ void  MLO_Imdct_ComputeDct4 (MLO_Imdct *imdct_ptr, MLO_Float dest_ptr [], const 
    {
       dest_ptr [k] = MLO_Float_Sub (dest_ptr [k], dest_ptr [k - 1]);
    }
+   
+   return MLO_SUCCESS;
 }
 
 
@@ -2339,7 +2345,8 @@ Input/output parameters:
 ==============================================================================
 */
 
-void  MLO_Imdct_ComputeDct2 (MLO_Imdct *imdct_ptr, MLO_Float dest_ptr [], const MLO_Float src_ptr [], int len)
+MLO_Result
+MLO_Imdct_ComputeDct2 (MLO_Imdct *imdct_ptr, MLO_Float dest_ptr [], const MLO_Float src_ptr [], int len)
 {
    int            len_h = len >> 1;
    int            len_q = len >> 2;
@@ -2348,14 +2355,14 @@ void  MLO_Imdct_ComputeDct2 (MLO_Imdct *imdct_ptr, MLO_Float dest_ptr [], const 
    int            step = 1;
    int            qpi_offset = len_h;
 
-   MLO_ASSERT (imdct_ptr != NULL);
-   MLO_ASSERT (dest_ptr != NULL);
-   MLO_ASSERT (src_ptr != NULL);
-   MLO_ASSERT (len > 0);
+   MLO_ASSERT(imdct_ptr != NULL);
+   MLO_ASSERT(dest_ptr != NULL);
+   MLO_ASSERT(src_ptr != NULL);
+   MLO_CHECK(len > 0);
 
    /* Reorders data */
    buf_ptr = &imdct_ptr->buffer [0] [0];
-   MLO_ASSERT (buf_ptr != src_ptr);
+   MLO_CHECK(buf_ptr != src_ptr);
    for (k = 0; k < len_h; ++k)
    {
       const int      k_2 = k * 2;
@@ -2420,4 +2427,6 @@ void  MLO_Imdct_ComputeDct2 (MLO_Imdct *imdct_ptr, MLO_Float dest_ptr [], const 
       dest_ptr [len   - k] = c_0m;
       dest_ptr [len_h - k] = MLO_Float_Neg (c_1m_n);
    }
+   
+   return MLO_SUCCESS;
 }

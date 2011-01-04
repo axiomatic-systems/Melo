@@ -37,7 +37,7 @@
 /*----------------------------------------------------------------------
 |       Function prototypes
 +---------------------------------------------------------------------*/
-static void MLO_InvQuant_DoInverseQuantisation (MLO_Float coef_arr [], const MLO_Int16 data_arr [], long len);
+static MLO_Result       MLO_InvQuant_DoInverseQuantisation (MLO_Float coef_arr [], const MLO_Int16 data_arr [], long len);
 static inline MLO_Float MLO_InvQuant_ComputePow43 (int quant);
 
 /*----------------------------------------------------------------------
@@ -9290,9 +9290,10 @@ Input/output parameters:
 ==============================================================================
 */
 
-void  MLO_InvQuant_ProcessChannel (MLO_IndivChnStream *ics_ptr)
+void  
+MLO_InvQuant_ProcessChannel (MLO_IndivChnStream *ics_ptr)
 {
-   MLO_ASSERT (ics_ptr != NULL);
+   MLO_ASSERT_V(ics_ptr != NULL);
 
    MLO_InvQuant_DoInverseQuantisation (
       &ics_ptr->coef_arr [0],
@@ -9303,14 +9304,15 @@ void  MLO_InvQuant_ProcessChannel (MLO_IndivChnStream *ics_ptr)
 
 
 
-void  MLO_InvQuant_DoInverseQuantisation (MLO_Float coef_arr [], const MLO_Int16 data_arr [], long len)
+MLO_Result
+MLO_InvQuant_DoInverseQuantisation (MLO_Float coef_arr [], const MLO_Int16 data_arr [], long len)
 {
    int            pos;
 
-   MLO_ASSERT (coef_arr != NULL);
-   MLO_ASSERT (data_arr != NULL);
-   MLO_ASSERT (len > 0);
-   MLO_ASSERT (len <= MLO_DEFS_FRAME_LEN_LONG);
+   MLO_ASSERT(coef_arr != NULL);
+   MLO_ASSERT(data_arr != NULL);
+   MLO_CHECK(len > 0);
+   MLO_CHECK(len <= MLO_DEFS_FRAME_LEN_LONG);
 
    for (pos = 0; pos < len; ++pos)
    {
@@ -9328,6 +9330,8 @@ void  MLO_InvQuant_DoInverseQuantisation (MLO_Float coef_arr [], const MLO_Int16
 
       coef_arr [pos] = invquant;
    }
+   
+   return MLO_SUCCESS;
 }
 
 
@@ -9348,12 +9352,13 @@ Returns: The absolute value of the original coefficient, range [0 ; 165113.49]
 ==============================================================================
 */
 
-MLO_Float   MLO_InvQuant_ComputePow43 (int quant)
+MLO_Float   
+MLO_InvQuant_ComputePow43 (int quant)
 {
    MLO_Float      invquant;
 
-   MLO_ASSERT (quant >= 0);
-   MLO_ASSERT (quant <= 8191);
+   MLO_ASSERT_LOG(quant >= 0);
+   MLO_ASSERT_LOG(quant <= 8191);
 
 #if defined(MLO_CONFIG_FULL_POW_4_3_TABLE)
     invquant = MLO_InvQuant_table_pow43[quant];
@@ -9373,7 +9378,7 @@ MLO_Float   MLO_InvQuant_ComputePow43 (int quant)
 		const MLO_Float   r1 = MLO_InvQuant_table_pow43 [k + 1];
 		invquant = MLO_Float_Lerp (r0, r1, t, 3);
 
-      MLO_ASSERT (k + 1 < (int)MLO_ARRAY_SIZE (MLO_InvQuant_table_pow43));
+      MLO_ASSERT_LOG(k + 1 < (int)MLO_ARRAY_SIZE (MLO_InvQuant_table_pow43));
    }
 
 #else
@@ -9394,13 +9399,13 @@ MLO_Float   MLO_InvQuant_ComputePow43 (int quant)
       const MLO_Float   diff = MLO_Float_Sub (r1, r0);
 		invquant = MLO_Float_Add (r0, MLO_Float_Mul (diff, t));
 
-      MLO_ASSERT (k + 1 < (int)MLO_ARRAY_SIZE (MLO_InvQuant_table_pow43));
+      MLO_ASSERT_LOG(k + 1 < (int)MLO_ARRAY_SIZE (MLO_InvQuant_table_pow43));
    }
 #endif
 
 #endif
 
-   MLO_ASSERT (invquant >= 0);
+   MLO_ASSERT_LOG(invquant >= 0);
 
    return (invquant);
 }

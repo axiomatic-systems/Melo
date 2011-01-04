@@ -64,53 +64,14 @@ static MLO_Result MLO_SyntacticElements_DecodeLfe (MLO_SyntacticElements *se_ptr
 static MLO_Result MLO_SyntacticElements_DecodeDse (MLO_SyntacticElements *se_ptr, MLO_BitStream *bit_ptr);
 static MLO_Result MLO_SyntacticElements_DecodePce (MLO_SyntacticElements *se_ptr, MLO_BitStream *bit_ptr);
 static MLO_Result MLO_SyntacticElements_DecodeFil (MLO_SyntacticElements *se_ptr, MLO_BitStream *bit_ptr);
-static void MLO_SyntacticElements_MemorizeElement (MLO_SyntacticElements *se_ptr, MLO_SyntacticElements_ContentType type, int index);
-static void MLO_SyntacticElements_InterleaveAndConvertChannel (MLO_SampleBuffer *outbuf_ptr, int chn, const MLO_Float in_ptr []);
+static MLO_Result MLO_SyntacticElements_MemorizeElement (MLO_SyntacticElements *se_ptr, MLO_SyntacticElements_ContentType type, int index);
+static MLO_Result MLO_SyntacticElements_InterleaveAndConvertChannel (MLO_SampleBuffer *outbuf_ptr, int chn, const MLO_Float in_ptr []);
 
 
 
 /*----------------------------------------------------------------------
 |       Functions
 +---------------------------------------------------------------------*/
-
-
-
-/*************************************************************************************************************/
-/*** Debug ***/
-#if 0
-#include <stdio.h>
-#include "MloIndivChnStream.h"
-
-static int  MLO_SyntacticElements_frame_index = 0;
-
-void MLO_SyntacticElements_DumpFrame (int channel, const MLO_Float *data_ptr, long len)
-{
-   if (MLO_SyntacticElements_frame_index < 100)
-   {
-      long           pos;
-      FILE *         f_ptr;
-      const char *   fname_0 = "D:\\Ohm Force\\dev\\test\\frames_test.txt";
-
-      if (MLO_SyntacticElements_frame_index == 0 && channel == 0)
-      {
-         remove (fname_0);
-      }
-      f_ptr = fopen (fname_0, "a");
-
-      fprintf (f_ptr, "Frame # %06d, channel # %02d\n", MLO_SyntacticElements_frame_index, channel);
-      for (pos = 0; pos < len; ++pos)
-      {
-         fprintf (f_ptr, "%.6g\n", data_ptr [pos]);
-      }
-      fprintf (f_ptr, "\n");
-
-      fclose (f_ptr);
-   }
-}
-#endif
-/*************************************************************************************************************/
-
-
 
 /*
 ==============================================================================
@@ -126,11 +87,12 @@ Returns:
 ==============================================================================
 */
 
-MLO_Result	MLO_SyntacticElements_Init (MLO_SyntacticElements *se_ptr)
+MLO_Result	
+MLO_SyntacticElements_Init (MLO_SyntacticElements *se_ptr)
 {
    MLO_Result     result = MLO_SUCCESS;
 
-	MLO_ASSERT (se_ptr != NULL);
+   MLO_ASSERT(se_ptr != NULL);
 
    result = MLO_IndivChnPool_Create (&se_ptr->chn_pool, 2);
    if (MLO_SUCCEEDED (result))
@@ -167,11 +129,14 @@ Input/output parameters:
 ==============================================================================
 */
 
-void	MLO_SyntacticElements_Restore (MLO_SyntacticElements *se_ptr)
+MLO_Result
+MLO_SyntacticElements_Restore (MLO_SyntacticElements *se_ptr)
 {
-	MLO_ASSERT (se_ptr != NULL);
+   MLO_ASSERT(se_ptr != NULL);
 
    MLO_IndivChnPool_Destroy (&se_ptr->chn_pool);
+   
+   return MLO_SUCCESS;
 }
 
 
@@ -197,9 +162,9 @@ MLO_SyntacticElements_SetNbrChn (MLO_SyntacticElements *se_ptr, int nbr_chn)
 {
    MLO_Result     result = MLO_SUCCESS;
 
-   MLO_ASSERT (se_ptr != NULL);
-   MLO_ASSERT (nbr_chn > 0);
-   MLO_ASSERT (nbr_chn <= MLO_DEFS_MAX_CHN);
+   MLO_ASSERT(se_ptr != NULL);
+   MLO_CHECK(nbr_chn > 0);
+   MLO_CHECK(nbr_chn <= MLO_DEFS_MAX_CHN);
 
    result = MLO_IndivChnPool_Allocate (&se_ptr->chn_pool, nbr_chn);
    if (MLO_SUCCEEDED (result))
@@ -228,13 +193,14 @@ Input/output parameters:
 ==============================================================================
 */
 
-void	MLO_SyntacticElements_StartNewFrame (MLO_SyntacticElements *se_ptr, MLO_SamplingFreq_Index fs_index)
+MLO_Result
+MLO_SyntacticElements_StartNewFrame (MLO_SyntacticElements *se_ptr, MLO_SamplingFreq_Index fs_index)
 {
    int            tag;
 
-   MLO_ASSERT (se_ptr != NULL);
-   MLO_ASSERT (fs_index >= 0);
-   MLO_ASSERT (fs_index < MLO_SAMPLING_FREQ_INDEX_NBR_VALID);
+   MLO_ASSERT(se_ptr != NULL);
+   MLO_CHECK(fs_index >= 0);
+   MLO_CHECK(fs_index < MLO_SAMPLING_FREQ_INDEX_NBR_VALID);
 
    MLO_IndivChnPool_Clear (&se_ptr->chn_pool);
 
@@ -251,6 +217,8 @@ void	MLO_SyntacticElements_StartNewFrame (MLO_SyntacticElements *se_ptr, MLO_Sam
    }
 
    se_ptr->pce.sampling_frequency_index = fs_index;
+   
+   return MLO_SUCCESS;
 }
 
 
@@ -277,8 +245,8 @@ MLO_SyntacticElements_Decode (MLO_SyntacticElements *se_ptr, MLO_BitStream *bit_
    MLO_Result     result = MLO_SUCCESS;
    MLO_Boolean    cont_flag = MLO_TRUE;
 
-	MLO_ASSERT (se_ptr != NULL);
-	MLO_ASSERT (bit_ptr != NULL);
+	MLO_ASSERT(se_ptr != NULL);
+	MLO_ASSERT(bit_ptr != NULL);
 
    /* Element selection */
    do
@@ -321,8 +289,7 @@ MLO_SyntacticElements_Decode (MLO_SyntacticElements *se_ptr, MLO_BitStream *bit_
 
       /* Shouldn't happen, all cases are covered for the 3-bit id_syn_ele */
       default:
-         MLO_ASSERT (MLO_FALSE);
-         break;
+         return MLO_ERROR_INVALID_DATA;
       }
 
       if (MLO_FAILED (result))
@@ -369,7 +336,7 @@ MLO_SyntacticElements_FinishSpectralProc (MLO_SyntacticElements *se_ptr)
    int            nbr_cce;
    int            nbr_chn;
 
-	MLO_ASSERT (se_ptr != NULL);
+   MLO_ASSERT(se_ptr != NULL);
 
    nbr_cce = se_ptr->nbr_cce;
    nbr_chn = se_ptr->chn_pool.nbr_chn;
@@ -403,21 +370,6 @@ MLO_SyntacticElements_FinishSpectralProc (MLO_SyntacticElements *se_ptr)
       );
    }
 
-/*************************************************************************************************************/
-/*** Debug ***/
-#if 0
-   for (chn = 0; chn < nbr_chn && MLO_SUCCEEDED (result); ++chn)
-   {
-      MLO_SyntacticElements_DumpFrame (
-         chn,
-         se_ptr->chn_pool.chn_ptr_arr [chn]->coef_arr,
-         MLO_DEFS_FRAME_LEN_LONG
-      );
-   }
-   ++ MLO_SyntacticElements_frame_index;
-#endif
-/*************************************************************************************************************/
-
    return (result);
 }
 
@@ -449,8 +401,8 @@ MLO_SyntacticElements_ConvertSpectralToTime (MLO_SyntacticElements *se_ptr, MLO_
    int            nbr_cce;
    int            nbr_chn;
 
-   MLO_ASSERT (se_ptr != NULL);
-   MLO_ASSERT (fb_ptr != NULL);
+   MLO_ASSERT(se_ptr != NULL);
+   MLO_ASSERT(fb_ptr != NULL);
 
    nbr_cce = se_ptr->nbr_cce;
    nbr_chn = se_ptr->chn_pool.nbr_chn;
@@ -498,8 +450,8 @@ MLO_SyntacticElements_SendToOutput (const MLO_SyntacticElements *se_ptr, MLO_Sam
    int nbr_received_elements;
    int channel_count = (int) MLO_SampleBuffer_GetFormat(outbuf_ptr)->channel_count;
 
-   MLO_ASSERT (se_ptr != NULL);
-   MLO_ASSERT (outbuf_ptr != NULL);
+   MLO_ASSERT(se_ptr != NULL);
+   MLO_ASSERT(outbuf_ptr != NULL);
 
    nbr_received_elements = se_ptr->nbr_received_elements;
 
@@ -548,7 +500,7 @@ MLO_SyntacticElements_SendToOutput (const MLO_SyntacticElements *se_ptr, MLO_Sam
          break;
 
       default:
-         MLO_ASSERT (MLO_FALSE);
+        return MLO_ERROR_INVALID_DATA;
       }
    }
 
@@ -574,15 +526,16 @@ Returns:
 ==============================================================================
 */
 
-MLO_Result  MLO_SyntacticElements_UseSce (MLO_SyntacticElements *se_ptr, int tag, MLO_ElementSceLfe **sce_ptr_ptr)
+MLO_Result  
+MLO_SyntacticElements_UseSce (MLO_SyntacticElements *se_ptr, int tag, MLO_ElementSceLfe **sce_ptr_ptr)
 {
    MLO_Result     result = MLO_SUCCESS;
    int            index;
 
-	MLO_ASSERT (se_ptr != NULL);
-    MLO_ASSERT (tag >= 0);
-    MLO_ASSERT (tag < (int)MLO_ARRAY_SIZE (se_ptr->sce_tag_map));
-	MLO_ASSERT (sce_ptr_ptr != NULL);
+	MLO_ASSERT(se_ptr != NULL);
+    MLO_CHECK(tag >= 0);
+    MLO_CHECK(tag < (int)MLO_ARRAY_SIZE (se_ptr->sce_tag_map));
+	MLO_ASSERT(sce_ptr_ptr != NULL);
 
    index = se_ptr->sce_tag_map [tag];
    if (index < 0)
@@ -616,15 +569,16 @@ Returns:
 ==============================================================================
 */
 
-MLO_Result  MLO_SyntacticElements_UseCpe (MLO_SyntacticElements *se_ptr, int tag, MLO_ElementCpe **cpe_ptr_ptr)
+MLO_Result  
+MLO_SyntacticElements_UseCpe (MLO_SyntacticElements *se_ptr, int tag, MLO_ElementCpe **cpe_ptr_ptr)
 {
    MLO_Result     result = MLO_SUCCESS;
    int            index;
 
-	MLO_ASSERT (se_ptr != NULL);
-    MLO_ASSERT (tag >= 0);
-    MLO_ASSERT (tag < (int)MLO_ARRAY_SIZE (se_ptr->cpe_tag_map));
-	MLO_ASSERT (cpe_ptr_ptr != NULL);
+   MLO_CHECK(se_ptr != NULL);
+   MLO_CHECK (tag >= 0);
+   MLO_CHECK(tag < (int)MLO_ARRAY_SIZE (se_ptr->cpe_tag_map));
+   MLO_ASSERT(cpe_ptr_ptr != NULL);
 
    index = se_ptr->cpe_tag_map [tag];
    if (index < 0)
@@ -641,13 +595,14 @@ MLO_Result  MLO_SyntacticElements_UseCpe (MLO_SyntacticElements *se_ptr, int tag
 
 
 
-static MLO_Result MLO_SyntacticElements_DecodeSce (MLO_SyntacticElements *se_ptr, MLO_BitStream *bit_ptr)
+static MLO_Result 
+MLO_SyntacticElements_DecodeSce (MLO_SyntacticElements *se_ptr, MLO_BitStream *bit_ptr)
 {
    MLO_Result     result = MLO_SUCCESS;
    int            pos;
 
-	MLO_ASSERT (se_ptr != NULL);
-	MLO_ASSERT (bit_ptr != NULL);
+   MLO_ASSERT(se_ptr != NULL);
+   MLO_ASSERT(bit_ptr != NULL);
 
    pos = se_ptr->nbr_sce;
    if (pos >= (int)MLO_ARRAY_SIZE (se_ptr->sce_arr))
@@ -669,8 +624,8 @@ static MLO_Result MLO_SyntacticElements_DecodeSce (MLO_SyntacticElements *se_ptr
    {
       int            tag =
          se_ptr->sce_arr [pos].element_instance_tag;
-      MLO_ASSERT (tag >= 0);
-      MLO_ASSERT (tag < (int)MLO_ARRAY_SIZE (se_ptr->sce_tag_map));
+      MLO_CHECK(tag >= 0);
+      MLO_CHECK(tag < (int)MLO_ARRAY_SIZE (se_ptr->sce_tag_map));
       if (se_ptr->sce_tag_map [tag] >= 0)
       {
          result = MLO_ERROR_SCE_TAG_DUPLICATED;
@@ -693,13 +648,14 @@ static MLO_Result MLO_SyntacticElements_DecodeSce (MLO_SyntacticElements *se_ptr
 
 
 
-static MLO_Result MLO_SyntacticElements_DecodeCpe (MLO_SyntacticElements *se_ptr, MLO_BitStream *bit_ptr)
+static MLO_Result 
+MLO_SyntacticElements_DecodeCpe (MLO_SyntacticElements *se_ptr, MLO_BitStream *bit_ptr)
 {
    MLO_Result     result = MLO_SUCCESS;
    int            pos;
 
-	MLO_ASSERT (se_ptr != NULL);
-	MLO_ASSERT (bit_ptr != NULL);
+   MLO_ASSERT(se_ptr != NULL);
+   MLO_ASSERT(bit_ptr != NULL);
 
    pos = se_ptr->nbr_cpe;
    if (pos >= (int)MLO_ARRAY_SIZE (se_ptr->cpe_arr))
@@ -721,8 +677,8 @@ static MLO_Result MLO_SyntacticElements_DecodeCpe (MLO_SyntacticElements *se_ptr
    {
       int            tag =
          se_ptr->cpe_arr [pos].element_instance_tag;
-      MLO_ASSERT (tag >= 0);
-      MLO_ASSERT (tag < (int)MLO_ARRAY_SIZE (se_ptr->cpe_tag_map));
+      MLO_CHECK(tag >= 0);
+      MLO_CHECK(tag < (int)MLO_ARRAY_SIZE (se_ptr->cpe_tag_map));
       if (se_ptr->cpe_tag_map [tag] >= 0)
       {
          result = MLO_ERROR_CPE_TAG_DUPLICATED;
@@ -745,12 +701,13 @@ static MLO_Result MLO_SyntacticElements_DecodeCpe (MLO_SyntacticElements *se_ptr
 
 
 
-static MLO_Result MLO_SyntacticElements_DecodeCce (MLO_SyntacticElements *se_ptr, MLO_BitStream *bit_ptr)
+static MLO_Result 
+MLO_SyntacticElements_DecodeCce (MLO_SyntacticElements *se_ptr, MLO_BitStream *bit_ptr)
 {
    MLO_Result     result = MLO_SUCCESS;
 
-	MLO_ASSERT (se_ptr != NULL);
-	MLO_ASSERT (bit_ptr != NULL);
+   MLO_ASSERT(se_ptr != NULL);
+   MLO_ASSERT(bit_ptr != NULL);
 
    if (se_ptr->nbr_cce >= (int)MLO_ARRAY_SIZE (se_ptr->cce_arr))
    {
@@ -777,13 +734,14 @@ static MLO_Result MLO_SyntacticElements_DecodeCce (MLO_SyntacticElements *se_ptr
 
 
 
-static MLO_Result MLO_SyntacticElements_DecodeLfe (MLO_SyntacticElements *se_ptr, MLO_BitStream *bit_ptr)
+static MLO_Result 
+MLO_SyntacticElements_DecodeLfe (MLO_SyntacticElements *se_ptr, MLO_BitStream *bit_ptr)
 {
    MLO_Result     result = MLO_SUCCESS;
    int            pos;
 
-	MLO_ASSERT (se_ptr != NULL);
-	MLO_ASSERT (bit_ptr != NULL);
+   MLO_ASSERT(se_ptr != NULL);
+   MLO_ASSERT(bit_ptr != NULL);
 
    pos = se_ptr->nbr_lfe;
    if (pos >= (int)MLO_ARRAY_SIZE (se_ptr->lfe_arr))
@@ -817,12 +775,13 @@ static MLO_Result MLO_SyntacticElements_DecodeLfe (MLO_SyntacticElements *se_ptr
 
 
 
-static MLO_Result MLO_SyntacticElements_DecodeDse (MLO_SyntacticElements *se_ptr, MLO_BitStream *bit_ptr)
+static MLO_Result 
+MLO_SyntacticElements_DecodeDse (MLO_SyntacticElements *se_ptr, MLO_BitStream *bit_ptr)
 {
     MLO_Result     result = MLO_SUCCESS;
 
-	MLO_ASSERT (se_ptr != NULL);
-	MLO_ASSERT (bit_ptr != NULL);
+	MLO_ASSERT(se_ptr != NULL);
+	MLO_ASSERT(bit_ptr != NULL);
     (void)se_ptr; /* unused */
 
     result = MLO_ElementDse_Decode (bit_ptr);
@@ -832,12 +791,13 @@ static MLO_Result MLO_SyntacticElements_DecodeDse (MLO_SyntacticElements *se_ptr
 
 
 
-static MLO_Result MLO_SyntacticElements_DecodePce (MLO_SyntacticElements *se_ptr, MLO_BitStream *bit_ptr)
+static MLO_Result 
+MLO_SyntacticElements_DecodePce (MLO_SyntacticElements *se_ptr, MLO_BitStream *bit_ptr)
 {
    MLO_Result     result = MLO_SUCCESS;
 
-	MLO_ASSERT (se_ptr != NULL);
-	MLO_ASSERT (bit_ptr != NULL);
+   MLO_ASSERT(se_ptr != NULL);
+   MLO_ASSERT(bit_ptr != NULL);
 
    result = MLO_ElementPce_Decode (&se_ptr->pce, bit_ptr);
 
@@ -846,12 +806,13 @@ static MLO_Result MLO_SyntacticElements_DecodePce (MLO_SyntacticElements *se_ptr
 
 
 
-static MLO_Result MLO_SyntacticElements_DecodeFil (MLO_SyntacticElements *se_ptr, MLO_BitStream *bit_ptr)
+static MLO_Result 
+MLO_SyntacticElements_DecodeFil (MLO_SyntacticElements *se_ptr, MLO_BitStream *bit_ptr)
 {
    MLO_Result     result = MLO_SUCCESS;
 
-	MLO_ASSERT (se_ptr != NULL);
-	MLO_ASSERT (bit_ptr != NULL);
+   MLO_ASSERT(se_ptr != NULL);
+   MLO_ASSERT(bit_ptr != NULL);
 
    if (se_ptr->nbr_fil >= (int)MLO_ARRAY_SIZE (se_ptr->fil_arr))
    {
@@ -876,21 +837,24 @@ static MLO_Result MLO_SyntacticElements_DecodeFil (MLO_SyntacticElements *se_ptr
 
 
 
-static void MLO_SyntacticElements_MemorizeElement (MLO_SyntacticElements *se_ptr, MLO_SyntacticElements_ContentType type, int index)
+static MLO_Result 
+MLO_SyntacticElements_MemorizeElement (MLO_SyntacticElements *se_ptr, MLO_SyntacticElements_ContentType type, int index)
 {
    int            pos;
 
-   MLO_ASSERT (se_ptr != NULL);
-   MLO_ASSERT (type < MLO_SYNTACTIC_ELEMENTS_CONTENT_TYPE_SCE_NBR_ELT);
-   MLO_ASSERT (index >= 0);
+   MLO_ASSERT(se_ptr != NULL);
+   MLO_CHECK(type < MLO_SYNTACTIC_ELEMENTS_CONTENT_TYPE_SCE_NBR_ELT);
+   MLO_CHECK(index >= 0);
 
    pos = se_ptr->nbr_received_elements;
-   MLO_ASSERT (pos < (int)MLO_ARRAY_SIZE (se_ptr->order_arr));
+   MLO_CHECK(pos < (int)MLO_ARRAY_SIZE (se_ptr->order_arr));
 
    se_ptr->order_arr [pos].type  = type;
    se_ptr->order_arr [pos].index = index;
 
    ++ se_ptr->nbr_received_elements;
+   
+   return MLO_SUCCESS;
 }
 
 /*
@@ -908,19 +872,20 @@ Input/output parameters:
 ==============================================================================
 */
 
-static void MLO_SyntacticElements_InterleaveAndConvertChannel (MLO_SampleBuffer *outbuf_ptr, int chn, const MLO_Float in_ptr [])
+static MLO_Result
+MLO_SyntacticElements_InterleaveAndConvertChannel (MLO_SampleBuffer *outbuf_ptr, int chn, const MLO_Float in_ptr [])
 {
    int                     nbr_chn;
    const MLO_SampleFormat* format;
 
-   MLO_ASSERT (outbuf_ptr != NULL);
-   MLO_ASSERT (chn >= 0);
-   MLO_ASSERT (in_ptr != NULL);
+   MLO_ASSERT(outbuf_ptr != NULL);
+   MLO_CHECK(chn >= 0);
+   MLO_ASSERT(in_ptr != NULL);
 
    format = MLO_SampleBuffer_GetFormat(outbuf_ptr);
-   MLO_ASSERT (format->type == MLO_SAMPLE_TYPE_INTERLACED_SIGNED);
+   MLO_CHECK(format->type == MLO_SAMPLE_TYPE_INTERLACED_SIGNED);
    nbr_chn = format->channel_count;
-   MLO_ASSERT (chn < nbr_chn);
+   MLO_CHECK(chn < nbr_chn);
 
    if (format->bits_per_sample == 16)
    {
@@ -937,6 +902,8 @@ static void MLO_SyntacticElements_InterleaveAndConvertChannel (MLO_SampleBuffer 
    else
    {
       /*** To do ***/
-      MLO_ASSERT (MLO_FALSE);
+      return MLO_ERROR_INVALID_PARAMETERS;
    }
+   
+   return MLO_SUCCESS;
 }

@@ -91,7 +91,7 @@ extern "C" {
 
 
 MLO_Result  MLO_ScaleFactor_Decode (MLO_ScaleFactor *sf_ptr, const MLO_IcsInfo *ics_ptr, const MLO_SectionData *sec_ptr, MLO_BitStream *bit_ptr, int global_gain);
-void  MLO_ScaleFactor_ScaleCoefficients (const MLO_ScaleFactor *sf_ptr, const MLO_IcsInfo *ics_ptr, MLO_Float coef_ptr []);
+MLO_Result  MLO_ScaleFactor_ScaleCoefficients (const MLO_ScaleFactor *sf_ptr, const MLO_IcsInfo *ics_ptr, MLO_Float coef_ptr []);
 MLO_Float   MLO_ScaleFactor_ComputeGain (int sf);
 
 

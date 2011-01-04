@@ -83,7 +83,7 @@ extern "C" {
 
 
 void  MLO_Fft_Init (MLO_Fft *fft_ptr);
-void  MLO_Fft_Process (MLO_Fft *fft_ptr, MLO_Float x_ptr [], const MLO_Float f_ptr [], int len);
+MLO_Result MLO_Fft_Process (MLO_Fft *fft_ptr, MLO_Float x_ptr [], const MLO_Float f_ptr [], int len);
 
 
 

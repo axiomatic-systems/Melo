@@ -34,12 +34,12 @@
 /*----------------------------------------------------------------------
 |       Function prototypes
 +---------------------------------------------------------------------*/
-static void MLO_FilterBank_ApplyWindow (MLO_FilterBank *fb_ptr, const MLO_IndivChnStream *ics_ptr);
-static void MLO_FilterBank_ApplyWindowLong (MLO_FilterBank *fb_ptr, const MLO_IndivChnStream *ics_ptr, int part);
-static void MLO_FilterBank_ApplyWindowShort (MLO_FilterBank *fb_ptr, const MLO_IndivChnStream *ics_ptr);
-static void MLO_FilterBank_ApplyWindowStart (MLO_FilterBank *fb_ptr, const MLO_IndivChnStream *ics_ptr);
-static void MLO_FilterBank_ApplyWindowStop (MLO_FilterBank *fb_ptr, const MLO_IndivChnStream *ics_ptr);
-static void MLO_FilterBank_MixFrames (const MLO_FilterBank *fb_ptr, MLO_IndivChnStream *ics_ptr);
+static MLO_Result MLO_FilterBank_ApplyWindow (MLO_FilterBank *fb_ptr, const MLO_IndivChnStream *ics_ptr);
+static MLO_Result MLO_FilterBank_ApplyWindowLong (MLO_FilterBank *fb_ptr, const MLO_IndivChnStream *ics_ptr, int part);
+static MLO_Result MLO_FilterBank_ApplyWindowShort (MLO_FilterBank *fb_ptr, const MLO_IndivChnStream *ics_ptr);
+static MLO_Result MLO_FilterBank_ApplyWindowStart (MLO_FilterBank *fb_ptr, const MLO_IndivChnStream *ics_ptr);
+static MLO_Result MLO_FilterBank_ApplyWindowStop (MLO_FilterBank *fb_ptr, const MLO_IndivChnStream *ics_ptr);
+static MLO_Result MLO_FilterBank_MixFrames (const MLO_FilterBank *fb_ptr, MLO_IndivChnStream *ics_ptr);
 
 /*----------------------------------------------------------------------
 |       Data
@@ -4695,7 +4695,8 @@ Returns:
 ==============================================================================
 */
 
-MLO_Result	MLO_FilterBank_Init (MLO_FilterBank *fb_ptr)
+MLO_Result	
+MLO_FilterBank_Init (MLO_FilterBank *fb_ptr)
 {
    MLO_Result  result = MLO_SUCCESS;
 
@@ -4723,12 +4724,14 @@ Output parameters:
 ==============================================================================
 */
 
-void	
+MLO_Result	
 MLO_FilterBank_Restore (MLO_FilterBank *fb_ptr)
 {
    MLO_ASSERT(fb_ptr != NULL);
 
    MLO_Imdct_Restore (&fb_ptr->imdct);
+   
+   return MLO_SUCCESS;
 }
 
 
@@ -4748,7 +4751,8 @@ Input/output parameters:
 ==============================================================================
 */
 
-void	MLO_FilterBank_ConvertSpectralToTime (MLO_FilterBank *fb_ptr, MLO_IndivChnStream *ics_ptr)
+MLO_Result
+MLO_FilterBank_ConvertSpectralToTime (MLO_FilterBank *fb_ptr, MLO_IndivChnStream *ics_ptr)
 {
    int            win;
    int            win_pos = 0;
@@ -4780,6 +4784,8 @@ void	MLO_FilterBank_ConvertSpectralToTime (MLO_FilterBank *fb_ptr, MLO_IndivChnS
 
    /* Mixes current and previous frames to the output buffer */
    MLO_FilterBank_MixFrames (fb_ptr, ics_ptr);
+   
+   return MLO_SUCCESS;
 }
 
 
@@ -4798,7 +4804,7 @@ Input/output parameters:
 ==============================================================================
 */
 
-static void 
+static MLO_Result 
 MLO_FilterBank_ApplyWindow (MLO_FilterBank *fb_ptr, const MLO_IndivChnStream *ics_ptr)
 {
    MLO_ASSERT(fb_ptr != NULL);
@@ -4826,8 +4832,10 @@ MLO_FilterBank_ApplyWindow (MLO_FilterBank *fb_ptr, const MLO_IndivChnStream *ic
       break;
 
    default:
-      MLO_ASSERT (MLO_FALSE);
+      return MLO_ERROR_INVALID_DATA;
    }
+   
+   return MLO_SUCCESS;
 }
 
 
@@ -4845,7 +4853,7 @@ Input/output parameters:
 ==============================================================================
 */
 
-static void 
+static MLO_Result 
 MLO_FilterBank_ApplyWindowLong (MLO_FilterBank *fb_ptr, const MLO_IndivChnStream *ics_ptr, int part)
 {
    const int      part_pos = part * MLO_DEFS_FRAME_LEN_LONG;
@@ -4857,8 +4865,8 @@ MLO_FilterBank_ApplyWindowLong (MLO_FilterBank *fb_ptr, const MLO_IndivChnStream
 
    MLO_ASSERT(fb_ptr != NULL);
    MLO_ASSERT(ics_ptr != NULL);
-   MLO_ASSERT(part >= 0);
-   MLO_ASSERT(part < 2);
+   MLO_CHECK(part >= 0);
+   MLO_CHECK(part < 2);
 
    shape = ics_ptr->ics_info.window_shape [part];
    win_ptr = &MloFilterBank_table_long [shape] [part_pos];
@@ -4868,6 +4876,8 @@ MLO_FilterBank_ApplyWindowLong (MLO_FilterBank *fb_ptr, const MLO_IndivChnStream
    {
       dest_ptr [pos] = MLO_Float_Mul (src_ptr [pos], win_ptr [pos]);
    }
+   
+   return MLO_SUCCESS;
 }
 
 
@@ -4884,7 +4894,7 @@ Input/output parameters:
 ==============================================================================
 */
 
-static void 
+static MLO_Result 
 MLO_FilterBank_ApplyWindowShort (MLO_FilterBank *fb_ptr, const MLO_IndivChnStream *ics_ptr)
 {
    MLO_IcsInfo_WindowShape shape;
@@ -4944,6 +4954,8 @@ MLO_FilterBank_ApplyWindowShort (MLO_FilterBank *fb_ptr, const MLO_IndivChnStrea
       0,
       MLO_FILTER_BANK_BORDER * sizeof (dest_ptr [0])
    );
+   
+   return MLO_SUCCESS;
 }
 
 
@@ -4960,7 +4972,7 @@ Input/output parameters:
 ==============================================================================
 */
 
-static void 
+static MLO_Result 
 MLO_FilterBank_ApplyWindowStart (MLO_FilterBank *fb_ptr, const MLO_IndivChnStream *ics_ptr)
 {
    MLO_IcsInfo_WindowShape shape;
@@ -4998,6 +5010,8 @@ MLO_FilterBank_ApplyWindowStart (MLO_FilterBank *fb_ptr, const MLO_IndivChnStrea
       0,
       MLO_FILTER_BANK_BORDER * sizeof (dest_ptr [0])
    );
+   
+   return MLO_SUCCESS;
 }
 
 
@@ -5014,7 +5028,7 @@ Input/output parameters:
 ==============================================================================
 */
 
-static void 
+static MLO_Result 
 MLO_FilterBank_ApplyWindowStop (MLO_FilterBank *fb_ptr, const MLO_IndivChnStream *ics_ptr)
 {
    MLO_IcsInfo_WindowShape shape;
@@ -5051,6 +5065,8 @@ MLO_FilterBank_ApplyWindowStop (MLO_FilterBank *fb_ptr, const MLO_IndivChnStream
       src_ptr,
       MLO_FILTER_BANK_BORDER * sizeof (dest_ptr [0])
    );
+   
+   return MLO_SUCCESS;
 }
 
 
@@ -5068,7 +5084,7 @@ Input/output parameters:
 ==============================================================================
 */
 
-static void 
+static MLO_Result 
 MLO_FilterBank_MixFrames (const MLO_FilterBank *fb_ptr, MLO_IndivChnStream *ics_ptr)
 {
    int            pos;
@@ -5097,4 +5113,6 @@ MLO_FilterBank_MixFrames (const MLO_FilterBank *fb_ptr, MLO_IndivChnStream *ics_
    {
       ics_ptr->prev_frame [pos] = fb_ptr->tmp_win [pos + MLO_DEFS_FRAME_LEN_LONG];
    }
+   
+   return MLO_SUCCESS;
 }

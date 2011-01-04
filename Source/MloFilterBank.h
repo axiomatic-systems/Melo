@@ -76,9 +76,9 @@ extern "C" {
 
 
 MLO_Result  MLO_FilterBank_Init (MLO_FilterBank *fb_ptr);
-void  MLO_FilterBank_Restore (MLO_FilterBank *fb_ptr);
+MLO_Result  MLO_FilterBank_Restore (MLO_FilterBank *fb_ptr);
 
-void  MLO_FilterBank_ConvertSpectralToTime (MLO_FilterBank *fb_ptr, MLO_IndivChnStream *ics_ptr);
+MLO_Result  MLO_FilterBank_ConvertSpectralToTime (MLO_FilterBank *fb_ptr, MLO_IndivChnStream *ics_ptr);
 
 
 

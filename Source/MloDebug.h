@@ -37,10 +37,6 @@
 
 #include "MloConfig.h"
 
-#if defined(MLO_CONFIG_HAVE_ASSERT_H)
-#include <assert.h>
-#endif
-
 /*----------------------------------------------------------------------
 |    Macros
 +---------------------------------------------------------------------*/
@@ -57,7 +53,7 @@ extern "C" {
 #endif /* __cplusplus */
 
 extern void MLO_Debug(const char* format, ...);
-#define MLO_ASSERT(_x) assert(_x)
+extern void MLO_DebugHook(void);
 
 #ifdef __cplusplus
 }

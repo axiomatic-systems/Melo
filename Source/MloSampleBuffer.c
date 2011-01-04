@@ -57,7 +57,7 @@ MLO_SampleBuffer_Create(MLO_Size size, MLO_SampleBuffer** buffer)
     /* allocate the buffer */
     if (size) {
         (*buffer)->buffer_size = size;
-        (*buffer)->buffer = MLO_AllocateMemory(size);
+        (*buffer)->buffer = MLO_AllocateZeroMemory(size);
         if ((*buffer)->buffer == NULL) {
             MLO_FreeMemory((void*)(*buffer));
             return MLO_ERROR_OUT_OF_MEMORY;
@@ -112,7 +112,7 @@ MLO_SampleBuffer_ReallocateBuffer(MLO_SampleBuffer* self, MLO_Size size)
     if (self->data_size > size) return MLO_ERROR_INVALID_PARAMETERS;
 
     /* allocate a new buffer */
-    new_buffer = (MLO_Byte*)MLO_AllocateMemory(size);
+    new_buffer = (MLO_Byte*)MLO_AllocateZeroMemory(size);
     if (new_buffer == NULL) return MLO_ERROR_OUT_OF_MEMORY;
 
     /* copy the contents of the previous buffer, if any */

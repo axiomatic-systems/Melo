@@ -55,7 +55,7 @@ MLO_ElementDse_Decode (MLO_BitStream *bit_ptr)
    MLO_Boolean    byte_align_flag;
    int            count;
 
-	MLO_ASSERT (bit_ptr != NULL);
+   MLO_CHECK(bit_ptr != NULL);
 
    MLO_BitStream_ReadBits (bit_ptr, 4);   /* Ignores element_instance_tag */
    byte_align_flag = (MLO_Boolean) MLO_BitStream_ReadBit (bit_ptr);

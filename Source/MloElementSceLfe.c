@@ -75,8 +75,8 @@ MLO_ElementSceLfe_Decode (MLO_ElementSceLfe *sce_ptr, MLO_BitStream *bit_ptr, ML
 	MLO_ASSERT(sce_ptr != NULL);
 	MLO_ASSERT(bit_ptr != NULL);
 	MLO_ASSERT(chn_pool_ptr != NULL);
-    MLO_ASSERT(fs_index >= 0);
-    MLO_CHECK_ARGS(fs_index < MLO_SAMPLING_FREQ_INDEX_NBR_VALID);
+    MLO_CHECK(fs_index >= 0);
+    MLO_CHECK(fs_index < MLO_SAMPLING_FREQ_INDEX_NBR_VALID);
 
     sce_ptr->element_instance_tag = MLO_BitStream_ReadBits (bit_ptr, 4);
 

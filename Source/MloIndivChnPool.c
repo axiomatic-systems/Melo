@@ -59,9 +59,9 @@ MLO_Result  MLO_IndivChnPool_Create (MLO_IndivChnPool *pool_ptr, int nbr_chn)
 {
     int            chn_cnt;
 
-    MLO_ASSERT (pool_ptr != NULL);
-	MLO_ASSERT (nbr_chn > 0);
-    MLO_ASSERT (nbr_chn <= MLO_DEFS_MAX_CHN);
+    MLO_ASSERT(pool_ptr != NULL);
+	MLO_CHECK(nbr_chn > 0);
+    MLO_CHECK(nbr_chn <= MLO_DEFS_MAX_CHN);
 
     pool_ptr->nbr_alloc_chn = 0;
     pool_ptr->nbr_chn = 0;
@@ -88,9 +88,10 @@ Input/output parameters:
 ==============================================================================
 */
 
-void  MLO_IndivChnPool_Destroy (MLO_IndivChnPool *pool_ptr)
+void  
+MLO_IndivChnPool_Destroy (MLO_IndivChnPool *pool_ptr)
 {
-	MLO_ASSERT (pool_ptr != NULL);
+   MLO_ASSERT_V(pool_ptr != NULL);
 
    MLO_IndivChnPool_EraseChannels (pool_ptr);
 }
@@ -119,13 +120,13 @@ MLO_IndivChnPool_Allocate (MLO_IndivChnPool *pool_ptr, int nbr_chn)
     MLO_Result          result = MLO_SUCCESS;
     MLO_IndivChnStream* mem_ptr = 0;
 
-	MLO_ASSERT (pool_ptr != NULL);
-	MLO_ASSERT (nbr_chn >= 0);
-    MLO_ASSERT (nbr_chn <= MLO_DEFS_MAX_CHN);
+	MLO_ASSERT(pool_ptr != NULL);
+	MLO_CHECK(nbr_chn >= 0);
+    MLO_CHECK(nbr_chn <= MLO_DEFS_MAX_CHN);
 
    if (nbr_chn != pool_ptr->nbr_alloc_chn)
    {
-      mem_ptr = MLO_AllocateMemory (sizeof (*mem_ptr) * nbr_chn);
+      mem_ptr = MLO_AllocateMemory/*MLO_AllocateZeroMemory*/ (sizeof (*mem_ptr) * nbr_chn);
       if (mem_ptr == 0)
       {
          result = MLO_ERROR_OUT_OF_MEMORY;
@@ -163,16 +164,18 @@ Input/output parameters:
 ==============================================================================
 */
 
-void  MLO_IndivChnPool_EraseChannels (MLO_IndivChnPool *pool_ptr)
+void  
+MLO_IndivChnPool_EraseChannels (MLO_IndivChnPool *pool_ptr)
 {
-   MLO_ASSERT (pool_ptr != NULL);
+   MLO_ASSERT_V(pool_ptr != NULL);
 
    if (pool_ptr->nbr_alloc_chn > 0)
    {
       int            chn_cnt;
 
-      MLO_ASSERT (pool_ptr->chn_ptr_arr [0] != 0);
-      MLO_FreeMemory (pool_ptr->chn_ptr_arr [0]);
+      if (pool_ptr->chn_ptr_arr [0]) {
+         MLO_FreeMemory (pool_ptr->chn_ptr_arr [0]);
+      }
       pool_ptr->nbr_alloc_chn = 0;
 
       for (chn_cnt = 0; chn_cnt < pool_ptr->nbr_alloc_chn; ++chn_cnt)
@@ -197,9 +200,10 @@ Output parameters:
 ==============================================================================
 */
 
-void  MLO_IndivChnPool_Clear (MLO_IndivChnPool *pool_ptr)
+void  
+MLO_IndivChnPool_Clear (MLO_IndivChnPool *pool_ptr)
 {
-   MLO_ASSERT (pool_ptr != NULL);
+   MLO_ASSERT_V(pool_ptr != NULL);
 
    pool_ptr->nbr_chn = 0;
 }
@@ -225,7 +229,7 @@ MLO_Result  MLO_IndivChnPool_AddChn (MLO_IndivChnPool *pool_ptr, int *index_ptr)
 {
    MLO_Result     result = MLO_SUCCESS;
 
-   MLO_ASSERT (pool_ptr != NULL);
+   MLO_ASSERT(pool_ptr != NULL);
 
    if (MLO_IndivChnPool_GetNbrChnFree (pool_ptr) > 0)
    {
@@ -255,7 +259,7 @@ Returns: Number of available channels, >= 0
 
 int   MLO_IndivChnPool_GetNbrChnFree (const MLO_IndivChnPool *pool_ptr)
 {
-   MLO_ASSERT (pool_ptr != NULL);
+   MLO_ASSERT(pool_ptr != NULL);
 
    return (pool_ptr->nbr_alloc_chn - pool_ptr->nbr_chn);
 }

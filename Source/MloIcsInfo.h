@@ -111,11 +111,9 @@ extern "C" {
 
 
 
-void  MLO_IcsInfo_ClearBuffers (MLO_IcsInfo *ics_ptr);
-
+void        MLO_IcsInfo_ClearBuffers (MLO_IcsInfo *ics_ptr);
 MLO_Result  MLO_IcsInfo_Decode (MLO_IcsInfo *ics_ptr, MLO_BitStream *bit_ptr, MLO_SamplingFreq_Index fs_index);
-
-void  MLO_IcsInfo_DeinterleaveCoefficients (const MLO_IcsInfo *ics_ptr, MLO_Float coef_ptr []);
+MLO_Result  MLO_IcsInfo_DeinterleaveCoefficients (const MLO_IcsInfo *ics_ptr, MLO_Float coef_ptr []);
 
 
 

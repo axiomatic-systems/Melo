@@ -42,6 +42,7 @@
 
 #include "MloConfig.h"
 #include "MloDebug.h"
+#include "MloResults.h"
 
 #if defined(MLO_CONFIG_HAVE_MATH_H)
 #include <math.h>
@@ -370,31 +371,31 @@ static inline MLO_Float MLO_Float_MulInt (MLO_Float a, int b)
 
 static inline MLO_Float MLO_Float_Div (MLO_Float a, MLO_Float b)
 {
-   MLO_ASSERT (a >= 0);
-   MLO_ASSERT (b > 0);
+   MLO_ASSERT_LOG(a >= 0);
+   MLO_ASSERT_LOG(b > 0);
 
    return (a / b);
 }
 
 static inline MLO_Float MLO_Float_DivInt (MLO_Float a, int b)
 {
-   MLO_ASSERT (a >= 0);
-   MLO_ASSERT (b > 0);
+   MLO_ASSERT_LOG(a >= 0);
+   MLO_ASSERT_LOG(b > 0);
 
    return (a / b);
 }
 
 static inline MLO_Float MLO_Float_ScaleP2 (MLO_Float a, int b)
 {
-   MLO_ASSERT (b >= MLO_FLOAT_TABLE_P2_MIN);
-   MLO_ASSERT (b <= MLO_FLOAT_TABLE_P2_MAX);
+   MLO_ASSERT_LOG(b >= MLO_FLOAT_TABLE_P2_MIN);
+   MLO_ASSERT_LOG(b <= MLO_FLOAT_TABLE_P2_MAX);
 
    return (a * MLO_Float_table_p2 [b - MLO_FLOAT_TABLE_P2_MIN]);
 }
 
 static inline MLO_Float MLO_Float_Sqrt (MLO_Float a)
 {
-   MLO_ASSERT (a >= 0);
+   MLO_ASSERT_LOG(a >= 0);
 
 #if defined (MLO_CONFIG_HAVE_SQRT)
    return ((MLO_Float) sqrt (a));

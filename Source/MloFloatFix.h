@@ -198,9 +198,9 @@ static inline MLO_Float MLO_Float_Div (MLO_Float a, MLO_Float b)
    MLO_CONFIG_INT64_TYPE   d;
    MLO_Float      sum;
 
-   MLO_ASSERT (a >= 0);
-   MLO_ASSERT (b > 0);
-   MLO_ASSERT (b < (((MLO_CONFIG_INT64_TYPE)1) << (64-1 - 8)));
+   MLO_ASSERT_LOG(a >= 0);
+   MLO_ASSERT_LOG(b > 0);
+   MLO_ASSERT_LOG(b < (((MLO_CONFIG_INT64_TYPE)1) << (64-1 - 8)));
 
    d = a / b;  /* Integer part */
    sum = d << MLO_FLOAT_FRAC;
@@ -231,7 +231,7 @@ static inline MLO_Float MLO_Float_Div (MLO_Float a, MLO_Float b)
 
 static inline MLO_Float MLO_Float_DivInt (MLO_Float a, int b)
 {
-   MLO_ASSERT (b > 0);
+   MLO_ASSERT_LOG(b > 0);
 
    return (a / b);
 }
@@ -251,7 +251,7 @@ static inline MLO_Float MLO_Float_ScaleP2 (MLO_Float a, int b)
    }
    else
    {
-      MLO_ASSERT (b < 64);
+      MLO_ASSERT_LOG(b < 64);
 
       a <<= b;
    }
@@ -353,7 +353,7 @@ static inline MLO_Float MLO_Float_Sqrt (MLO_Float a)
 
    MLO_Float      m = ((MLO_Float)1) << 60;
 
-   MLO_ASSERT (a >= 0);
+   MLO_ASSERT_LOG(a >= 0);
 
    do
    {
@@ -377,8 +377,8 @@ static inline MLO_Float MLO_Float_Lerp (MLO_Float a, MLO_Float b, int k, int bit
 {
    const MLO_Float   diff = MLO_Float_Sub (b, a);
 
-   MLO_ASSERT (k >= 0);
-   MLO_ASSERT (k < (1L << bits));
+   MLO_ASSERT_LOG(k >= 0);
+   MLO_ASSERT_LOG(k < (1L << bits));
    
    return (MLO_Float_Add (a, MLO_Float_MulInt (diff, k) >> bits));
 }

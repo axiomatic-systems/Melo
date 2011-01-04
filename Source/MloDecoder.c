@@ -446,9 +446,9 @@ MLO_Decoder_DecodeFrameContent (
 {
     MLO_Result result = MLO_SUCCESS;
 
-    MLO_ASSERT (decoder_ptr != 0);
-    MLO_ASSERT (bit_ptr     != 0);
-    MLO_ASSERT (buffer_ptr  != 0);
+    MLO_CHECK(decoder_ptr != 0);
+    MLO_CHECK(bit_ptr     != 0);
+    MLO_CHECK(buffer_ptr  != 0);
 
     /* Convert compressed bitstream into formated data */
     result = MLO_SyntacticElements_Decode (

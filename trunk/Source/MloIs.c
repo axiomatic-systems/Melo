@@ -38,7 +38,7 @@
 /*----------------------------------------------------------------------
 |       Prototypes
 +---------------------------------------------------------------------*/
-static void MLO_Is_ProcessSfb (const MLO_IndivChnStream *ics_l_ptr, MLO_IndivChnStream *ics_r_ptr, int g, int sfb, int win_pos, MLO_Float scale);
+static MLO_Result MLO_Is_ProcessSfb (const MLO_IndivChnStream *ics_l_ptr, MLO_IndivChnStream *ics_r_ptr, int g, int sfb, int win_pos, MLO_Float scale);
 static MLO_Float  MLO_Is_ConvIsPositionToGain (int is_position);
 
 /*----------------------------------------------------------------------
@@ -56,7 +56,8 @@ Input/output parameters:
 ==============================================================================
 */
 
-void  MLO_Is_Process (MLO_ElementCpe *cpe_ptr)
+MLO_Result  
+MLO_Is_Process (MLO_ElementCpe *cpe_ptr)
 {
    MLO_IndivChnStream *
                   ics_l_ptr;
@@ -68,12 +69,15 @@ void  MLO_Is_Process (MLO_ElementCpe *cpe_ptr)
    int            group_pos = 0;
    int            g;
 
-   MLO_ASSERT (cpe_ptr != NULL);
+   MLO_ASSERT(cpe_ptr != NULL);
 
+   /* do nothing is common_window is not set */
+   if (!cpe_ptr->common_window_flag) return MLO_SUCCESS;
+   
    ics_l_ptr = cpe_ptr->ics_ptr_arr [0];
    ics_r_ptr = cpe_ptr->ics_ptr_arr [1];
-   MLO_ASSERT (ics_l_ptr != NULL);
-   MLO_ASSERT (ics_r_ptr != NULL);
+   MLO_ASSERT(ics_l_ptr != NULL);
+   MLO_ASSERT(ics_r_ptr != NULL);
 
    ms_mask_flag =
       (cpe_ptr->ms_mask_present == MLO_ELEMENT_CPE_MS_MASK_TYPE_USED);
@@ -107,26 +111,29 @@ void  MLO_Is_Process (MLO_ElementCpe *cpe_ptr)
       group_pos +=   ics_l_ptr->ics_info.window_group_length [g]
                    * MLO_DEFS_FRAME_LEN_SHORT;
    }
+   
+   return MLO_SUCCESS;
 }
 
 
 
-static void MLO_Is_ProcessSfb (const MLO_IndivChnStream *ics_l_ptr, MLO_IndivChnStream *ics_r_ptr, int g, int sfb, int win_pos, MLO_Float scale)
+static MLO_Result
+MLO_Is_ProcessSfb (const MLO_IndivChnStream *ics_l_ptr, MLO_IndivChnStream *ics_r_ptr, int g, int sfb, int win_pos, MLO_Float scale)
 {
    int            win;
    int            sfb_start;
    int            sfb_len;
    int            window_group_length;
 
-   MLO_ASSERT (ics_l_ptr != NULL);
-   MLO_ASSERT (ics_r_ptr != NULL);
-   MLO_ASSERT (g >= 0);
-   MLO_ASSERT (g < 8);
-   MLO_ASSERT (sfb >= 0);
-   MLO_ASSERT (sfb < ics_l_ptr->ics_info.max_sfb);
-   MLO_ASSERT (win_pos >= 0);
-   MLO_ASSERT (win_pos < MLO_DEFS_FRAME_LEN_LONG);
-   MLO_ASSERT (MLO_SectionData_IsIntensity (&ics_l_ptr->section_data, g, sfb));
+   MLO_ASSERT(ics_l_ptr != NULL);
+   MLO_ASSERT(ics_r_ptr != NULL);
+   MLO_CHECK(g >= 0);
+   MLO_CHECK(g < 8);
+   MLO_CHECK(sfb >= 0);
+   MLO_CHECK(sfb < ics_l_ptr->ics_info.max_sfb);
+   MLO_CHECK(win_pos >= 0);
+   MLO_CHECK(win_pos < MLO_DEFS_FRAME_LEN_LONG);
+   /*MLO_ASSERT(MLO_SectionData_IsIntensity (&ics_l_ptr->section_data, g, sfb));*/
 
    sfb_start = ics_l_ptr->ics_info.swb_offset [sfb];
    sfb_len   = ics_l_ptr->ics_info.swb_offset [sfb + 1] - sfb_start;
@@ -148,6 +155,8 @@ static void MLO_Is_ProcessSfb (const MLO_IndivChnStream *ics_l_ptr, MLO_IndivChn
       }
       win_pos += MLO_DEFS_FRAME_LEN_SHORT;
    }
+   
+   return MLO_SUCCESS;
 }
 
 
@@ -170,7 +179,8 @@ Returns:
 ==============================================================================
 */
 
-static MLO_Float  MLO_Is_ConvIsPositionToGain (int is_position)
+static MLO_Float  
+MLO_Is_ConvIsPositionToGain (int is_position)
 {
    MLO_Float      gain;
 

@@ -36,8 +36,8 @@
 |       Function prototypes
 +---------------------------------------------------------------------*/
 static MLO_Result MLO_IcsInfo_ComputeWindowGroupingInfo (MLO_IcsInfo *ics_ptr);
-static void MLO_IcsInfo_ComputeWindowGroupingInfoLong (MLO_IcsInfo *ics_ptr);
-static void MLO_IcsInfo_ComputeWindowGroupingInfoShort (MLO_IcsInfo *ics_ptr);
+static MLO_Result MLO_IcsInfo_ComputeWindowGroupingInfoLong (MLO_IcsInfo *ics_ptr);
+static MLO_Result MLO_IcsInfo_ComputeWindowGroupingInfoShort (MLO_IcsInfo *ics_ptr);
 
 /*----------------------------------------------------------------------
 |       Constants
@@ -220,7 +220,7 @@ MLO_IcsInfo_ClearBuffers (MLO_IcsInfo *ics_ptr)
 {
    int            pos;
 
-	MLO_ASSERT (ics_ptr != NULL);
+	MLO_ASSERT_V(ics_ptr != NULL);
 
    for (pos = 0; pos <MLO_IcsInfo_WSIndex_NBR_ELT; ++pos)
    {
@@ -255,10 +255,10 @@ MLO_IcsInfo_Decode (MLO_IcsInfo *ics_ptr, MLO_BitStream *bit_ptr, MLO_SamplingFr
 {
    MLO_Result     result = MLO_SUCCESS;
 
-   MLO_ASSERT (ics_ptr != NULL);
-   MLO_ASSERT (bit_ptr != NULL);
-   MLO_ASSERT (fs_index >= 0);
-   MLO_ASSERT (fs_index < MLO_SAMPLING_FREQ_INDEX_NBR_VALID);
+   MLO_ASSERT(ics_ptr != NULL);
+   MLO_ASSERT(bit_ptr != NULL);
+   MLO_CHECK(fs_index >= 0);
+   MLO_CHECK(fs_index < MLO_SAMPLING_FREQ_INDEX_NBR_VALID);
 
    /* Saves previous frame's state */
    ics_ptr->window_shape [MLO_IcsInfo_WSIndex_PREV] =
@@ -316,7 +316,8 @@ Input parameters:
 ==============================================================================
 */
 
-void MLO_IcsInfo_DeinterleaveCoefficients (const MLO_IcsInfo *ics_ptr, MLO_Float coef_ptr [])
+MLO_Result 
+MLO_IcsInfo_DeinterleaveCoefficients (const MLO_IcsInfo *ics_ptr, MLO_Float coef_ptr [])
 {
    MLO_Float      tmp_arr [MLO_DEFS_FRAME_LEN_LONG];
    int            group_pos = 0;
@@ -325,8 +326,8 @@ void MLO_IcsInfo_DeinterleaveCoefficients (const MLO_IcsInfo *ics_ptr, MLO_Float
    int            num_swb;
    int            g;
 
-   MLO_ASSERT (ics_ptr != NULL);
-   MLO_ASSERT (coef_ptr != NULL);
+   MLO_ASSERT(ics_ptr != NULL);
+   MLO_ASSERT(coef_ptr != NULL);
 
    num_window_groups = ics_ptr->num_window_groups;
    num_swb = ics_ptr->num_swb;
@@ -356,7 +357,7 @@ void MLO_IcsInfo_DeinterleaveCoefficients (const MLO_IcsInfo *ics_ptr, MLO_Float
             dest_pos += win_dest_size;
          }
 
-         MLO_ASSERT (dest_pos == ics_ptr->swb_offset [sfb] + group_len);
+         MLO_CHECK(dest_pos == ics_ptr->swb_offset [sfb] + group_len);
       }
 
       MLO_CopyMemory (
@@ -366,8 +367,10 @@ void MLO_IcsInfo_DeinterleaveCoefficients (const MLO_IcsInfo *ics_ptr, MLO_Float
       );
 
       group_pos += group_len;
-      MLO_ASSERT (src_pos == group_pos);
+      MLO_CHECK(src_pos == group_pos);
    }
+   
+   return MLO_SUCCESS;
 }
 
 
@@ -392,9 +395,9 @@ MLO_Result  MLO_IcsInfo_ComputeWindowGroupingInfo (MLO_IcsInfo *ics_ptr)
 {
    int            result = MLO_SUCCESS;
 
-   MLO_ASSERT (ics_ptr != NULL);
-   MLO_ASSERT (ics_ptr->fs_index >= 0);
-   MLO_ASSERT (ics_ptr->fs_index < MLO_SAMPLING_FREQ_INDEX_NBR_VALID);
+   MLO_ASSERT(ics_ptr != NULL);
+   MLO_CHECK(ics_ptr->fs_index >= 0);
+   MLO_CHECK(ics_ptr->fs_index < MLO_SAMPLING_FREQ_INDEX_NBR_VALID);
 
    /* Sampling rate below 8 kHz is not supported by this section. */
    if (ics_ptr->fs_index >= MLO_SAMPLING_FREQ_INDEX_NBR_SUPPORTED)
@@ -417,8 +420,7 @@ MLO_Result  MLO_IcsInfo_ComputeWindowGroupingInfo (MLO_IcsInfo *ics_ptr)
          break;
 
       default:
-         MLO_ASSERT (MLO_FALSE);
-         break;
+         return MLO_ERROR_INVALID_DATA;
       }
    }
 
@@ -427,16 +429,16 @@ MLO_Result  MLO_IcsInfo_ComputeWindowGroupingInfo (MLO_IcsInfo *ics_ptr)
 
 
 
-void	
+MLO_Result	
 MLO_IcsInfo_ComputeWindowGroupingInfoLong (MLO_IcsInfo *ics_ptr)
 {
    MLO_SamplingFreq_Index fs_index;
    int            nbr_swb;
    int            i;
 
-   MLO_ASSERT (ics_ptr != NULL);
-   MLO_ASSERT (ics_ptr->fs_index >= 0);
-   MLO_ASSERT (ics_ptr->fs_index < MLO_SAMPLING_FREQ_INDEX_NBR_SUPPORTED);
+   MLO_ASSERT(ics_ptr != NULL);
+   MLO_CHECK(ics_ptr->fs_index >= 0);
+   MLO_CHECK(ics_ptr->fs_index < MLO_SAMPLING_FREQ_INDEX_NBR_SUPPORTED);
 
    fs_index = ics_ptr->fs_index;
 
@@ -445,8 +447,8 @@ MLO_IcsInfo_ComputeWindowGroupingInfoLong (MLO_IcsInfo *ics_ptr)
    ics_ptr->window_group_length [ics_ptr->num_window_groups - 1] = 1;
 
    nbr_swb = MLO_IcsInfo_num_swb_long_window_1024 [fs_index];
-   MLO_ASSERT (nbr_swb + 1 <= (int)MLO_ARRAY_SIZE (ics_ptr->swb_offset));
-   MLO_ASSERT (nbr_swb + 1 <= (int)MLO_ARRAY_SIZE (ics_ptr->sect_sfb_offset [0]));
+   MLO_CHECK(nbr_swb + 1 <= (int)MLO_ARRAY_SIZE (ics_ptr->swb_offset));
+   MLO_CHECK(nbr_swb + 1 <= (int)MLO_ARRAY_SIZE (ics_ptr->sect_sfb_offset [0]));
    ics_ptr->num_swb = nbr_swb;
 
    /* Preparation of sect_sfb_offset for long blocks.
@@ -455,19 +457,21 @@ MLO_IcsInfo_ComputeWindowGroupingInfoLong (MLO_IcsInfo *ics_ptr)
    {
       const int      offset =
          MLO_IcsInfo_swb_offset_long_window_1024 [fs_index] [i];
-      MLO_ASSERT (offset >= 0);
-      MLO_ASSERT (MLO_IcsInfo_swb_offset_long_window_1024 [fs_index] != 0);
+      MLO_CHECK(offset >= 0);
+      MLO_CHECK(MLO_IcsInfo_swb_offset_long_window_1024 [fs_index] != 0);
       ics_ptr->sect_sfb_offset [0] [i] = offset;
       ics_ptr->swb_offset [i] = offset;
    }
 
    /* We support only 1024-sample frames */
-   MLO_ASSERT (ics_ptr->sect_sfb_offset [0] [nbr_swb] == MLO_DEFS_FRAME_LEN_LONG);
+   MLO_CHECK(ics_ptr->sect_sfb_offset [0] [nbr_swb] == MLO_DEFS_FRAME_LEN_LONG);
+   
+   return MLO_SUCCESS;
 }
 
 
 
-void	
+MLO_Result	
 MLO_IcsInfo_ComputeWindowGroupingInfoShort (MLO_IcsInfo *ics_ptr)
 {
    MLO_SamplingFreq_Index fs_index;
@@ -475,9 +479,9 @@ MLO_IcsInfo_ComputeWindowGroupingInfoShort (MLO_IcsInfo *ics_ptr)
    int            i;
    int            g;
 
-   MLO_ASSERT (ics_ptr != NULL);
-   MLO_ASSERT (ics_ptr->fs_index >= 0);
-   MLO_ASSERT (ics_ptr->fs_index < MLO_SAMPLING_FREQ_INDEX_NBR_SUPPORTED);
+   MLO_ASSERT(ics_ptr != NULL);
+   MLO_CHECK(ics_ptr->fs_index >= 0);
+   MLO_CHECK(ics_ptr->fs_index < MLO_SAMPLING_FREQ_INDEX_NBR_SUPPORTED);
 
    fs_index = ics_ptr->fs_index;
 
@@ -515,8 +519,8 @@ MLO_IcsInfo_ComputeWindowGroupingInfoShort (MLO_IcsInfo *ics_ptr)
       int            cur_swb_off =
          MLO_IcsInfo_swb_offset_short_window_128 [fs_index] [0];
 
-      MLO_ASSERT (cur_swb_off >= 0);
-      MLO_ASSERT (MLO_IcsInfo_swb_offset_short_window_128 [fs_index] != 0);
+      MLO_CHECK(cur_swb_off >= 0);
+      MLO_CHECK(MLO_IcsInfo_swb_offset_short_window_128 [fs_index] != 0);
 
       for (i = 0; i < nbr_swb; ++i)
       {
@@ -525,8 +529,8 @@ MLO_IcsInfo_ComputeWindowGroupingInfoShort (MLO_IcsInfo *ics_ptr)
          int            width = next_swb_off - cur_swb_off;
 
          /* We support only 128-sample frames */
-         MLO_ASSERT (next_swb_off == MLO_DEFS_FRAME_LEN_SHORT || i < nbr_swb);
-         MLO_ASSERT (width > 0);
+         MLO_CHECK(next_swb_off == MLO_DEFS_FRAME_LEN_SHORT || i < nbr_swb);
+         MLO_CHECK(width > 0);
 
          width *= ics_ptr->window_group_length [g];
          ics_ptr->sect_sfb_offset [g] [i] = offset;
@@ -536,4 +540,6 @@ MLO_IcsInfo_ComputeWindowGroupingInfoShort (MLO_IcsInfo *ics_ptr)
       }
       ics_ptr->sect_sfb_offset [g] [nbr_swb] = offset;
    }
+   
+   return MLO_SUCCESS;
 }

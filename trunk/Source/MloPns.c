@@ -42,10 +42,10 @@ static MLO_UInt32 MLO_Pns_rand_state = 1;
 /*----------------------------------------------------------------------
 |       Prototypes
 +---------------------------------------------------------------------*/
-static void MLO_Pns_ProcessCommon (MLO_IndivChnStream *ics_l_ptr, MLO_IndivChnStream *ics_r_ptr, MLO_ElementCpe *cpe_ptr);
-static void MLO_Pns_ProcessSfbSingle (MLO_IndivChnStream *ics_ptr, int g, int sfb, int win_pos);
-static void MLO_Pns_CopySfbNoise (const MLO_IndivChnStream *ics_l_ptr, MLO_IndivChnStream *ics_r_ptr, int g, int sfb, int win_pos);
-static void MLO_Pns_GenRandVect (MLO_Float *coef_ptr, int len, MLO_Float noise_nrg_gain);
+static MLO_Result MLO_Pns_ProcessCommon (MLO_IndivChnStream *ics_l_ptr, MLO_IndivChnStream *ics_r_ptr, MLO_ElementCpe *cpe_ptr);
+static MLO_Result MLO_Pns_ProcessSfbSingle (MLO_IndivChnStream *ics_ptr, int g, int sfb, int win_pos);
+static MLO_Result MLO_Pns_CopySfbNoise (const MLO_IndivChnStream *ics_l_ptr, MLO_IndivChnStream *ics_r_ptr, int g, int sfb, int win_pos);
+static MLO_Result MLO_Pns_GenRandVect (MLO_Float *coef_ptr, int len, MLO_Float noise_nrg_gain);
 static MLO_Float  MLO_Pns_GenRandVal (void);
 static MLO_Int32  MLO_Pns_GenRandValInt (void);
 static MLO_Float  MLO_Pns_ConvNoiseNrgToGain (int noise_nrg);
@@ -66,9 +66,10 @@ Input/output parameters:
 ==============================================================================
 */
 
-void  MLO_Pns_ProcessSingle (MLO_IndivChnStream *ics_ptr)
+void  
+MLO_Pns_ProcessSingle (MLO_IndivChnStream *ics_ptr)
 {
-   MLO_ASSERT (ics_ptr != NULL);
+   MLO_ASSERT_V(ics_ptr != NULL);
 
    MLO_Pns_ProcessCommon (ics_ptr, 0, 0);
 }
@@ -88,11 +89,12 @@ Input/output parameters:
 ==============================================================================
 */
 
-void  MLO_Pns_ProcessPair (MLO_ElementCpe *cpe_ptr)
+void  
+MLO_Pns_ProcessPair (MLO_ElementCpe *cpe_ptr)
 {
-   MLO_ASSERT (cpe_ptr != NULL);
-   MLO_ASSERT (cpe_ptr->ics_ptr_arr [0] != 0);
-   MLO_ASSERT (cpe_ptr->ics_ptr_arr [1] != 0);
+   MLO_ASSERT_V(cpe_ptr != NULL);
+   MLO_ASSERT_V(cpe_ptr->ics_ptr_arr [0] != 0);
+   MLO_ASSERT_V(cpe_ptr->ics_ptr_arr [1] != 0);
 
    MLO_Pns_ProcessCommon (cpe_ptr->ics_ptr_arr [0], cpe_ptr->ics_ptr_arr [1], cpe_ptr);
 }
@@ -116,59 +118,68 @@ Input/output parameters:
 ==============================================================================
 */
 
-static void  MLO_Pns_ProcessCommon (MLO_IndivChnStream *ics_l_ptr, MLO_IndivChnStream *ics_r_ptr, MLO_ElementCpe *cpe_ptr)
+static MLO_Result  
+MLO_Pns_ProcessCommon (MLO_IndivChnStream *ics_l_ptr, MLO_IndivChnStream *ics_r_ptr, MLO_ElementCpe *cpe_ptr)
 {
    int            num_window_groups;
    int            max_sfb;
-   int            group_pos = 0;
+   int            group_pos;
    int            g;
+   MLO_Boolean    correlated = MLO_FALSE;
    MLO_ElementCpe_MsMaskType
                   ms_mask_present = MLO_ELEMENT_CPE_MS_MASK_TYPE_ALL_0;
 
-   MLO_ASSERT (ics_l_ptr != NULL);
-   MLO_ASSERT (ics_r_ptr == NULL || cpe_ptr != NULL);
+   MLO_ASSERT(ics_l_ptr != NULL);
+   MLO_ASSERT(ics_r_ptr == NULL || cpe_ptr != NULL);
 
+
+   if (cpe_ptr != 0) {
+      ms_mask_present = cpe_ptr->ms_mask_present;
+      correlated      = cpe_ptr->common_window_flag;
+   }
+
+   /* process the first channel */
    num_window_groups = ics_l_ptr->ics_info.num_window_groups;
    max_sfb = ics_l_ptr->ics_info.max_sfb;
+   group_pos = 0;
+   for (g = 0; g < num_window_groups; ++g) {
+      int sfb;
 
-   if (cpe_ptr != 0)
-   {
-      ms_mask_present = cpe_ptr->ms_mask_present;
-   }
-
-   for (g = 0; g < num_window_groups; ++g)
-   {
-      int            sfb;
-
-      for (sfb = 0; sfb < max_sfb; ++sfb)
-      {
-         MLO_Boolean    noise_l_flag =
-            MLO_SectionData_IsNoise (&ics_l_ptr->section_data, g, sfb);
-         if (noise_l_flag)
-         {
-            MLO_Pns_ProcessSfbSingle (ics_l_ptr, g, sfb, group_pos);
-         }
-
-         if (   ics_r_ptr != 0
-             && MLO_SectionData_IsNoise (&ics_r_ptr->section_data, g, sfb))
-         {
-            if (   (   ms_mask_present == MLO_ELEMENT_CPE_MS_MASK_TYPE_ALL_1
-                    || (   ms_mask_present == MLO_ELEMENT_CPE_MS_MASK_TYPE_USED
-                        && cpe_ptr->ms_used [g] [sfb]))
-                && noise_l_flag)
-            {
-               MLO_Pns_CopySfbNoise (ics_l_ptr, ics_r_ptr, g, sfb, group_pos);
-            }
-            else
-            {
-               MLO_Pns_ProcessSfbSingle (ics_r_ptr, g, sfb, group_pos);
-            }
+      for (sfb = 0; sfb < max_sfb; ++sfb) {
+         if (MLO_SectionData_IsNoise (&ics_l_ptr->section_data, g, sfb)) {
+            MLO_Pns_ProcessSfbSingle(ics_l_ptr, g, sfb, group_pos);
          }
       }
-
-      group_pos +=   ics_l_ptr->ics_info.window_group_length [g]
-                   * MLO_DEFS_FRAME_LEN_SHORT;
+      
+      group_pos += ics_l_ptr->ics_info.window_group_length[g] * MLO_DEFS_FRAME_LEN_SHORT;
    }
+
+   /* process the second channel if there is one */
+   if (ics_r_ptr) {
+       num_window_groups = ics_r_ptr->ics_info.num_window_groups;
+       max_sfb = ics_r_ptr->ics_info.max_sfb;
+       group_pos = 0;
+       for (g = 0; g < num_window_groups; ++g) {
+          int sfb;
+
+          for (sfb = 0; sfb < max_sfb; ++sfb) {
+             if (MLO_SectionData_IsNoise(&ics_r_ptr->section_data, g, sfb)) {
+                if (correlated &&
+                    (ms_mask_present == MLO_ELEMENT_CPE_MS_MASK_TYPE_ALL_1 || 
+                     (ms_mask_present == MLO_ELEMENT_CPE_MS_MASK_TYPE_USED && cpe_ptr->ms_used[g][sfb])) &&
+                    MLO_SectionData_IsNoise (&ics_l_ptr->section_data, g, sfb)) {
+                   MLO_Pns_CopySfbNoise(ics_l_ptr, ics_r_ptr, g, sfb, group_pos);
+                } else {
+                   MLO_Pns_ProcessSfbSingle(ics_r_ptr, g, sfb, group_pos);
+                }
+             }
+          }
+
+          group_pos += ics_l_ptr->ics_info.window_group_length[g] * MLO_DEFS_FRAME_LEN_SHORT;
+       }
+   }
+    
+   return MLO_SUCCESS;
 }
 
 
@@ -188,7 +199,8 @@ Input/output parameters:
 ==============================================================================
 */
 
-static void MLO_Pns_ProcessSfbSingle (MLO_IndivChnStream *ics_ptr, int g, int sfb, int win_pos)
+static MLO_Result 
+MLO_Pns_ProcessSfbSingle (MLO_IndivChnStream *ics_ptr, int g, int sfb, int win_pos)
 {
    int            win;
    int            sfb_start;
@@ -197,14 +209,14 @@ static void MLO_Pns_ProcessSfbSingle (MLO_IndivChnStream *ics_ptr, int g, int sf
    MLO_Float      noise_nrg_gain;
    int            window_group_length;
 
-   MLO_ASSERT (ics_ptr != NULL);
-   MLO_ASSERT (g >= 0);
-   MLO_ASSERT (g < 8);
-   MLO_ASSERT (sfb >= 0);
-   MLO_ASSERT (sfb < ics_ptr->ics_info.max_sfb);
-   MLO_ASSERT (win_pos >= 0);
-   MLO_ASSERT (win_pos < MLO_DEFS_FRAME_LEN_LONG);
-   MLO_ASSERT (MLO_SectionData_IsNoise (&ics_ptr->section_data, g, sfb));
+   MLO_ASSERT(ics_ptr != NULL);
+   MLO_CHECK(g >= 0);
+   MLO_CHECK(g < 8);
+   MLO_CHECK(sfb >= 0);
+   MLO_CHECK(sfb < ics_ptr->ics_info.max_sfb);
+   MLO_CHECK(win_pos >= 0);
+   MLO_CHECK(win_pos < MLO_DEFS_FRAME_LEN_LONG);
+   MLO_CHECK(MLO_SectionData_IsNoise (&ics_ptr->section_data, g, sfb));
 
    noise_nrg = ics_ptr->sf_data.scale_factors [g] [sfb];
    noise_nrg_gain = MLO_Pns_ConvNoiseNrgToGain (noise_nrg);
@@ -224,6 +236,8 @@ static void MLO_Pns_ProcessSfbSingle (MLO_IndivChnStream *ics_ptr, int g, int sf
       );
       win_pos += MLO_DEFS_FRAME_LEN_SHORT;
    }
+   
+   return MLO_SUCCESS;
 }
 
 
@@ -245,22 +259,23 @@ Input/output parameters:
 ==============================================================================
 */
 
-static void MLO_Pns_CopySfbNoise (const MLO_IndivChnStream *ics_l_ptr, MLO_IndivChnStream *ics_r_ptr, int g, int sfb, int win_pos)
+static MLO_Result
+MLO_Pns_CopySfbNoise (const MLO_IndivChnStream *ics_l_ptr, MLO_IndivChnStream *ics_r_ptr, int g, int sfb, int win_pos)
 {
    int            win;
    int            sfb_start;
    int            sfb_len;
    int            window_group_length;
 
-   MLO_ASSERT (ics_l_ptr != NULL);
-   MLO_ASSERT (ics_r_ptr != NULL);
-   MLO_ASSERT (g >= 0);
-   MLO_ASSERT (g < ics_l_ptr->ics_info.num_window_groups);
-   MLO_ASSERT (sfb >= 0);
-   MLO_ASSERT (sfb < ics_l_ptr->ics_info.max_sfb);
-   MLO_ASSERT (win_pos >= 0);
-   MLO_ASSERT (win_pos < MLO_DEFS_FRAME_LEN_LONG);
-   MLO_ASSERT (MLO_SectionData_IsNoise (&ics_l_ptr->section_data, g, sfb));
+   MLO_ASSERT(ics_l_ptr != NULL);
+   MLO_ASSERT(ics_r_ptr != NULL);
+   MLO_CHECK(g >= 0);
+   MLO_CHECK(g < ics_l_ptr->ics_info.num_window_groups);
+   MLO_CHECK(sfb >= 0);
+   MLO_CHECK(sfb < ics_l_ptr->ics_info.max_sfb);
+   MLO_CHECK(win_pos >= 0);
+   MLO_CHECK(win_pos < MLO_DEFS_FRAME_LEN_LONG);
+   MLO_CHECK(MLO_SectionData_IsNoise (&ics_l_ptr->section_data, g, sfb));
 
    sfb_start = ics_l_ptr->ics_info.swb_offset [sfb];
    sfb_len   = ics_l_ptr->ics_info.swb_offset [sfb + 1] - sfb_start;
@@ -277,6 +292,8 @@ static void MLO_Pns_CopySfbNoise (const MLO_IndivChnStream *ics_l_ptr, MLO_Indiv
       );
       win_pos += MLO_DEFS_FRAME_LEN_SHORT;
    }
+   
+   return MLO_SUCCESS;
 }
 
 
@@ -295,16 +312,17 @@ Output parameters:
 ==============================================================================
 */
 
-static void MLO_Pns_GenRandVect (MLO_Float *coef_ptr, int len, MLO_Float noise_nrg_gain)
+static MLO_Result
+MLO_Pns_GenRandVect (MLO_Float *coef_ptr, int len, MLO_Float noise_nrg_gain)
 {
    int            i;
    MLO_Float      energy_sum = 0;
    MLO_Float      rms;
    MLO_Float      scale;
 
-   MLO_ASSERT (coef_ptr != NULL);
-   MLO_ASSERT (len > 0);
-   MLO_ASSERT (len <= MLO_DEFS_FRAME_LEN_LONG);
+   MLO_ASSERT(coef_ptr != NULL);
+   MLO_CHECK(len > 0);
+   MLO_CHECK(len <= MLO_DEFS_FRAME_LEN_LONG);
 
    /* Generates random vector */
    for (i = 0; i < len; ++i)
@@ -322,6 +340,8 @@ static void MLO_Pns_GenRandVect (MLO_Float *coef_ptr, int len, MLO_Float noise_n
    {
       coef_ptr [i] = MLO_Float_Mul (coef_ptr [i], scale);
    }
+   
+   return MLO_SUCCESS;
 }
 
 
@@ -340,7 +360,8 @@ Returns:
 ==============================================================================
 */
 
-static MLO_Float  MLO_Pns_GenRandVal ()
+static MLO_Float  
+MLO_Pns_GenRandVal ()
 {
 #if defined (MLO_CONFIG_FIXED)
    return ((MLO_Float) MLO_Pns_GenRandValInt ());
@@ -362,7 +383,8 @@ Returns:
 ==============================================================================
 */
 
-static MLO_Int32  MLO_Pns_GenRandValInt ()
+static MLO_Int32  
+MLO_Pns_GenRandValInt ()
 {
    MLO_Int32      r = (MLO_Int32) MLO_Pns_rand_state;
    MLO_Pns_rand_state = MLO_Pns_rand_state * 1234567UL + 890123UL;
@@ -390,7 +412,8 @@ Returns:
 ==============================================================================
 */
 
-static MLO_Float  MLO_Pns_ConvNoiseNrgToGain (int noise_nrg)
+static MLO_Float  
+MLO_Pns_ConvNoiseNrgToGain (int noise_nrg)
 {
    MLO_Float      gain;
 

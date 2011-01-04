@@ -56,8 +56,8 @@ extern "C" {
 
 
 
-void  MLO_HcbPair_decode_binary (MLO_Int16 data_ptr [2], MLO_BitStream *bit_ptr, MLO_Hcb hcb);
-void  MLO_HcbPair_decode_2steps (MLO_Int16 data_ptr [2], MLO_BitStream *bit_ptr, MLO_Hcb hcb);
+MLO_Result  MLO_HcbPair_decode_binary (MLO_Int16 data_ptr [2], MLO_BitStream *bit_ptr, MLO_Hcb hcb);
+MLO_Result  MLO_HcbPair_decode_2steps (MLO_Int16 data_ptr [2], MLO_BitStream *bit_ptr, MLO_Hcb hcb);
 
 
 

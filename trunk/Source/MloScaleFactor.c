@@ -82,7 +82,8 @@ Returns:
 ==============================================================================
 */
 
-MLO_Result  MLO_ScaleFactor_Decode (MLO_ScaleFactor *sf_ptr, const MLO_IcsInfo *ics_ptr, const MLO_SectionData *sec_ptr, MLO_BitStream *bit_ptr, int global_gain)
+MLO_Result  
+MLO_ScaleFactor_Decode (MLO_ScaleFactor *sf_ptr, const MLO_IcsInfo *ics_ptr, const MLO_SectionData *sec_ptr, MLO_BitStream *bit_ptr, int global_gain)
 {
    MLO_Result     result = MLO_SUCCESS;
    MLO_Boolean    noise_pcm_flag = MLO_TRUE;
@@ -92,13 +93,16 @@ MLO_Result  MLO_ScaleFactor_Decode (MLO_ScaleFactor *sf_ptr, const MLO_IcsInfo *
    int            g;
    int            num_windows_groups;
 
-   MLO_ASSERT (sf_ptr != NULL);
-   MLO_ASSERT (ics_ptr != NULL);
-   MLO_ASSERT (sec_ptr != NULL);
-   MLO_ASSERT (bit_ptr != NULL);
-   MLO_ASSERT (global_gain >= 0);
-   MLO_ASSERT (global_gain <= 255);
+   MLO_ASSERT(sf_ptr != NULL);
+   MLO_ASSERT(ics_ptr != NULL);
+   MLO_ASSERT(sec_ptr != NULL);
+   MLO_ASSERT(bit_ptr != NULL);
+   MLO_CHECK(global_gain >= 0);
+   MLO_CHECK(global_gain <= 255);
 
+   /* clear the data first */
+   MLO_SetMemory(sf_ptr, 0, sizeof(*sf_ptr));
+   
    num_windows_groups = ics_ptr->num_window_groups;
    for (g = 0; g < num_windows_groups && MLO_SUCCEEDED (result); ++g)
    {
@@ -174,16 +178,17 @@ Input/output parameters:
 ==============================================================================
 */
 
-void  MLO_ScaleFactor_ScaleCoefficients (const MLO_ScaleFactor *sf_ptr, const MLO_IcsInfo *ics_ptr, MLO_Float coef_ptr [])
+MLO_Result
+MLO_ScaleFactor_ScaleCoefficients (const MLO_ScaleFactor *sf_ptr, const MLO_IcsInfo *ics_ptr, MLO_Float coef_ptr [])
 {
    int            g;
    int            group_pos = 0;
    int            num_window_groups;
    int            max_sfb;
 
-   MLO_ASSERT (sf_ptr != NULL);
-   MLO_ASSERT (ics_ptr != NULL);
-   MLO_ASSERT (coef_ptr != NULL);
+   MLO_ASSERT(sf_ptr != NULL);
+   MLO_ASSERT(ics_ptr != NULL);
+   MLO_ASSERT(coef_ptr != NULL);
 
    num_window_groups = ics_ptr->num_window_groups;
    max_sfb = ics_ptr->max_sfb;
@@ -201,7 +206,7 @@ void  MLO_ScaleFactor_ScaleCoefficients (const MLO_ScaleFactor *sf_ptr, const ML
               group_pos * MLO_DEFS_FRAME_LEN_SHORT
             + ics_ptr->sect_sfb_offset [g] [sfb + 1];
 
-         MLO_ASSERT (end <= MLO_DEFS_FRAME_LEN_LONG);
+         MLO_CHECK(end <= MLO_DEFS_FRAME_LEN_LONG);
 
          while (coef_pos < end)
          {
@@ -212,6 +217,8 @@ void  MLO_ScaleFactor_ScaleCoefficients (const MLO_ScaleFactor *sf_ptr, const ML
 
       group_pos += ics_ptr->window_group_length [g];
    }
+   
+   return MLO_SUCCESS;
 }
 
 
@@ -230,19 +237,20 @@ Returns: gain value, range [2.980e-8 ; 4.623e+11]
 ==============================================================================
 */
 
-MLO_Float   MLO_ScaleFactor_ComputeGain (int sf)
+MLO_Float   
+MLO_ScaleFactor_ComputeGain (int sf)
 {
    MLO_Float      r;
    int            s;
 
-   MLO_ASSERT (sf >= MLO_SCALE_FACTOR_MIN_VAL);
-   MLO_ASSERT (sf <= MLO_SCALE_FACTOR_MAX_VAL);
+   MLO_ASSERT_LOG(sf >= MLO_SCALE_FACTOR_MIN_VAL);
+   MLO_ASSERT_LOG(sf <= MLO_SCALE_FACTOR_MAX_VAL);
 
 	r = MLO_ScaleFactor_table_pow2 [sf & 3];
    s = (sf >> 2) - (MLO_SCALE_FACTOR_UNITY_GAIN >> 2);
    r = MLO_Float_ScaleP2 (r, s);
 
-   MLO_ASSERT (r > 0);
+   MLO_ASSERT_LOG(r > 0);
 
 	return (r);
 }

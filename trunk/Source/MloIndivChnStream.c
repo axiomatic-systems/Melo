@@ -56,9 +56,10 @@ Input/output parameters:
 ==============================================================================
 */
 
-void  MLO_IndivChnStream_ClearBuffers (MLO_IndivChnStream *ics_ptr)
+void  
+MLO_IndivChnStream_ClearBuffers (MLO_IndivChnStream *ics_ptr)
 {
-   MLO_ASSERT (ics_ptr != NULL);
+   MLO_ASSERT_V(ics_ptr != NULL);
 
    MLO_IcsInfo_ClearBuffers (&ics_ptr->ics_info);
 
@@ -101,14 +102,15 @@ Returns:
 ==============================================================================
 */
 
-MLO_Result	MLO_IndivChnStream_Decode (MLO_IndivChnStream *ics_ptr, MLO_BitStream *bit_ptr, MLO_Boolean common_win_flag, MLO_Boolean scale_flag, MLO_SamplingFreq_Index fs_index)
+MLO_Result	
+MLO_IndivChnStream_Decode (MLO_IndivChnStream *ics_ptr, MLO_BitStream *bit_ptr, MLO_Boolean common_win_flag, MLO_Boolean scale_flag, MLO_SamplingFreq_Index fs_index)
 {
    int            result = MLO_SUCCESS;
 
-   MLO_ASSERT (ics_ptr != NULL);
-   MLO_ASSERT (bit_ptr != NULL);
-   MLO_ASSERT (fs_index >= 0);
-   MLO_ASSERT (fs_index < MLO_SAMPLING_FREQ_INDEX_NBR_VALID);
+   MLO_ASSERT(ics_ptr != NULL);
+   MLO_ASSERT(bit_ptr != NULL);
+   MLO_CHECK(fs_index >= 0);
+   MLO_CHECK(fs_index < MLO_SAMPLING_FREQ_INDEX_NBR_VALID);
 
    ics_ptr->global_gain = MLO_BitStream_ReadBits (bit_ptr, 8);
 
@@ -121,7 +123,7 @@ MLO_Result	MLO_IndivChnStream_Decode (MLO_IndivChnStream *ics_ptr, MLO_BitStream
    if (MLO_SUCCEEDED (result))
    {
       /* Section data */
-      MLO_SectionData_Decode (
+      result = MLO_SectionData_Decode (
          &ics_ptr->section_data,
          &ics_ptr->ics_info,
          bit_ptr
@@ -217,8 +219,8 @@ MLO_Result  MLO_IndivChnStream_DecodePulseData (MLO_IndivChnStream *ics_ptr, MLO
    MLO_Result     result = MLO_SUCCESS;
    int            nbr_pulses;
 
-   MLO_ASSERT (ics_ptr != NULL);
-   MLO_ASSERT (bit_ptr != NULL);
+   MLO_ASSERT(ics_ptr != NULL);
+   MLO_ASSERT(bit_ptr != NULL);
 
    ics_ptr->number_pulse = MLO_BitStream_ReadBits (bit_ptr, 2);
    ics_ptr->pulse_start_sfb = MLO_BitStream_ReadBits (bit_ptr, 6);
@@ -270,15 +272,16 @@ Returns:
 ==============================================================================
 */
 
-MLO_Result  MLO_IndivChnStream_DecodeSpectralData (MLO_IndivChnStream *ics_ptr, MLO_BitStream *bit_ptr)
+MLO_Result  
+MLO_IndivChnStream_DecodeSpectralData (MLO_IndivChnStream *ics_ptr, MLO_BitStream *bit_ptr)
 {
    MLO_Result     result = MLO_SUCCESS;
    int            g;
    int            group_pos = 0;
    int            num_window_groups;
 
-   MLO_ASSERT (ics_ptr != NULL);
-   MLO_ASSERT (bit_ptr != NULL);
+   MLO_ASSERT(ics_ptr != NULL);
+   MLO_ASSERT(bit_ptr != NULL);
 
    /* Spectral array should be cleaned before entering the decoding stage
       because non-transmitted info above max_sfb is implicitely 0 (4.6.3.3). */
@@ -299,7 +302,7 @@ MLO_Result  MLO_IndivChnStream_DecodeSpectralData (MLO_IndivChnStream *ics_ptr, 
          const int      sect_end   = ics_ptr->section_data.sect_end   [g] [i];
          const int      beg = ics_ptr->ics_info.sect_sfb_offset [g] [sect_start];
          const int      end = ics_ptr->ics_info.sect_sfb_offset [g] [sect_end  ];
-         MLO_ASSERT (beg <= end);
+         MLO_CHECK(beg <= end);
 
          if (   sect_cb != MLO_HCB_ZERO_HCB
              && sect_cb != MLO_HCB_NOISE_HCB
@@ -311,7 +314,7 @@ MLO_Result  MLO_IndivChnStream_DecodeSpectralData (MLO_IndivChnStream *ics_ptr, 
 
             for (k = beg; k < end && MLO_SUCCEEDED (result); k += inc)
             {
-               MLO_ASSERT (data_pos < (int)MLO_ARRAY_SIZE (ics_ptr->data));
+               MLO_CHECK(data_pos < (int)MLO_ARRAY_SIZE (ics_ptr->data));
 
                result = MLO_Huffman_decode_spectral_data (
                   &ics_ptr->data [data_pos],

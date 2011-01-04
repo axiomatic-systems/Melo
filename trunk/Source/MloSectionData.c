@@ -61,16 +61,20 @@ Output parameters:
 ==============================================================================
 */
 
-void  MLO_SectionData_Decode (MLO_SectionData *sec_ptr, const MLO_IcsInfo *ics_ptr, MLO_BitStream *bit_ptr)
+MLO_Result
+MLO_SectionData_Decode (MLO_SectionData *sec_ptr, const MLO_IcsInfo *ics_ptr, MLO_BitStream *bit_ptr)
 {
    int            sect_len_bits = 5;
    int            sect_esc_val;
    int            g;
 
-	MLO_ASSERT (sec_ptr != NULL);
-	MLO_ASSERT (ics_ptr != NULL);
-	MLO_ASSERT (bit_ptr != NULL);
+	MLO_ASSERT(sec_ptr != NULL);
+	MLO_ASSERT(ics_ptr != NULL);
+	MLO_ASSERT(bit_ptr != NULL);
 
+   /* clear the data first */
+   MLO_SetMemory(sec_ptr, 0, sizeof(*sec_ptr));
+    
    if (ics_ptr->window_sequence == MLO_ICS_INFO_WIN_EIGHT_SHORT_SEQUENCE)
    {
       sect_len_bits = 3;
@@ -88,10 +92,10 @@ void  MLO_SectionData_Decode (MLO_SectionData *sec_ptr, const MLO_IcsInfo *ics_p
          int            sfb;
          int            end;
 
-         MLO_ASSERT (i < (int)MLO_ARRAY_SIZE (sec_ptr->sect_cb [0]));
-         MLO_ASSERT (i < (int)MLO_ARRAY_SIZE (sec_ptr->sect_start [0]));
-         MLO_ASSERT (i < (int)MLO_ARRAY_SIZE (sec_ptr->sect_end [0]));
-         MLO_ASSERT (i < (int)MLO_ARRAY_SIZE (sec_ptr->sect_cb [0]));
+         MLO_CHECK(i < (int)MLO_ARRAY_SIZE (sec_ptr->sect_cb [0]));
+         MLO_CHECK(i < (int)MLO_ARRAY_SIZE (sec_ptr->sect_start [0]));
+         MLO_CHECK(i < (int)MLO_ARRAY_SIZE (sec_ptr->sect_end [0]));
+         MLO_CHECK(i < (int)MLO_ARRAY_SIZE (sec_ptr->sect_cb [0]));
 
          /* aacSectionDataResilienceFlag not set */
          sec_ptr->sect_cb [g] [i] = MLO_BitStream_ReadBits (bit_ptr, 4);
@@ -104,14 +108,14 @@ void  MLO_SectionData_Decode (MLO_SectionData *sec_ptr, const MLO_IcsInfo *ics_p
          while (sect_len_incr == sect_esc_val);
 
          end = k + sect_len;
-         MLO_ASSERT (k <= (int)MLO_MAX_VAL_U (sec_ptr->sect_start [0] [0]));
-         MLO_ASSERT (end <= (int)MLO_MAX_VAL_U (sec_ptr->sect_end [0] [0]));
+         MLO_CHECK(k <= (int)MLO_MAX_VAL_U (sec_ptr->sect_start [0] [0]));
+         MLO_CHECK(end <= (int)MLO_MAX_VAL_U (sec_ptr->sect_end [0] [0]));
          sec_ptr->sect_start [g] [i] = k;
          sec_ptr->sect_end [g] [i] = end;
 
          for (sfb = k; sfb < end; ++sfb)
          {
-            MLO_ASSERT (sfb < (int)MLO_ARRAY_SIZE (sec_ptr->sfb_cb [0]));
+            MLO_CHECK(sfb < (int)MLO_ARRAY_SIZE (sec_ptr->sfb_cb [0]));
             sec_ptr->sfb_cb [g] [sfb] = sec_ptr->sect_cb [g] [i];
          }
 
@@ -121,6 +125,8 @@ void  MLO_SectionData_Decode (MLO_SectionData *sec_ptr, const MLO_IcsInfo *ics_p
 
       sec_ptr->num_sec [g] = i;
    }
+   
+   return MLO_SUCCESS;
 }
 
 
@@ -145,16 +151,17 @@ Returns:
 ==============================================================================
 */
 
-int   MLO_SectionData_IsIntensity (const MLO_SectionData *sec_ptr, int group, int sfb)
+int   
+MLO_SectionData_IsIntensity (const MLO_SectionData *sec_ptr, int group, int sfb)
 {
    MLO_Hcb        c;
    int            ret_val = 0;
 
-   MLO_ASSERT (sec_ptr != NULL);
-   MLO_ASSERT (group >= 0);
-   MLO_ASSERT (group < (int)MLO_ARRAY_SIZE (sec_ptr->sect_cb));
-   MLO_ASSERT (sfb >= 0);
-   MLO_ASSERT (sfb < (int)MLO_ARRAY_SIZE (sec_ptr->sect_cb [0]));
+   MLO_ASSERT_LOG(sec_ptr != NULL);
+   MLO_ASSERT_LOG(group >= 0);
+   MLO_ASSERT_LOG(group < (int)MLO_ARRAY_SIZE (sec_ptr->sect_cb));
+   MLO_ASSERT_LOG(sfb >= 0);
+   MLO_ASSERT_LOG(sfb < (int)MLO_ARRAY_SIZE (sec_ptr->sect_cb [0]));
 
    c = sec_ptr->sfb_cb [group] [sfb];
    if (c == MLO_HCB_INTENSITY_HCB)
@@ -187,16 +194,17 @@ Returns:
 ==============================================================================
 */
 
-MLO_Boolean MLO_SectionData_IsNoise (const MLO_SectionData *sec_ptr, int group, int sfb)
+MLO_Boolean 
+MLO_SectionData_IsNoise (const MLO_SectionData *sec_ptr, int group, int sfb)
 {
    MLO_Hcb        c;
    MLO_Boolean    noise_flag = MLO_FALSE;
 
-   MLO_ASSERT (sec_ptr != NULL);
-   MLO_ASSERT (group >= 0);
-   MLO_ASSERT (group < (int)MLO_ARRAY_SIZE (sec_ptr->sect_cb));
-   MLO_ASSERT (sfb >= 0);
-   MLO_ASSERT (sfb < (int)MLO_ARRAY_SIZE (sec_ptr->sect_cb [0]));
+   MLO_ASSERT_LOG(sec_ptr != NULL);
+   MLO_ASSERT_LOG(group >= 0);
+   MLO_ASSERT_LOG(group < (int)MLO_ARRAY_SIZE (sec_ptr->sect_cb));
+   MLO_ASSERT_LOG(sfb >= 0);
+   MLO_ASSERT_LOG(sfb < (int)MLO_ARRAY_SIZE (sec_ptr->sect_cb [0]));
 
    c = sec_ptr->sfb_cb [group] [sfb];
    if (c == MLO_HCB_NOISE_HCB)

@@ -88,12 +88,18 @@
 /*----------------------------------------------------------------------
 |    macros
 +---------------------------------------------------------------------*/
-#if defined(MLO_DEBUG)
-#define MLO_CHECK_ARGS(_x) MLO_ASSERT(_x)
-#else
-#define MLO_CHECK_ARGS(_x) if (!(_x)) return MLO_ERROR_INVALID_PARAMETERS
-#endif
 
-#define MLO_CHECK_DATA(_x) if (!(_x)) return MLO_ERROR_INVALID_DATA
+#if defined(MLO_DEBUG)
+#include "MloDebug.h"
+#define MLO_CHECK(_x)      if (!(_x)) { MLO_DebugHook(); return MLO_ERROR_INVALID_DATA;}
+#define MLO_ASSERT(_x)     if (!(_x)) return MLO_ERROR_INVALID_PARAMETERS
+#define MLO_ASSERT_V(_x)   if (!(_x)) return
+#define MLO_ASSERT_LOG(_x) if (!(_x)) {}
+#else
+#define MLO_CHECK(_x)      if (!(_x)) return MLO_ERROR_INVALID_DATA
+#define MLO_ASSERT(_x)
+#define MLO_ASSERT_V(_x)
+#define MLO_ASSERT_LOG(_x)
+#endif
 
 #endif /* _MLO_ERRORS_H_ */

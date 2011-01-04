@@ -37,7 +37,7 @@
 /*----------------------------------------------------------------------
 |       Prototypes
 +---------------------------------------------------------------------*/
-static void MLO_Ms_ProcessSfb (MLO_IndivChnStream *ics_l_ptr, MLO_IndivChnStream *ics_r_ptr, int g, int sfb, int win_pos);
+static MLO_Result MLO_Ms_ProcessSfb (MLO_IndivChnStream *ics_l_ptr, MLO_IndivChnStream *ics_r_ptr, int g, int sfb, int win_pos);
 
 /*----------------------------------------------------------------------
 |       Functions
@@ -54,11 +54,15 @@ Input/output parameters:
 ==============================================================================
 */
 
-void	MLO_Ms_Process (MLO_ElementCpe *cpe_ptr)
+MLO_Result	
+MLO_Ms_Process (MLO_ElementCpe *cpe_ptr)
 {
    MLO_ElementCpe_MsMaskType  ms_mask_present;
-   MLO_ASSERT (cpe_ptr != NULL);
+   MLO_ASSERT(cpe_ptr != NULL);
 
+   /* don't use M/S if common_window is not set */
+   if (!cpe_ptr->common_window_flag) return MLO_SUCCESS;
+   
    ms_mask_present = cpe_ptr->ms_mask_present;
    if (ms_mask_present != MLO_ELEMENT_CPE_MS_MASK_TYPE_ALL_0)
    {
@@ -90,25 +94,28 @@ void	MLO_Ms_Process (MLO_ElementCpe *cpe_ptr)
                       * MLO_DEFS_FRAME_LEN_SHORT;
       }
    }
+   
+   return MLO_SUCCESS;
 }
 
 
 
-static void MLO_Ms_ProcessSfb (MLO_IndivChnStream *ics_l_ptr, MLO_IndivChnStream *ics_r_ptr, int g, int sfb, int win_pos)
+static MLO_Result
+MLO_Ms_ProcessSfb (MLO_IndivChnStream *ics_l_ptr, MLO_IndivChnStream *ics_r_ptr, int g, int sfb, int win_pos)
 {
    int            sfb_start;
    int            sfb_len;
    int            window_group_length;
    int            win;
 
-   MLO_ASSERT (ics_l_ptr != NULL);
-   MLO_ASSERT (ics_r_ptr != NULL);
-   MLO_ASSERT (g >= 0);
-   MLO_ASSERT (g < 8);
-   MLO_ASSERT (sfb >= 0);
-   MLO_ASSERT (sfb < ics_r_ptr->ics_info.max_sfb);
-   MLO_ASSERT (win_pos >= 0);
-   MLO_ASSERT (win_pos < MLO_DEFS_FRAME_LEN_LONG);
+   MLO_ASSERT(ics_l_ptr != NULL);
+   MLO_ASSERT(ics_r_ptr != NULL);
+   MLO_CHECK(g >= 0);
+   MLO_CHECK(g < 8);
+   MLO_CHECK(sfb >= 0);
+   MLO_CHECK(sfb < ics_r_ptr->ics_info.max_sfb);
+   MLO_CHECK(win_pos >= 0);
+   MLO_CHECK(win_pos < MLO_DEFS_FRAME_LEN_LONG);
 
    sfb_start = ics_r_ptr->ics_info.swb_offset [sfb];
    sfb_len   = ics_r_ptr->ics_info.swb_offset [sfb + 1] - sfb_start;
@@ -132,4 +139,6 @@ static void MLO_Ms_ProcessSfb (MLO_IndivChnStream *ics_l_ptr, MLO_IndivChnStream
 
       win_pos += MLO_DEFS_FRAME_LEN_SHORT;
    }
+   
+   return MLO_SUCCESS;
 }

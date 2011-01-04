@@ -57,7 +57,7 @@ extern "C" {
 
 
 
-void  MLO_Ms_Process (MLO_ElementCpe *cpe_ptr);
+MLO_Result  MLO_Ms_Process (MLO_ElementCpe *cpe_ptr);
 
 
 

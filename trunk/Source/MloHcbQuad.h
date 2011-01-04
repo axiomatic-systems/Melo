@@ -56,8 +56,8 @@ extern "C" {
 
 
 
-void  MLO_HcbQuad_decode_binary (MLO_Int16 data_ptr [4], MLO_BitStream *bit_ptr, MLO_Hcb hcb);
-void  MLO_HcbQuad_decode_2steps (MLO_Int16 data_ptr [4], MLO_BitStream *bit_ptr, MLO_Hcb hcb);
+MLO_Result  MLO_HcbQuad_decode_binary (MLO_Int16 data_ptr [4], MLO_BitStream *bit_ptr, MLO_Hcb hcb);
+MLO_Result  MLO_HcbQuad_decode_2steps (MLO_Int16 data_ptr [4], MLO_BitStream *bit_ptr, MLO_Hcb hcb);
 
 
 

@@ -69,8 +69,8 @@ extern "C" {
 
 
 
-void  MLO_SectionData_Decode (MLO_SectionData *sec_ptr, const MLO_IcsInfo *ics_ptr, MLO_BitStream *bit_ptr);
-int   MLO_SectionData_IsIntensity (const MLO_SectionData *sec_ptr, int group, int sfb);
+MLO_Result  MLO_SectionData_Decode (MLO_SectionData *sec_ptr, const MLO_IcsInfo *ics_ptr, MLO_BitStream *bit_ptr);
+int         MLO_SectionData_IsIntensity (const MLO_SectionData *sec_ptr, int group, int sfb);
 MLO_Boolean MLO_SectionData_IsNoise (const MLO_SectionData *sec_ptr, int group, int sfb);
 
 

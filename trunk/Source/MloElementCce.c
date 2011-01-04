@@ -60,14 +60,14 @@ static const MLO_Float MLO_ElementCce_table_pow2 [MLO_ELEMENT_CCE_POW2_RES] =
 /*----------------------------------------------------------------------
 |       Prototypes
 +---------------------------------------------------------------------*/
-static int  MLO_ElementCce_DecodeTargets (MLO_ElementCce *cce_ptr, MLO_BitStream *bit_ptr);
-static void MLO_ElementCce_DecodeGainElementList (MLO_ElementCce_GainElementList *gel_ptr, MLO_BitStream *bit_ptr, const MLO_IcsInfo *ics_info_ptr, MLO_Boolean cge_flag);
-static void MLO_ElementCce_CoupleChannel (const MLO_ElementCce *cce_ptr, MLO_IndivChnStream *ics_ptr, int list_index, MLO_ElementCce_Stage stage);
-static void MLO_ElementCce_CoupleChannelNoGain (const MLO_ElementCce *cce_ptr, MLO_IndivChnStream *ics_ptr);
-static void MLO_ElementCce_CalculateGains (const MLO_ElementCce *cce_ptr, int list_index, MLO_ElementCce_LinearGainArray gain_arr);
+static int        MLO_ElementCce_DecodeTargets (MLO_ElementCce *cce_ptr, MLO_BitStream *bit_ptr);
+static MLO_Result MLO_ElementCce_DecodeGainElementList (MLO_ElementCce_GainElementList *gel_ptr, MLO_BitStream *bit_ptr, const MLO_IcsInfo *ics_info_ptr, MLO_Boolean cge_flag);
+static MLO_Result MLO_ElementCce_CoupleChannel (const MLO_ElementCce *cce_ptr, MLO_IndivChnStream *ics_ptr, int list_index, MLO_ElementCce_Stage stage);
+static MLO_Result MLO_ElementCce_CoupleChannelNoGain (const MLO_ElementCce *cce_ptr, MLO_IndivChnStream *ics_ptr);
+static MLO_Result MLO_ElementCce_CalculateGains (const MLO_ElementCce *cce_ptr, int list_index, MLO_ElementCce_LinearGainArray gain_arr);
 static MLO_Float  MLO_ElementCce_CalculateLinearGain (int scale_log, int cge);
-static void MLO_ElementCce_ApplyChannelCouplingDep (const MLO_ElementCce *cce_ptr, MLO_IndivChnStream *ics_ptr, MLO_ElementCce_LinearGainArray gain_arr);
-static void MLO_ElementCce_ApplyChannelCouplingIndep (const MLO_ElementCce *cce_ptr, MLO_IndivChnStream *ics_ptr, int list_index);
+static MLO_Result MLO_ElementCce_ApplyChannelCouplingDep (const MLO_ElementCce *cce_ptr, MLO_IndivChnStream *ics_ptr, MLO_ElementCce_LinearGainArray gain_arr);
+static MLO_Result MLO_ElementCce_ApplyChannelCouplingIndep (const MLO_ElementCce *cce_ptr, MLO_IndivChnStream *ics_ptr, int list_index);
 
 /*----------------------------------------------------------------------
 |       Functions
@@ -107,11 +107,11 @@ MLO_ElementCce_Decode (MLO_ElementCce *cce_ptr, MLO_BitStream *bit_ptr, MLO_Indi
     int            ics_index = -1;
     MLO_IndivChnStream * ics_ptr = 0;
 
-	MLO_ASSERT (cce_ptr != NULL);
-	MLO_ASSERT (bit_ptr != NULL);
-	MLO_ASSERT (chn_pool_ptr != NULL);
-    MLO_CHECK_ARGS(fs_index >= 0);
-    MLO_CHECK_ARGS(fs_index < MLO_SAMPLING_FREQ_INDEX_NBR_VALID);
+	MLO_ASSERT(cce_ptr != NULL);
+	MLO_ASSERT(bit_ptr != NULL);
+	MLO_ASSERT(chn_pool_ptr != NULL);
+    MLO_CHECK(fs_index >= 0);
+    MLO_CHECK(fs_index < MLO_SAMPLING_FREQ_INDEX_NBR_VALID);
 
    cce_ptr->element_instance_tag = MLO_BitStream_ReadBits (bit_ptr, 4);
    cce_ptr->ind_sw_cce_flag      = MLO_BitStream_ReadBit (bit_ptr);
@@ -171,7 +171,7 @@ MLO_ElementCce_Process (const MLO_ElementCce *cce_ptr, struct MLO_SyntacticEleme
 
    MLO_ASSERT(cce_ptr != NULL);
    MLO_ASSERT(se_ptr != NULL);
-   MLO_CHECK_ARGS(stage < MLO_ELEMENT_CCE_STAGE_NBR_ELT);
+   MLO_CHECK(stage < MLO_ELEMENT_CCE_STAGE_NBR_ELT);
 
    switch (stage)
    {
@@ -297,11 +297,11 @@ static int  MLO_ElementCce_DecodeTargets (MLO_ElementCce *cce_ptr, MLO_BitStream
     int            nbr_targets;
     int            target_cnt;
 
-    MLO_ASSERT (cce_ptr != NULL);
-	MLO_ASSERT (bit_ptr != NULL);
+    MLO_ASSERT(cce_ptr != NULL);
+	MLO_ASSERT(bit_ptr != NULL);
 
    nbr_targets = cce_ptr->num_coupled_elements + 1;
-   MLO_CHECK_DATA(nbr_targets <= (int)MLO_ARRAY_SIZE (cce_ptr->cc_target_arr));
+   MLO_CHECK(nbr_targets <= (int)MLO_ARRAY_SIZE (cce_ptr->cc_target_arr));
 
    for (target_cnt = 0; target_cnt < nbr_targets; ++target_cnt)
    {
@@ -342,7 +342,7 @@ Input/output parameters:
 ==============================================================================
 */
 
-static void
+static MLO_Result
 MLO_ElementCce_DecodeGainElementList (MLO_ElementCce_GainElementList *gel_ptr, MLO_BitStream *bit_ptr, const MLO_IcsInfo *ics_info_ptr, MLO_Boolean cge_flag)
 {
 	MLO_ASSERT(gel_ptr != NULL);
@@ -368,8 +368,8 @@ MLO_ElementCce_DecodeGainElementList (MLO_ElementCce_GainElementList *gel_ptr, M
       const int      num_window_groups = ics_info_ptr->num_window_groups;
       int            g;
 
-      MLO_ASSERT(num_window_groups <= (int)MLO_ARRAY_SIZE (gel_ptr->dpcm_gain_element));
-      MLO_ASSERT(max_sfb           <= (int)MLO_ARRAY_SIZE (gel_ptr->dpcm_gain_element [0]));
+      MLO_CHECK(num_window_groups <= (int)MLO_ARRAY_SIZE (gel_ptr->dpcm_gain_element));
+      MLO_CHECK(max_sfb           <= (int)MLO_ARRAY_SIZE (gel_ptr->dpcm_gain_element [0]));
 
       for (g = 0; g < num_window_groups; ++g)
       {
@@ -382,19 +382,21 @@ MLO_ElementCce_DecodeGainElementList (MLO_ElementCce_GainElementList *gel_ptr, M
          }
       }
    }
+   
+   return MLO_SUCCESS;
 }
 
 
 
 /* Ref: 4.6.8.3.3 */
-static void
+static MLO_Result
 MLO_ElementCce_CoupleChannel (const MLO_ElementCce *cce_ptr, MLO_IndivChnStream *ics_ptr, int list_index, MLO_ElementCce_Stage stage)
 {
 	MLO_ASSERT(cce_ptr != NULL);
 	MLO_ASSERT(ics_ptr != NULL);
-	MLO_ASSERT(list_index >= 0);
-    MLO_ASSERT(list_index < cce_ptr->num_gain_element_lists);
-    MLO_ASSERT(stage < MLO_ELEMENT_CCE_STAGE_NBR_ELT);
+	MLO_CHECK(list_index >= 0);
+    MLO_CHECK(list_index < cce_ptr->num_gain_element_lists);
+    MLO_CHECK(stage < MLO_ELEMENT_CCE_STAGE_NBR_ELT);
 
    if (list_index == 0)
    {
@@ -420,19 +422,21 @@ MLO_ElementCce_CoupleChannel (const MLO_ElementCce *cce_ptr, MLO_IndivChnStream 
          MLO_ElementCce_ApplyChannelCouplingIndep (cce_ptr, ics_ptr, list_index);
       }
    }
+   
+   return MLO_SUCCESS;
 }
 
 
 
 /* For both spectral and time domains */
-static void 
+static MLO_Result 
 MLO_ElementCce_CoupleChannelNoGain (const MLO_ElementCce *cce_ptr, MLO_IndivChnStream *ics_ptr)
 {
    MLO_Float *    cc_coef_arr;
    int            pos;
 
-   MLO_ASSERT (cce_ptr != NULL);
-   MLO_ASSERT (ics_ptr != NULL);
+   MLO_ASSERT(cce_ptr != NULL);
+   MLO_ASSERT(ics_ptr != NULL);
 
    cc_coef_arr = &cce_ptr->ics_ptr->coef_arr [0];
    for (pos = 0; pos < MLO_DEFS_FRAME_LEN_LONG; ++pos)
@@ -440,11 +444,13 @@ MLO_ElementCce_CoupleChannelNoGain (const MLO_ElementCce *cce_ptr, MLO_IndivChnS
       ics_ptr->coef_arr [pos] =
          MLO_Float_Add (ics_ptr->coef_arr [pos], cc_coef_arr [pos]);
    }
+   
+   return MLO_SUCCESS;
 }
 
 
 
-static void
+static MLO_Result
 MLO_ElementCce_CalculateGains (const MLO_ElementCce *cce_ptr, int list_index, MLO_ElementCce_LinearGainArray gain_arr)
 {
     const MLO_ElementCce_GainElementList * gel_ptr;
@@ -453,10 +459,10 @@ MLO_ElementCce_CalculateGains (const MLO_ElementCce *cce_ptr, int list_index, ML
     int            num_window_groups;
     int            max_sfb;
 
-    MLO_ASSERT (cce_ptr != NULL);
-	MLO_ASSERT (list_index >= 0);
-    MLO_ASSERT (list_index < cce_ptr->num_gain_element_lists);
-	MLO_ASSERT (gain_arr != 0);
+    MLO_ASSERT(cce_ptr != NULL);
+	MLO_CHECK(list_index >= 0);
+    MLO_CHECK(list_index < cce_ptr->num_gain_element_lists);
+	MLO_CHECK(gain_arr != 0);
 
    gel_ptr = &cce_ptr->gel_arr [list_index];
    scale_log = 1 << cce_ptr->gain_element_scale;
@@ -516,6 +522,8 @@ MLO_ElementCce_CalculateGains (const MLO_ElementCce *cce_ptr, int list_index, ML
          }
       }
    }
+   
+   return MLO_SUCCESS;
 }
 
 
@@ -531,8 +539,8 @@ static MLO_Float  MLO_ElementCce_CalculateLinearGain (int scale_log, int cge)
       cge_s_i
    );
 
-   MLO_ASSERT (cge_s >= 0);
-   MLO_ASSERT (MLO_SIGN (cge_s_i) == MLO_SIGN (cge_s));
+   MLO_ASSERT_LOG(cge_s >= 0);
+   MLO_ASSERT_LOG(MLO_SIGN (cge_s_i) == MLO_SIGN (cge_s));
 
    return (gain);
 }
@@ -540,7 +548,7 @@ static MLO_Float  MLO_ElementCce_CalculateLinearGain (int scale_log, int cge)
 
 
 /* gain_arr is actually const */
-static void 
+static MLO_Result 
 MLO_ElementCce_ApplyChannelCouplingDep (const MLO_ElementCce *cce_ptr, MLO_IndivChnStream *ics_ptr, MLO_ElementCce_LinearGainArray gain_arr)
 {
     int            num_window_groups;
@@ -551,7 +559,7 @@ MLO_ElementCce_ApplyChannelCouplingDep (const MLO_ElementCce *cce_ptr, MLO_Indiv
 
     MLO_ASSERT(cce_ptr != NULL);
 	MLO_ASSERT(ics_ptr != NULL);
-	MLO_ASSERT(gain_arr != 0);
+	MLO_CHECK(gain_arr != 0);
 
    cc_coef_arr = &cce_ptr->ics_ptr->coef_arr [0];
    num_window_groups = ics_ptr->ics_info.num_window_groups;
@@ -588,9 +596,11 @@ MLO_ElementCce_ApplyChannelCouplingDep (const MLO_ElementCce *cce_ptr, MLO_Indiv
       group_pos +=   ics_ptr->ics_info.window_group_length [g]
                    * MLO_DEFS_FRAME_LEN_SHORT;
    }
+   
+   return MLO_SUCCESS;
 }
 
-static void 
+static MLO_Result 
 MLO_ElementCce_ApplyChannelCouplingIndep (const MLO_ElementCce *cce_ptr, MLO_IndivChnStream *ics_ptr, int list_index)
 {
     int            scale_log;
@@ -600,8 +610,8 @@ MLO_ElementCce_ApplyChannelCouplingIndep (const MLO_ElementCce *cce_ptr, MLO_Ind
 
     MLO_ASSERT(cce_ptr != NULL);
 	MLO_ASSERT(ics_ptr != NULL);
-	MLO_ASSERT(list_index >= 0);
-    MLO_ASSERT(list_index < cce_ptr->num_gain_element_lists);
+	MLO_CHECK(list_index >= 0);
+    MLO_CHECK(list_index < cce_ptr->num_gain_element_lists);
 
     scale_log = 1 << cce_ptr->gain_element_scale;
     gain = MLO_ElementCce_CalculateLinearGain (
@@ -615,4 +625,6 @@ MLO_ElementCce_ApplyChannelCouplingIndep (const MLO_ElementCce *cce_ptr, MLO_Ind
         const MLO_Float   g = MLO_Float_Mul (cc_coef_arr [pos], gain);
         ics_ptr->coef_arr [pos] = MLO_Float_Add (ics_ptr->coef_arr [pos], g);
     }
+    
+    return MLO_SUCCESS;
 }

@@ -132,11 +132,11 @@ static const MLO_Float MLO_Tns_table_coef [2] [2] [1 << MLO_TNS_MAX_COEF_RES] =
 
 
 
-static void MLO_Tns_ProcessFilter (MLO_IndivChnStream *ics_ptr, int win, int filter, int *bottom_ptr);
-static void MLO_Tns_CalculateLpcCoef (const MLO_Tns_Filter *filter_ptr, int resol, MLO_Float lpc_coef_arr [1 + MLO_TNS_MAX_ORDER]);
-static void MLO_Tns_InvQuantCoef (const MLO_Tns_Filter *filter_ptr, int resol, MLO_Float iq_arr [MLO_TNS_MAX_ORDER]);
-static void MLO_Tns_ConvCoefToLpc (MLO_Float lpc_coef_arr [1 + MLO_TNS_MAX_ORDER], MLO_Float iq_arr [MLO_TNS_MAX_ORDER], int order);
-static void MLO_Tns_RunFilter (MLO_Float *coef_ptr, int length, int inc, const MLO_Float lpc_coef_arr [1 + MLO_TNS_MAX_ORDER], int order);
+static MLO_Result MLO_Tns_ProcessFilter (MLO_IndivChnStream *ics_ptr, int win, int filter, int *bottom_ptr);
+static MLO_Result MLO_Tns_CalculateLpcCoef (const MLO_Tns_Filter *filter_ptr, int resol, MLO_Float lpc_coef_arr [1 + MLO_TNS_MAX_ORDER]);
+static MLO_Result MLO_Tns_InvQuantCoef (const MLO_Tns_Filter *filter_ptr, int resol, MLO_Float iq_arr [MLO_TNS_MAX_ORDER]);
+static MLO_Result MLO_Tns_ConvCoefToLpc (MLO_Float lpc_coef_arr [1 + MLO_TNS_MAX_ORDER], MLO_Float iq_arr [MLO_TNS_MAX_ORDER], int order);
+static MLO_Result MLO_Tns_RunFilter (MLO_Float *coef_ptr, int length, int inc, const MLO_Float lpc_coef_arr [1 + MLO_TNS_MAX_ORDER], int order);
 
 
 
@@ -171,9 +171,9 @@ MLO_Tns_Decode (MLO_Tns *tns_ptr, const MLO_IcsInfo *ics_info_ptr, MLO_BitStream
    int            bd_order = 5;
    int            w;
 
-   MLO_ASSERT (tns_ptr != NULL);
-   MLO_ASSERT (ics_info_ptr != NULL);
-   MLO_ASSERT (bit_ptr != NULL);
+   MLO_ASSERT(tns_ptr != NULL);
+   MLO_ASSERT(ics_info_ptr != NULL);
+   MLO_ASSERT(bit_ptr != NULL);
 
    if (ics_info_ptr->window_sequence == MLO_ICS_INFO_WIN_EIGHT_SHORT_SEQUENCE)
    {
@@ -182,7 +182,7 @@ MLO_Tns_Decode (MLO_Tns *tns_ptr, const MLO_IcsInfo *ics_info_ptr, MLO_BitStream
       bd_order = 3;
    }
 
-   MLO_ASSERT (ics_info_ptr->num_windows <= (int)MLO_ARRAY_SIZE (tns_ptr->win_arr));
+   MLO_CHECK(ics_info_ptr->num_windows <= (int)MLO_ARRAY_SIZE (tns_ptr->win_arr));
    for (w = 0; w < ics_info_ptr->num_windows; ++ w)
    {
       MLO_Tns_Window *  win_ptr = &tns_ptr->win_arr [w];
@@ -190,7 +190,7 @@ MLO_Tns_Decode (MLO_Tns *tns_ptr, const MLO_IcsInfo *ics_info_ptr, MLO_BitStream
       int            f;
 
       win_ptr->n_filt = MLO_BitStream_ReadBits (bit_ptr, bd_n_filt);
-      MLO_CHECK_DATA (win_ptr->n_filt <= (int)MLO_ARRAY_SIZE (win_ptr->filter));
+      MLO_CHECK(win_ptr->n_filt <= (int)MLO_ARRAY_SIZE (win_ptr->filter));
 
       if (win_ptr->n_filt > 0)
       {
@@ -207,7 +207,7 @@ MLO_Tns_Decode (MLO_Tns *tns_ptr, const MLO_IcsInfo *ics_info_ptr, MLO_BitStream
 
          filter_ptr->length = MLO_BitStream_ReadBits (bit_ptr, bd_length);
          filter_ptr->order  = MLO_BitStream_ReadBits (bit_ptr, bd_order);
-         MLO_CHECK_DATA (filter_ptr->order <= MLO_ARRAY_SIZE (filter_ptr->coef));
+         MLO_CHECK(filter_ptr->order <= MLO_ARRAY_SIZE (filter_ptr->coef));
 
          if (filter_ptr->order > 0)
          {
@@ -217,8 +217,8 @@ MLO_Tns_Decode (MLO_Tns *tns_ptr, const MLO_IcsInfo *ics_info_ptr, MLO_BitStream
             filter_ptr->direction = MLO_BitStream_ReadBit (bit_ptr);
             filter_ptr->compress = MLO_BitStream_ReadBit (bit_ptr);
             bd_coef -= filter_ptr->compress;
-            MLO_CHECK_DATA (bd_coef > 0);
-            MLO_CHECK_DATA (bd_coef <= MLO_TNS_MAX_COEF_RES);
+            MLO_CHECK(bd_coef > 0);
+            MLO_CHECK(bd_coef <= MLO_TNS_MAX_COEF_RES);
 
             for (c = 0; c < filter_ptr->order; ++c)
             {
@@ -247,7 +247,7 @@ Input/output parameters:
 MLO_Result
 MLO_Tns_Process (struct MLO_IndivChnStream *ics_ptr)
 {
-   MLO_ASSERT (ics_ptr != NULL);
+   MLO_ASSERT(ics_ptr != NULL);
 
    if (ics_ptr->tns_data_present_flag)
    {
@@ -289,7 +289,8 @@ Input/output parameters:
 ==============================================================================
 */
 
-static void MLO_Tns_ProcessFilter (MLO_IndivChnStream *ics_ptr, int win, int filter, int *bottom_ptr)
+static MLO_Result
+MLO_Tns_ProcessFilter (MLO_IndivChnStream *ics_ptr, int win, int filter, int *bottom_ptr)
 {
    const MLO_Tns_Filter *  filter_ptr;
    int            top;
@@ -297,14 +298,14 @@ static void MLO_Tns_ProcessFilter (MLO_IndivChnStream *ics_ptr, int win, int fil
    int            tns_max_order;
    MLO_Tns_WinSize   win_size = MLO_TNS_WIN_SIZE_LONG;
 
-   MLO_ASSERT (ics_ptr != NULL);
-   MLO_ASSERT (win >= 0);
-   MLO_ASSERT (win < ics_ptr->ics_info.num_windows);
-   MLO_ASSERT (filter >= 0);
-   MLO_ASSERT (filter < ics_ptr->tns.win_arr [win].n_filt);
-   MLO_ASSERT (bottom_ptr != NULL);
-   MLO_ASSERT (*bottom_ptr > 0);
-   MLO_ASSERT (*bottom_ptr <= ics_ptr->ics_info.num_swb);
+   MLO_ASSERT(ics_ptr != NULL);
+   MLO_CHECK(win >= 0);
+   MLO_CHECK(win < ics_ptr->ics_info.num_windows);
+   MLO_CHECK(filter >= 0);
+   MLO_CHECK(filter < ics_ptr->tns.win_arr [win].n_filt);
+   MLO_ASSERT(bottom_ptr != NULL);
+   MLO_CHECK(*bottom_ptr > 0);
+   MLO_CHECK(*bottom_ptr <= ics_ptr->ics_info.num_swb);
 
    if (ics_ptr->ics_info.window_sequence == MLO_ICS_INFO_WIN_EIGHT_SHORT_SEQUENCE)
    {
@@ -355,6 +356,8 @@ static void MLO_Tns_ProcessFilter (MLO_IndivChnStream *ics_ptr, int win, int fil
          );
       }
    }
+   
+   return MLO_SUCCESS;
 }
 
 
@@ -373,15 +376,18 @@ Output parameters:
 ==============================================================================
 */
 
-static void MLO_Tns_CalculateLpcCoef (const MLO_Tns_Filter *filter_ptr, int resol, MLO_Float lpc_coef_arr [1 + MLO_TNS_MAX_ORDER])
+static MLO_Result
+MLO_Tns_CalculateLpcCoef (const MLO_Tns_Filter *filter_ptr, int resol, MLO_Float lpc_coef_arr [1 + MLO_TNS_MAX_ORDER])
 {
    MLO_Float      iq_arr [MLO_TNS_MAX_ORDER];
 
-   MLO_ASSERT (resol >= 0);
-   MLO_ASSERT (resol <= 1);
+   MLO_CHECK(resol >= 0);
+   MLO_CHECK(resol <= 1);
 
    MLO_Tns_InvQuantCoef (filter_ptr, resol, iq_arr);
    MLO_Tns_ConvCoefToLpc (lpc_coef_arr, iq_arr, filter_ptr->order);
+   
+   return MLO_SUCCESS;
 }
 
 
@@ -400,7 +406,8 @@ Output parameters:
 ==============================================================================
 */
 
-static void MLO_Tns_InvQuantCoef (const MLO_Tns_Filter *filter_ptr, int resol, MLO_Float iq_arr [MLO_TNS_MAX_ORDER])
+static MLO_Result
+MLO_Tns_InvQuantCoef (const MLO_Tns_Filter *filter_ptr, int resol, MLO_Float iq_arr [MLO_TNS_MAX_ORDER])
 {
    const int      order = filter_ptr->order;
    const int      compress = filter_ptr->compress;
@@ -411,6 +418,8 @@ static void MLO_Tns_InvQuantCoef (const MLO_Tns_Filter *filter_ptr, int resol, M
       const int      coef = filter_ptr->coef [i];
       iq_arr [i] = MLO_Tns_table_coef [resol] [compress] [coef];
    }
+   
+   return MLO_SUCCESS;
 }
 
 
@@ -429,11 +438,12 @@ Output parameters:
 ==============================================================================
 */
 
-static void MLO_Tns_ConvCoefToLpc (MLO_Float lpc_coef_arr [1 + MLO_TNS_MAX_ORDER], MLO_Float iq_arr [MLO_TNS_MAX_ORDER], int order)
+static MLO_Result
+MLO_Tns_ConvCoefToLpc (MLO_Float lpc_coef_arr [1 + MLO_TNS_MAX_ORDER], MLO_Float iq_arr [MLO_TNS_MAX_ORDER], int order)
 {
    int            m;
 
-   MLO_ASSERT (order > 0);
+   MLO_CHECK(order > 0);
 
    /* Conversion to LPC coefficients */
    lpc_coef_arr [0] = 1;
@@ -460,6 +470,8 @@ static void MLO_Tns_ConvCoefToLpc (MLO_Float lpc_coef_arr [1 + MLO_TNS_MAX_ORDER
       /* changed */
       lpc_coef_arr [m] = iq_arr [m - 1];
    }
+   
+   return MLO_SUCCESS;
 }
 
 
@@ -481,16 +493,17 @@ Input/output parameters:
 ==============================================================================
 */
 
-static void MLO_Tns_RunFilter (MLO_Float *coef_ptr, int length, int inc, const MLO_Float lpc_coef_arr [1 + MLO_TNS_MAX_ORDER], int order)
+static MLO_Result
+MLO_Tns_RunFilter (MLO_Float *coef_ptr, int length, int inc, const MLO_Float lpc_coef_arr [1 + MLO_TNS_MAX_ORDER], int order)
 {
    int            pos = 1;
 
-   MLO_ASSERT (coef_ptr != NULL);
-   MLO_ASSERT (length > 0);
-   MLO_ASSERT (inc == 1 || inc == -1);
-   MLO_ASSERT (lpc_coef_arr != 0);
-   MLO_ASSERT (order > 0);
-   MLO_ASSERT (order <= MLO_TNS_MAX_ORDER);
+   MLO_ASSERT(coef_ptr != NULL);
+   MLO_CHECK(length > 0);
+   MLO_CHECK(inc == 1 || inc == -1);
+   MLO_CHECK(lpc_coef_arr != 0);
+   MLO_CHECK(order > 0);
+   MLO_CHECK(order <= MLO_TNS_MAX_ORDER);
 
    /* As filter state is 0, first data is unchanged */
    coef_ptr += inc;
@@ -518,4 +531,6 @@ static void MLO_Tns_RunFilter (MLO_Float *coef_ptr, int length, int inc, const M
       coef_ptr += inc;
       ++ pos;
    }
+   
+   return MLO_SUCCESS;
 }

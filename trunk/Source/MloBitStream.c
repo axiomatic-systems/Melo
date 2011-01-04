@@ -48,7 +48,7 @@ MLO_BitStream_Construct(MLO_BitStream* bits, MLO_Size size)
 {
     /* make the buffer size an integer number of words */
     size = MLO_WORD_BYTES*((size+MLO_WORD_BYTES-1)/MLO_WORD_BYTES);
-    bits->buffer = (unsigned char*)MLO_AllocateMemory(size);
+    bits->buffer = (unsigned char*)MLO_AllocateMemory/*MLO_AllocateZeroMemory*/(size);
     bits->buffer_size = size;
     bits->data_size = 0;
     if (bits->buffer == NULL) return MLO_ERROR_OUT_OF_MEMORY;

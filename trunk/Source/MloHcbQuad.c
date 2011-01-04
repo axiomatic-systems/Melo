@@ -757,7 +757,7 @@ Input/output parameters:
 ==============================================================================
 */
 
-void  
+MLO_Result  
 MLO_HcbQuad_decode_binary (MLO_Int16 data_ptr [4], MLO_BitStream *bit_ptr, MLO_Hcb hcb)
 {
    unsigned int offset = 0;
@@ -765,8 +765,8 @@ MLO_HcbQuad_decode_binary (MLO_Int16 data_ptr [4], MLO_BitStream *bit_ptr, MLO_H
 
    MLO_ASSERT(data_ptr != NULL);
    MLO_ASSERT(bit_ptr != NULL);
-   MLO_ASSERT(hcb > MLO_HCB_ZERO_HCB);
-   MLO_ASSERT(hcb < MLO_HCB_FIRST_PAIR_HCB);
+   MLO_CHECK(hcb > MLO_HCB_ZERO_HCB);
+   MLO_CHECK(hcb < MLO_HCB_FIRST_PAIR_HCB);
 
    table_ptr = MLO_HcbQuad_cookbook_index [hcb].bin_ptr;
    MLO_ASSERT(table_ptr != NULL);
@@ -781,6 +781,8 @@ MLO_HcbQuad_decode_binary (MLO_Int16 data_ptr [4], MLO_BitStream *bit_ptr, MLO_H
    data_ptr [1] = table_ptr [offset].data [1];
    data_ptr [2] = table_ptr [offset].data [2];
    data_ptr [3] = table_ptr [offset].data [3];
+   
+   return MLO_SUCCESS;
 }
 
 
@@ -799,7 +801,7 @@ Input/output parameters:
 ==============================================================================
 */
 
-void  
+MLO_Result  
 MLO_HcbQuad_decode_2steps (MLO_Int16 data_ptr [4], MLO_BitStream *bit_ptr, MLO_Hcb hcb)
 {
    int            offset = 0;
@@ -811,13 +813,13 @@ MLO_HcbQuad_decode_2steps (MLO_Int16 data_ptr [4], MLO_BitStream *bit_ptr, MLO_H
 
    MLO_ASSERT(data_ptr != NULL);
    MLO_ASSERT(bit_ptr != NULL);
-   MLO_ASSERT(hcb > MLO_HCB_ZERO_HCB);
-   MLO_ASSERT(hcb < MLO_HCB_FIRST_PAIR_HCB);
+   MLO_CHECK(hcb > MLO_HCB_ZERO_HCB);
+   MLO_CHECK(hcb < MLO_HCB_FIRST_PAIR_HCB);
 
    table_1_ptr = MLO_HcbQuad_cookbook_index [hcb].step_1_ptr;
    table_2_ptr = MLO_HcbQuad_cookbook_index [hcb].step_2_ptr;
-   MLO_ASSERT (table_1_ptr != NULL);
-   MLO_ASSERT (table_2_ptr != NULL);
+   MLO_CHECK(table_1_ptr != NULL);
+   MLO_CHECK(table_2_ptr != NULL);
 
    cw = MLO_BitStream_PeekBits (bit_ptr, nbr_bits);
 
@@ -839,6 +841,8 @@ MLO_HcbQuad_decode_2steps (MLO_Int16 data_ptr [4], MLO_BitStream *bit_ptr, MLO_H
    data_ptr [1] = table_2_ptr [offset].y;
    data_ptr [2] = table_2_ptr [offset].z;
    data_ptr [3] = table_2_ptr [offset].w;
+   
+   return MLO_SUCCESS;
 }
 
 

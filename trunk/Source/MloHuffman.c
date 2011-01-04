@@ -35,9 +35,9 @@
 /*----------------------------------------------------------------------
 |       Prototypes
 +---------------------------------------------------------------------*/
-static void MLO_Huffman_decode_spectral_data_pair (MLO_Int16 data_ptr [2], MLO_BitStream *bit_ptr, MLO_Hcb hcb);
-static void MLO_Huffman_decode_spectral_data_quad (MLO_Int16 data_ptr [4], MLO_BitStream *bit_ptr, MLO_Hcb hcb);
-static void MLO_Huffman_decode_spectral_data_esc (MLO_Int16 data_ptr [2], MLO_BitStream *bit_ptr);
+static MLO_Result MLO_Huffman_decode_spectral_data_pair (MLO_Int16 data_ptr [2], MLO_BitStream *bit_ptr, MLO_Hcb hcb);
+static MLO_Result MLO_Huffman_decode_spectral_data_quad (MLO_Int16 data_ptr [4], MLO_BitStream *bit_ptr, MLO_Hcb hcb);
+static MLO_Result MLO_Huffman_decode_spectral_data_esc (MLO_Int16 data_ptr [2], MLO_BitStream *bit_ptr);
 
 static void MLO_Huffman_decode_binary_pair_sign (MLO_Int16 data_ptr [2], MLO_BitStream *bit_ptr, MLO_Hcb hcb);
 static void MLO_Huffman_decode_2steps_pair_sign (MLO_Int16 data_ptr [2], MLO_BitStream *bit_ptr, MLO_Hcb hcb);
@@ -72,10 +72,10 @@ MLO_Huffman_decode_spectral_data (MLO_Int16 data_ptr [], MLO_BitStream *bit_ptr,
 {
    MLO_Result     result = MLO_SUCCESS;
 
-   MLO_ASSERT (data_ptr != NULL);
-   MLO_ASSERT (bit_ptr != NULL);
-   MLO_ASSERT (hcb > MLO_HCB_ZERO_HCB);
-   MLO_ASSERT (hcb <= MLO_HCB_ESC_HCB);
+   MLO_ASSERT(data_ptr != NULL);
+   MLO_ASSERT(bit_ptr != NULL);
+   MLO_CHECK(hcb > MLO_HCB_ZERO_HCB);
+   MLO_CHECK(hcb <= MLO_HCB_ESC_HCB);
 
    /* Quad */
    if (hcb < MLO_HCB_FIRST_PAIR_HCB)
@@ -106,13 +106,13 @@ MLO_Huffman_decode_spectral_data (MLO_Int16 data_ptr [], MLO_BitStream *bit_ptr,
 
 
 
-void  
+MLO_Result  
 MLO_Huffman_decode_spectral_data_pair (MLO_Int16 data_ptr [2], MLO_BitStream *bit_ptr, MLO_Hcb hcb)
 {
-	MLO_ASSERT (data_ptr != NULL);
-	MLO_ASSERT (bit_ptr != NULL);
-	MLO_ASSERT (hcb >= MLO_HCB_FIRST_PAIR_HCB);
-    MLO_ASSERT (hcb < MLO_HCB_ESC_HCB);
+	MLO_ASSERT(data_ptr != NULL);
+	MLO_ASSERT(bit_ptr != NULL);
+	MLO_CHECK(hcb >= MLO_HCB_FIRST_PAIR_HCB);
+    MLO_CHECK(hcb < MLO_HCB_ESC_HCB);
 
    switch (hcb)
    {
@@ -135,18 +135,19 @@ MLO_Huffman_decode_spectral_data_pair (MLO_Int16 data_ptr [2], MLO_BitStream *bi
       break;
 
    default:
-      MLO_ASSERT (MLO_FALSE);
-      break;
+      return MLO_ERROR_INVALID_DATA;
    }
+   
+   return MLO_SUCCESS;
 }
 
-void  
+MLO_Result  
 MLO_Huffman_decode_spectral_data_quad (MLO_Int16 data_ptr [4], MLO_BitStream *bit_ptr, MLO_Hcb hcb)
 {
-	MLO_ASSERT (data_ptr != NULL);
-	MLO_ASSERT (bit_ptr != NULL);
-    MLO_ASSERT (hcb > MLO_HCB_ZERO_HCB);
-	MLO_ASSERT (hcb < MLO_HCB_FIRST_PAIR_HCB);
+	MLO_ASSERT(data_ptr != NULL);
+	MLO_ASSERT(bit_ptr != NULL);
+    MLO_CHECK(hcb > MLO_HCB_ZERO_HCB);
+	MLO_CHECK(hcb < MLO_HCB_FIRST_PAIR_HCB);
 
    switch (hcb)
    {
@@ -164,22 +165,25 @@ MLO_Huffman_decode_spectral_data_quad (MLO_Int16 data_ptr [4], MLO_BitStream *bi
       break;
 
    default:
-      MLO_ASSERT (MLO_FALSE);
-      break;
+      return MLO_ERROR_INVALID_DATA;
    }
+   
+   return MLO_SUCCESS;
 }
 
 
 
-void  
+MLO_Result  
 MLO_Huffman_decode_spectral_data_esc (MLO_Int16 data_ptr [2], MLO_BitStream *bit_ptr)
 {
-	MLO_ASSERT (data_ptr != NULL);
-	MLO_ASSERT (bit_ptr != NULL);
+	MLO_ASSERT(data_ptr != NULL);
+	MLO_ASSERT(bit_ptr != NULL);
 
    MLO_Huffman_decode_2steps_pair_sign (data_ptr, bit_ptr, MLO_HCB_ESC_HCB);
    data_ptr [0] = MLO_Huffman_decode_escape_code (data_ptr [0], bit_ptr);
    data_ptr [1] = MLO_Huffman_decode_escape_code (data_ptr [1], bit_ptr);
+   
+   return MLO_SUCCESS;
 }
 
 
@@ -244,9 +248,6 @@ Returns: Signed value.
 MLO_Int16	
 MLO_Huffman_apply_sign (MLO_Int16 data, MLO_BitStream *bit_ptr)
 {
-	MLO_ASSERT (data >= 0);
-	MLO_ASSERT (bit_ptr != NULL);
-
    if (data != 0)
    {
       if (MLO_BitStream_ReadBit (bit_ptr) != 0)
@@ -279,8 +280,6 @@ Returns: The final data.
 MLO_Int16	
 MLO_Huffman_decode_escape_code (MLO_Int16 data, MLO_BitStream *bit_ptr)
 {
-	MLO_ASSERT (bit_ptr != NULL);
-
    /* If escape sequence is present */
    if (MLO_ABS (data) == 16)
    {

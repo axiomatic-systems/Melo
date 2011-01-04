@@ -138,10 +138,10 @@ extern "C" {
 
 
 MLO_Result  MLO_SyntacticElements_Init (MLO_SyntacticElements *se_ptr);
-void  MLO_SyntacticElements_Restore (MLO_SyntacticElements *se_ptr);
+MLO_Result  MLO_SyntacticElements_Restore (MLO_SyntacticElements *se_ptr);
 MLO_Result  MLO_SyntacticElements_SetNbrChn (MLO_SyntacticElements *se_ptr, int nbr_chn);
 
-void  MLO_SyntacticElements_StartNewFrame (MLO_SyntacticElements *se_ptr, MLO_SamplingFreq_Index fs_index);
+MLO_Result  MLO_SyntacticElements_StartNewFrame (MLO_SyntacticElements *se_ptr, MLO_SamplingFreq_Index fs_index);
 
 MLO_Result  MLO_SyntacticElements_Decode (MLO_SyntacticElements *se_ptr, MLO_BitStream *bit_ptr);
 MLO_Result  MLO_SyntacticElements_FinishSpectralProc (MLO_SyntacticElements *se_ptr);

@@ -304,7 +304,7 @@ static const MLO_Float MLO_Fft_table_cos [MLO_FFT_TABLE_LEN_COS] =
 
 
 
-static void MLO_Fft_BuildBrTable (MLO_Int16 br_ptr [], int bit_depth);
+static MLO_Result MLO_Fft_BuildBrTable (MLO_Int16 br_ptr [], int bit_depth);
 
 static inline void   MLO_Fft_DoPass1 (MLO_Float dest_ptr [], const MLO_Float x_ptr [], int len, const MLO_Int16 br_ptr []);
 static inline void   MLO_Fft_DoPass3 (MLO_Float dest_ptr [], const MLO_Float src_ptr [], int len);
@@ -331,8 +331,6 @@ Output parameters:
 
 void  MLO_Fft_Init (MLO_Fft *fft_ptr)
 {
-   MLO_ASSERT(fft_ptr != NULL);
-
    MLO_Fft_BuildBrTable (&fft_ptr->table_br_l [0], 10);
    MLO_Fft_BuildBrTable (&fft_ptr->table_br_s [0], 7);
 }
@@ -383,14 +381,15 @@ Throws: Nothing
 ==============================================================================
 */
 
-void  MLO_Fft_Process (MLO_Fft *fft_ptr, MLO_Float y_ptr [], const MLO_Float x_ptr [], int len)
+MLO_Result
+MLO_Fft_Process (MLO_Fft *fft_ptr, MLO_Float y_ptr [], const MLO_Float x_ptr [], int len)
 {
    MLO_Float *    buf_ptr;
 
    MLO_ASSERT(fft_ptr != NULL);
    MLO_ASSERT(x_ptr != NULL);
    MLO_ASSERT(y_ptr != NULL);
-   MLO_ASSERT(   len == MLO_DEFS_FRAME_LEN_SHORT
+   MLO_CHECK(   len == MLO_DEFS_FRAME_LEN_SHORT
 /*************************************************************************************************************/
 /*** Debug ***/
                || len == 8 /*** Debug ***/
@@ -398,8 +397,8 @@ void  MLO_Fft_Process (MLO_Fft *fft_ptr, MLO_Float y_ptr [], const MLO_Float x_p
                || len == MLO_DEFS_FRAME_LEN_LONG);
 
    buf_ptr = &fft_ptr->buffer [0];
-   MLO_ASSERT (x_ptr != buf_ptr);
-   MLO_ASSERT (y_ptr != buf_ptr);
+   MLO_ASSERT(x_ptr != buf_ptr);
+   MLO_ASSERT(y_ptr != buf_ptr);
 
    if (len == MLO_DEFS_FRAME_LEN_SHORT)
    {
@@ -433,17 +432,20 @@ void  MLO_Fft_Process (MLO_Fft *fft_ptr, MLO_Float y_ptr [], const MLO_Float x_p
       MLO_Fft_DoPassN (buf_ptr, y_ptr, MLO_DEFS_FRAME_LEN_LONG, 9);
       MLO_Fft_DoPassN (y_ptr, buf_ptr, MLO_DEFS_FRAME_LEN_LONG, 10);
    }
+   
+   return MLO_SUCCESS;
 }
 
 
 
-static void MLO_Fft_BuildBrTable (MLO_Int16 br_ptr [], int bit_depth)
+static MLO_Result
+MLO_Fft_BuildBrTable (MLO_Int16 br_ptr [], int bit_depth)
 {
    const int      len = (1 << bit_depth) / MLO_FFT_BR_PACK;
    int            cnt;
 
-   MLO_ASSERT (br_ptr != 0);
-   MLO_ASSERT (   len == MLO_FFT_TABLE_LEN_BR_S
+   MLO_ASSERT(br_ptr != NULL);
+   MLO_CHECK (   len == MLO_FFT_TABLE_LEN_BR_S
                || len == MLO_FFT_TABLE_LEN_BR_L);
 
    br_ptr [0] = 0;
@@ -465,6 +467,8 @@ static void MLO_Fft_BuildBrTable (MLO_Int16 br_ptr [], int bit_depth)
 
 		br_ptr [cnt] = (MLO_Int16) br_index;
 	}
+    
+    return MLO_SUCCESS;
 }
 
 

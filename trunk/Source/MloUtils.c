@@ -31,6 +31,16 @@
 #include "MloConfig.h"
 #include "MloUtils.h"
 #include "MloResults.h"
+#include "MloDebug.h"
+
+/*----------------------------------------------------------------------
+|    MLO_DebugHook
++---------------------------------------------------------------------*/
+void
+MLO_DebugHook(void)
+{
+    
+}
 
 /*----------------------------------------------------------------------
 |    MLO_BytesFromInt32Be

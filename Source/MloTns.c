@@ -413,6 +413,9 @@ MLO_Tns_InvQuantCoef (const MLO_Tns_Filter *filter_ptr, int resol, MLO_Float iq_
    const int      compress = filter_ptr->compress;
    int            i;
 
+   MLO_CHECK(order >= 0);
+   MLO_CHECK(order <= MLO_TNS_MAX_ORDER);
+   
    for (i = 0; i < order; ++i)
    {
       const int      coef = filter_ptr->coef [i];
@@ -444,7 +447,8 @@ MLO_Tns_ConvCoefToLpc (MLO_Float lpc_coef_arr [1 + MLO_TNS_MAX_ORDER], MLO_Float
    int            m;
 
    MLO_CHECK(order > 0);
-
+   MLO_CHECK(order <= MLO_TNS_MAX_ORDER);
+   
    /* Conversion to LPC coefficients */
    lpc_coef_arr [0] = 1;
    for (m = 1; m <= order; ++m)

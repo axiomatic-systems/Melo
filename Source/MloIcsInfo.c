@@ -348,6 +348,7 @@ MLO_IcsInfo_DeinterleaveCoefficients (const MLO_IcsInfo *ics_ptr, MLO_Float coef
 
          for (win = 0; win < nbr_win; ++win)
          {
+            MLO_CHECK(dest_pos < MLO_DEFS_FRAME_LEN_LONG);
             MLO_CopyMemory (
                &tmp_arr [dest_pos],
                &coef_ptr [src_pos],

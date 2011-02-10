@@ -354,9 +354,9 @@ MLO_SyntacticElements_FinishSpectralProc (MLO_SyntacticElements *se_ptr)
    /* Temporal Noise Shapping */
    if (MLO_SUCCEEDED (result))
    {
-      for (chn = 0; chn < nbr_chn; ++chn)
+      for (chn = 0; chn < nbr_chn && MLO_SUCCEEDED (result); ++chn)
       {
-         MLO_Tns_Process (se_ptr->chn_pool.chn_ptr_arr [chn]);
+         result = MLO_Tns_Process (se_ptr->chn_pool.chn_ptr_arr [chn]);
       }
    }
 
@@ -408,10 +408,10 @@ MLO_SyntacticElements_ConvertSpectralToTime (MLO_SyntacticElements *se_ptr, MLO_
    nbr_chn = se_ptr->chn_pool.nbr_chn;
 
 	/* Conversion from spectral to time domain */
-   for (chn = 0; chn < nbr_chn; ++chn)
+   for (chn = 0; chn < nbr_chn && MLO_SUCCEEDED (result); ++chn)
    {
       MLO_IndivChnStream *	ics_ptr = se_ptr->chn_pool.chn_ptr_arr [chn];
-      MLO_FilterBank_ConvertSpectralToTime (fb_ptr, ics_ptr);
+      result = MLO_FilterBank_ConvertSpectralToTime (fb_ptr, ics_ptr);
    }
 
    /* Independently Switched Coupling */

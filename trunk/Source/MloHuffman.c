@@ -114,7 +114,7 @@ MLO_Huffman_decode_spectral_data_pair (MLO_Int16 data_ptr [2], MLO_BitStream *bi
 	MLO_CHECK(hcb >= MLO_HCB_FIRST_PAIR_HCB);
     MLO_CHECK(hcb < MLO_HCB_ESC_HCB);
 
-   switch (hcb)
+   switch ((int)hcb)
    {
    case  5:
       MLO_HcbPair_decode_binary (data_ptr, bit_ptr, hcb);
@@ -149,7 +149,7 @@ MLO_Huffman_decode_spectral_data_quad (MLO_Int16 data_ptr [4], MLO_BitStream *bi
     MLO_CHECK(hcb > MLO_HCB_ZERO_HCB);
 	MLO_CHECK(hcb < MLO_HCB_FIRST_PAIR_HCB);
 
-   switch (hcb)
+   switch ((int)hcb)
    {
    case  1:
    case  2:

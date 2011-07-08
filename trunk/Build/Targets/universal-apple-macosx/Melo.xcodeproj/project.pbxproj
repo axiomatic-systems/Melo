@@ -407,6 +407,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				PRODUCT_NAME = Melo;
+				SUPPORTED_PLATFORMS = "macosx iphoneos iphonesimulator";
 			};
 			name = Debug;
 		};
@@ -414,6 +415,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				PRODUCT_NAME = Melo;
+				SUPPORTED_PLATFORMS = "macosx iphoneos iphonesimulator";
 			};
 			name = Release;
 		};

@@ -33,7 +33,7 @@ def GetDirPath(drct):
     return '#/'+drct
     
 def DeclareBuildDir(env, drct):
-    env.BuildDir(drct, GetDirPath(drct), duplicate=0)
+    env.VariantDir(drct, GetDirPath(drct), duplicate=0)
     
 def GetIncludeDirs(modules, exclude=None):
     dirs = []

@@ -388,10 +388,10 @@ Returns: Number of bytes read from the stream, > 0
 MLO_Result
 MLO_ElementFil_DecodeExcludedChannels (MLO_ElementFil_DynamicRangeInfo *drc_ptr, MLO_BitStream *bit_ptr, unsigned int* bytes_read)
 {
-   MLO_CHECK_CST (
+   /*MLO_CHECK_CST (
       ExcludedMaskBitDepth,
       MLO_BIT_DEPTH (drc_ptr->excluded_mask) >= MLO_DEFS_MAX_CHN
-   );
+   );*/
 
    int continue_flag = 1;
    int offset = 0;

@@ -293,7 +293,7 @@ static inline MLO_Float MLO_Float_Sqrt (MLO_Float a)
 {
    MLO_Float      r = 0;
 
-   MLO_CHECK_CST (Even_precision_requested, (MLO_FLOAT_FRAC & 1) == 0);
+   /*MLO_CHECK_CST (Even_precision_requested, (MLO_FLOAT_FRAC & 1) == 0);*/
 
 #if 1 /* Unrolled loop */
 

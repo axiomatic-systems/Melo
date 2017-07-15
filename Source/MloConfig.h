@@ -62,7 +62,9 @@ typedef unsigned char    MLO_UInt8;
 #define inline __inline
 #endif
 
+#if (_MSC_VER < 1900)
 #define vsnprintf _vsnprintf
+#endif
 
 #endif
 

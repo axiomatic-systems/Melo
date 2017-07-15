@@ -1,1 +1,13 @@
 xcschememanagement.plist
+Build/Targets/x86-microsoft-win32-vs2010/Melo/Debug/
+Build/Targets/x86-microsoft-win32-vs2010/Melo/Release/
+*.db
+Build/Targets/x86-microsoft-win32-vs2015/.vs/
+Build/Targets/x86-microsoft-win32-vs2015/Debug/
+Build/Targets/x86-microsoft-win32-vs2015/ImdctTest/Debug/
+Build/Targets/x86-microsoft-win32-vs2015/ImdctTest/Release/
+Build/Targets/x86-microsoft-win32-vs2015/Melo/Debug/
+Build/Targets/x86-microsoft-win32-vs2015/Melo/Release/
+Build/Targets/x86-microsoft-win32-vs2015/MeloDll/Debug/
+Build/Targets/x86-microsoft-win32-vs2015/MeloDll/Release/
+Build/Targets/x86-microsoft-win32-vs2015/Release/
